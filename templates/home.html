@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='mixhtml.js') }}" defer></script>
+    <title>Welcome home </title>
+</head>
+
+<body>
+    <div id="container">
+        <button class="burger" aria-label="Menu">
+            <i class="fa-solid fa-bars"></i>
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <nav>
+                <ul>
+                    <li><a href="#"><i class="fab fa-twitter"></i></a></li>
+                    <li><a href="#"><i class="fa-solid fa-house"></i><span>Home</span></a></li>
+                    <li><a href="#"><i class="fa-solid fa-magnifying-glass"></i><span>Explore</span></a></li>
+                    <li><a href="#"><i class="fa-regular fa-bell"></i><span>Notifications</span></a></li>
+                    <li><a href="#"><i class="fa-regular fa-envelope"></i><span>Messages</span></a></li>
+                    <li><a href="#"><i class="fa-solid fa-atom"></i><span>Grok</span></a></li>
+                    <li><a href="#"><i class="fa-regular fa-bookmark"></i><span>Bookmarks</span></a></li>
+                    <li><a href="#"><i class="fa-solid fa-briefcase"></i><span>Jobs</span></a></li>
+                    <li><a href="#"><i class="fa-solid fa-users"></i><span>Communities</span></a></li>
+                    <li><a href="#"><i class="fa-solid fa-star"></i><span>Premium</span></a></li>
+                    <li><a href="#"><i class="fa-solid fa-bolt"></i><span>Verified Orgs</span></a></li>
+                    <li><a href="#"><i class="fa-regular fa-user"></i><span>Profile</span></a></li>
+                    <li><a href="#"><i class="fa-solid fa-ellipsis"></i><span>More</span></a></li>
+                    <li><a href="bridge-logout"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></a></li>
+                </ul>
+
+                <button class="post-btn">Post</button>
+
+                <div id="profile_tag">
+                    <img src="https://avatar.iran.liara.run/public/73" alt="Profile">
+                    <div>
+                        <div class="name">
+                            Santiago
+                        </div>
+                        <div class="handle">
+                            @santiago 
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-ellipsis option"></i>
+                </div>
+        </nav>
+
+        <main>
+            <main id="tweets">
+                {% for tweet in tweets: %}
+                    {% include "_tweet.html" %}
+                {% endfor %}
+
+            </main>
+            {% include "___show_more_tweets.html" %}
+        </main>
+        <aside>
+            <form action="">
+                <input type="text" placeholder="Search Twitter">
+                <button>Search</button>
+            </form>
+            <div class="happening-now">
+                <h2>What's happening now</h2>
+                <div class="trending">
+                    {% for trend in trends: %}
+                        {% include "_trend.html" %}
+                    {% endfor %}
+                    
+                    <button class="show-more-btn">Show more</button>
+                </div>
+
+            </div>
+            <hr>
+            <div class="who-to-follow">
+                <h2>Who to follow</h2>
+                <div class="follow-suggestion">
+
+                    {% for user in users_rows %}
+                        {% include "_who_to_follow.html" %}
+                    {% endfor %}
+
+                    <button class="show-more-btn">Show more</button>
+                </div>
+            </div>
+        </aside>
+    </div>
+</body>
+</html>
