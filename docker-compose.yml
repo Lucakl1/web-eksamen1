@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: twitter_flask
+    container_name: x_flask
     depends_on:
       - mariadb
     ports:
@@ -13,26 +13,42 @@ services:
 
   mariadb:
     image: mariadb:10.6.20
-    container_name: twitter_mariadb
+    container_name: x_mariadb
     environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: twitter
+      MYSQL_ROOT_PASSWORD: eksamen312luca
+      MYSQL_DATABASE: x
     volumes:
       - mariadb_data:/var/lib/mysql
     ports:
       - 3306:3306
 
+  arangodb:
+    image: arangodb:latest
+    container_name: arangodb
+    environment:
+      - ARANGO_ROOT_PASSWORD=eksamen312luca
+    ports:
+      - "8529:8529"
+    volumes:
+      - arango_data:/var/lib/arangodb3
+    networks:
+      - arango-network
+
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: twitter_phpmyadmin
+    container_name: x_phpmyadmin
     depends_on:
       - mariadb
     environment:
       PMA_HOST: mariadb
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: eksamen312luca
     ports:
       - 8080:80
+
 volumes:
   mariadb_data:
+  arango_data:
 
-
+networks:
+  arango-network:
+    driver: bridge
