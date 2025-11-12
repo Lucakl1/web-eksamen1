@@ -3,6 +3,7 @@ from flask_session import Session
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from icecream import ic
+import requests
 
 # standard python libaryes
 import csv, io, json, time, uuid, os
@@ -70,26 +71,64 @@ def view_index():
         return "error"
 
 @app.route("/login", methods=["GET", "POST"])
-def login():
-    if request.method == "GET":
-        try:
-            if session.get("user", ""): return redirect("/")
-            return render_template("login.html")
-        except Exception as ex:
-            ic(ex)
-            return "error"
+@app.route("/login/<lan>", methods=["GET", "POST"])
+def login(lan = "en"):
+    try:
+        #mangler x.allowed_languages
+        if lan not in x.allowed_languages: lan = "english"
+        x.default_language = lan
 
-    if request.method == "POST":
-        pass
+        if request.method == "GET":
+            try:
+                if session.get("user", ""): return redirect("/")
+                return render_template("login.html")
+            except Exception as ex:
+                ic(ex)
+                return "error"
 
+        if request.method == "POST":
+            pass
+
+    except Exception as ex:
+        ic(ex)
+        return "error"
+
+@app.route("/signup", methods=["GET", "POST"])
+@app.route("/signup/<lan>", methods=["GET", "POST"])
+def signup(lan = "en"):
+    try:
+        if lan not in x.allowed_languages: lan = "english"
+        x.default_language = lan
+
+        if request.method == "GET":
+            try:
+                if session.get("user", ""): return redirect("/")
+                return render_template("signup.html")
+            except Exception as ex:
+                ic(ex)
+                return "error"
+
+        if request.method == "POST":
+            pass
+
+    except Exception as ex:
+        ic(ex)
+        return "error"
+
+##############################
+########## utilities #########
+##############################
 @app.get("/get-data-from-sheet")
 def get_data_from_sheet():
     try:
+ 
         # Check if the admin is running this end-point, else show error
  
         # flaskwebmail
-        # code 1UYgE2jJ__HYl0N7lA5JR3sMH75hwhzhPPsSRRA-WNdg
-        # link to sheet https://docs.google.com/spreadsheets/d/1UYgE2jJ__HYl0N7lA5JR3sMH75hwhzhPPsSRRA-WNdg/edit
+        # Create a google sheet
+        # share and make it visible to "anyone with the link"
+        # In the link, find the ID of the sheet. Here: 1aPqzumjNp0BwvKuYPBZwel88UO-OC_c9AEMFVsCw1qU
+        # Replace the ID in the 2 places bellow
         url= f"https://docs.google.com/spreadsheets/d/{x.google_spread_sheet_key}/export?format=csv&id={x.google_spread_sheet_key}"
         res=requests.get(url=url)
         # ic(res.text) # contains the csv text structure
@@ -105,9 +144,10 @@ def get_data_from_sheet():
         # Convert each row into the desired structure
         for row in reader:
             item = {
-                    'english': row['en'],
-                    'danish': row['da'],
-                    'spanish': row['sp']
+                    'english': row['english'],
+                    'danish': row['danish'],
+                    'spanish': row['spanish']
+               
             }
             # Append the dictionary to the list
             data[row['key']] = (item)
@@ -120,7 +160,9 @@ def get_data_from_sheet():
         with open("dictionary.json", 'w', encoding='utf-8') as f:
             f.write(json_data)
  
-        return "Dictonary updated sucessfully"
+        return "ok"
     except Exception as ex:
         ic(ex)
         return str(ex)
+    finally:
+        pass

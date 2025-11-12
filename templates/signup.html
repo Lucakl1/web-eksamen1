@@ -1,0 +1,58 @@
+{% include "global/header.html" %}
+
+<main>
+    <figure>
+        <svg width="300" height="300" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M178.57 127.15 290.27 0h-26.46l-97.03 110.38L89.34 0H0l117.13 166.93L0 300.25h26.46l102.4-116.59 81.8 116.59h89.34M36.01 19.54H76.66l187.13 262.13h-40.66"/></svg>
+    </figure>
+    <div>
+        <h1>Sign up to X</h1>
+        <form action="/signup/{{ lan }}" mix-post autocomplete="off">
+            <div class="switch_language">
+                <div>
+                    <label for="user_email">E-mail</label>
+                    <input name="user_email" type="text" id="user_email" placeholder="E-mail" mix-check="{{ x.REGEX_EMAIL }}">
+                </div>
+                <div>
+                    <label for="user_language">Language</label>
+                    <select name="user_language" id="user_language">
+                        <option value="en" selected>English</option>
+                        <option value="dk">Danish</option>
+                        <option value="sp">Spanish</option>
+                    </select>
+                </div>
+
+            </div>
+            <div>
+                <label for="user_password">Password</label>
+                <input name="user_password" type="password" id="user_password" placeholder="Password" mix-check="{{ x.REGEX_USER_PASSWORD }}">
+            </div>
+            <div>
+                <label for="user_phone">Phone number</label>
+                <input name="user_phone" type="tel" id="user_phone" placeholder="Phone number" mix-check="{{ x.REGEX_USER_PASSWORD }}">
+            </div>
+            <div>
+                <label for="user_username">Username</label>
+                <input name="user_username" type="text" id="user_username" placeholder="Username" mix-check="{{ x.REGEX_USER_USERNAME }}">
+            </div>
+            <div class="two_inputs">
+                <div>
+                    <label for="user_first_name">First name</label>
+                    <input name="user_first_name" type="text" id="user_first_name" placeholder="First name" mix-check="{{ x.REGEX_USER_PASSWORD }}">
+                </div>
+                <div>
+                    <label for="user_last_name">Last name</label>
+                    <input name="user_last_name" type="text" id="user_last_name" placeholder="Last name" mix-check="{{ x.REGEX_USER_PASSWORD }}">
+                </div>
+            </div>
+            <button mix-default="Login" mix-await="Logging in..." type="submit">
+                Sign up
+            </button>
+        </form>
+        <p>
+            Allready have an account?
+            <a href="{{ url_for('login') }}">Log in</a>
+        </p>
+    </div>
+</main>
+
+{% include "global/footer.html" %}

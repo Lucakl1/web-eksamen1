@@ -5,7 +5,7 @@ import re
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-import dictionary
+#import dictionary
 
 from functools import wraps
 
@@ -13,6 +13,8 @@ from icecream import ic
 ic.configureOutput(prefix=f'----- | ', includeContext=True)
 
 UPLOAD_ITEM_FOLDER = './images'
+
+google_spread_sheet_key = "1UYgE2jJ__HYl0N7lA5JR3sMH75hwhzhPPsSRRA"
 
 ##############################
 def db():
@@ -23,7 +25,7 @@ def db():
             password = "password",
             database = "x"
         )
-        cursor = db.cursor(dictionary=True)
+        #cursor = db.cursor(dictionary=True)
         return db, cursor
     except Exception as e:
         print(e, flush=True)
@@ -46,7 +48,7 @@ def no_cache(view):
 REGEX_EMAIL = "^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$"
 def validate_user_email(lan="en"):
     user_email = request.form.get("user_email", "").strip()
-    if not re.match(REGEX_EMAIL, user_email): raise Exception(getattr(dictionary, f"{lan}_invalid_email"), 400)
+    #if not re.match(REGEX_EMAIL, user_email): raise Exception(getattr(dictionary, f"{lan}_invalid_email"), 400)
     return user_email
 
 ##############################
@@ -77,7 +79,7 @@ USER_PASSWORD_MAX = 50
 REGEX_USER_PASSWORD = f"^.{{{USER_PASSWORD_MIN},{USER_PASSWORD_MAX}}}$"
 def validate_user_password(lan="en"):
     user_password = request.form.get("user_password", "").strip()
-    if not re.match(REGEX_USER_PASSWORD, user_password): raise Exception(getattr(dictionary, f"{lan}_invalid_password"), 400)
+    #if not re.match(REGEX_USER_PASSWORD, user_password): raise Exception(getattr(dictionary, f"{lan}_invalid_password"), 400)
     return user_password
 
 
