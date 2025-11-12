@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: x_flask
+    container_name: x_flask2
     depends_on:
       - mariadb
     ports:
@@ -13,7 +13,7 @@ services:
 
   mariadb:
     image: mariadb:10.6.20
-    container_name: x_mariadb
+    container_name: x_mariadb2
     environment:
       MYSQL_ROOT_PASSWORD: eksamen312luca
       MYSQL_DATABASE: x
@@ -24,7 +24,7 @@ services:
 
   arangodb:
     image: arangodb:latest
-    container_name: arangodb
+    container_name: arangodb2
     environment:
       - ARANGO_ROOT_PASSWORD=eksamen312luca
     ports:
@@ -36,7 +36,7 @@ services:
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: x_phpmyadmin
+    container_name: x_phpmyadmin2
     depends_on:
       - mariadb
     environment:
