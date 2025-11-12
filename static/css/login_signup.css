@@ -1,0 +1,70 @@
+main {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+
+    > figure {
+        margin: 0 auto;
+        width: fit-content;
+        align-self: flex-end;
+    }
+
+    > div {
+        max-width: 500px;
+        width: 100%;
+        margin: 0 auto;
+        align-self: flex-start;
+
+        form {
+            display: flex;
+            flex-flow: column;
+            align-items: center;
+    
+            > * {
+                width: 100%;
+                display: flex;
+                flex-flow: column;
+    
+                label {
+                    padding: 0.75rem 0 0.3rem 0;
+                }
+                
+                input {
+                    padding: 0.75rem 1rem;
+                    border: 1px solid black;
+                    border-radius: 50px;
+    
+                    ::placeholder {
+                        font-family: var(--font);
+                    }
+                }
+    
+            }
+    
+            button {
+                margin-top: 1rem;
+                padding: 0.75rem 2rem;
+                width: fit-content;
+                align-self: flex-start;
+                border-radius: 50px;
+                background: black;
+                color: white;
+                cursor: pointer;
+            }
+        }
+
+        p {
+            margin-top: 1rem;
+        }
+    }
+
+    
+    @media (width > 980px) {
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+
+        > figure, > div {
+            align-self: center;
+        }
+    }
+}

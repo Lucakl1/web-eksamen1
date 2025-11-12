@@ -22,7 +22,9 @@ Session(app)
 @app.context_processor
 def global_variables():
     return dict (
-        site_name = request.path.replace("/", " ")
+        site_name = request.path.replace("/", " "),
+        user_role = session.get("user", ""),
+        x = x
     )
 
 ##############################
