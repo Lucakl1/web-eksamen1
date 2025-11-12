@@ -2,11 +2,13 @@ from flask import Flask, render_template, request, session, redirect, url_for
 from flask_session import Session
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
-import x 
-import time
-import uuid
-import os
 from icecream import ic
+
+# standard python libaryes
+import csv, io, json, time, uuid, os
+
+# other python files
+import x
 
 app = Flask(__name__)
 
@@ -86,6 +88,8 @@ def get_data_from_sheet():
         # Check if the admin is running this end-point, else show error
  
         # flaskwebmail
+        # code 1UYgE2jJ__HYl0N7lA5JR3sMH75hwhzhPPsSRRA-WNdg
+        # link to sheet https://docs.google.com/spreadsheets/d/1UYgE2jJ__HYl0N7lA5JR3sMH75hwhzhPPsSRRA-WNdg/edit
         url= f"https://docs.google.com/spreadsheets/d/{x.google_spread_sheet_key}/export?format=csv&id={x.google_spread_sheet_key}"
         res=requests.get(url=url)
         # ic(res.text) # contains the csv text structure
