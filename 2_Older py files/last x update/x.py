@@ -15,7 +15,7 @@ ic.configureOutput(prefix=f'----- | ', includeContext=True)
 UPLOAD_ITEM_FOLDER = './images'
 
 ##############################
-google_spread_sheet_key = "1UYgE2jJ__HYl0N7lA5JR3sMH75hwhzhPPsSRRA-WNdg"
+google_spread_sheet_key = "1tJKfElMdDbIgaNKd6LKodUmg7lPsfUodbTDS5Ubi-5o"
 allowed_languages = ["english", "danish", "spanish"]
 default_language = "english"
 

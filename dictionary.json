@@ -1,1 +1,62 @@
-{}
+{
+    "sign_up_to": {
+        "english": "Sign up to",
+        "danish": "Tilmeld dig",
+        "spanish": "Regístrate en"
+    },
+    "email": {
+        "english": "E-mail",
+        "danish": "E-mail",
+        "spanish": "Correo electrónico"
+    },
+    "language": {
+        "english": "Language",
+        "danish": "Sprog",
+        "spanish": "Idioma"
+    },
+    "password": {
+        "english": "Password",
+        "danish": "Adgangskode",
+        "spanish": "Contraseña"
+    },
+    "phone_number": {
+        "english": "Phone number",
+        "danish": "Telefonnummer",
+        "spanish": "Número de teléfono"
+    },
+    "username": {
+        "english": "Username",
+        "danish": "Brugernavn",
+        "spanish": "Nombre de usuario"
+    },
+    "first_name": {
+        "english": "First name",
+        "danish": "Fornavn",
+        "spanish": "Nombre"
+    },
+    "last_name": {
+        "english": "Last name",
+        "danish": "Efternavn",
+        "spanish": "Apellido"
+    },
+    "allready_have_an_account": {
+        "english": "Already have an account?",
+        "danish": "Har du allerede en konto?",
+        "spanish": "¿Ya tienes una cuenta?"
+    },
+    "log_in": {
+        "english": "Log in",
+        "danish": "Log ind",
+        "spanish": "Iniciar sesión"
+    },
+    "logging_in...": {
+        "english": "Logging in...",
+        "danish": "Logger ind...",
+        "spanish": "Iniciando sesión..."
+    },
+    "sign_up": {
+        "english": "Sign up",
+        "danish": "Tilmeld dig",
+        "spanish": "Inscribirse"
+    }
+}

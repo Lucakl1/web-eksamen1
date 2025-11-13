@@ -27,7 +27,7 @@ def global_variables():
     return dict (
         site_name = request.path.replace("/", " "),
         user_role = session.get("user", ""),
-        x = x
+        x = x,
     )
 
 ##############################
@@ -121,26 +121,18 @@ def signup(lan = "en"):
 @app.get("/get-data-from-sheet")
 def get_data_from_sheet():
     try:
- 
         # Check if the admin is running this end-point, else show error
  
-        # flaskwebmail
-        # Create a google sheet
-        # share and make it visible to "anyone with the link"
-        # In the link, find the ID of the sheet. Here: 1aPqzumjNp0BwvKuYPBZwel88UO-OC_c9AEMFVsCw1qU
-        # Replace the ID in the 2 places bellow
+        # key: 1UYgE2jJ__HYl0N7lA5JR3sMH75hwhzhPPsSRRA-WNdg
         url= f"https://docs.google.com/spreadsheets/d/{x.google_spread_sheet_key}/export?format=csv&id={x.google_spread_sheet_key}"
         res=requests.get(url=url)
-        # ic(res.text) # contains the csv text structure
+        # return(res.text) # retuns a page if there is an error
         csv_text = res.content.decode('utf-8')
         csv_file = io.StringIO(csv_text) # Use StringIO to treat the string as a file
        
-        # Initialize an empty list to store the data
         data = {}
- 
-        # Read the CSV data
         reader = csv.DictReader(csv_file)
-        ic(reader)
+        #ic(reader)
         # Convert each row into the desired structure
         for row in reader:
             item = {
@@ -149,7 +141,6 @@ def get_data_from_sheet():
                     'spanish': row['spanish']
                
             }
-            # Append the dictionary to the list
             data[row['key']] = (item)
  
         # Convert the data to JSON
@@ -160,7 +151,7 @@ def get_data_from_sheet():
         with open("dictionary.json", 'w', encoding='utf-8') as f:
             f.write(json_data)
  
-        return "ok"
+        return f"data has been saved <br> <br> {json_data}"
     except Exception as ex:
         ic(ex)
         return str(ex)
