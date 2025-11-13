@@ -40,7 +40,7 @@
             </div>
             <div>
                 <label for="user_phone">{{ x.lans('phone_number') }}</label>
-                <input name="user_phone" type="tel" id="user_phone" placeholder="{{ x.lans('phone_number') }}" mix-check="{{ x.REGEX_USER_PASSWORD }}">
+                <input name="user_phone" type="tel" id="user_phone" placeholder="{{ x.lans('phone_number') }}" mix-check="{{ x.REGEX_PHONE }}">
             </div>
             <div>
                 <label for="user_username">{{ x.lans('username') }}</label>
@@ -49,11 +49,11 @@
             <div class="two_inputs">
                 <div>
                     <label for="user_first_name">{{ x.lans('first_name') }}</label>
-                    <input name="user_first_name" type="text" id="user_first_name" placeholder="{{ x.lans('first_name') }}" mix-check="{{ x.REGEX_USER_PASSWORD }}">
+                    <input name="user_first_name" type="text" id="user_first_name" placeholder="{{ x.lans('first_name') }}" mix-check="{{ x.REGEX_USER_FIRST_NAME }}">
                 </div>
                 <div>
                     <label for="user_last_name">{{ x.lans('last_name') }}</label>
-                    <input name="user_last_name" type="text" id="user_last_name" placeholder="{{ x.lans('last_name') }}" mix-check="{{ x.REGEX_USER_PASSWORD }}">
+                    <input name="user_last_name" type="text" id="user_last_name" placeholder="{{ x.lans('last_name') }}" mix-check="{{ x.REGEX_USER_LAST_NAME }}">
                 </div>
             </div>
             <button mix-default="{{ x.lans('sign_up') }}" mix-await="{{ x.lans('signing_up...') }}" type="submit">

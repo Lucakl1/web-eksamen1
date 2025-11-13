@@ -13,6 +13,8 @@
 body {
     font-family: var(--font);
     font-size: 16px;
+    max-width: 1440px;
+    margin: 0 auto;
 }
 
 a {
@@ -27,4 +29,8 @@ main {
     @media (width > 786px) {
         padding: 0 32px;
     }
+}
+
+.mix-error {
+    background: rgb(255, 231, 231);
 }

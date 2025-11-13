@@ -133,5 +133,30 @@
         "english": "Confirm password",
         "danish": "",
         "spanish": ""
+    },
+    "confirm_passwords_dont_match": {
+        "english": "Confirm password don't match",
+        "danish": "",
+        "spanish": ""
+    },
+    "invalid_phone_number": {
+        "english": "Invalid phone number",
+        "danish": "",
+        "spanish": ""
+    },
+    "username_or_password_is_wrong": {
+        "english": "Username or password is wrong",
+        "danish": "",
+        "spanish": ""
+    },
+    "email_or_password_is_wrong": {
+        "english": "Email or password is wrong",
+        "danish": "",
+        "spanish": ""
+    },
+    "user_not_verified": {
+        "english": "You are not varified - check your E mail",
+        "danish": "",
+        "spanish": ""
     }
 }

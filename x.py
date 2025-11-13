@@ -83,6 +83,16 @@ def validate_user_first_name():
     if len(user_first_name) > USER_FIRST_NAME_MAX: raise Exception(f"x exception - {lans('first_name_to_long_must_be_below')} {USER_FIRST_NAME_MAX}", 400)
     return user_first_name
 
+##############################
+USER_LAST_NAME_MIN = 2
+USER_LAST_NAME_MAX = 20
+REGEX_USER_LAST_NAME = f"^.{{{USER_LAST_NAME_MIN},{USER_LAST_NAME_MAX}}}$"
+def validate_user_first_name():
+    user_last_name = request.form.get("user_last_name", "").strip()
+    if len(user_last_name) < USER_LAST_NAME_MIN: raise Exception(f"x exception - {lans('last_name_to_short_must_be_above')} {USER_FIRST_NAME_MIN}", 400)
+    if len(user_last_name) > USER_LAST_NAME_MAX: raise Exception(f"x exception - {lans('last_name_to_long_must_be_below')} {USER_FIRST_NAME_MAX}", 400)
+    return user_last_name
+
 
 ##############################
 USER_PASSWORD_MIN = 6
@@ -102,8 +112,28 @@ def validate_user_password_confirm():
     if user_password != user_password_confirm : raise Exception(f"x exception - {lans('confirm_passwords_dont_match')}", 400)
     return user_password_confirm
 
+##############################
+# phone number regex
+# Denmark
+# England
+# USA
+# Spain
 
+REGEX_PHONE = """^(?:
+    (?:\+?45[ \-]?\d{2}[ \-]?\d{2}[ \-]?\d{2}[ \-]?\d{2}) |
+    (?:\+?44[ \-]?(?:\d{4}[ \-]?\d{6}|\d{3}[ \-]?\d{3}[ \-]?\d{4})) |
+    (?:\+?1[ \-]?(?:\d{3}[ \-]?\d{3}[ \-]?\d{4})) |
+    (?:\+?34[ \-]?\d{3}[ \-]?\d{2}[ \-]?\d{2}[ \-]?\d{2})
+)$"""
+def validate_user_phone():
+    user_phone = request.form.get("user_phone", "").strip()
+    if not re.match(REGEX_PHONE, user_phone): raise Exception(f"x exception - {lans('invalid_phone_number')}", 400)
+    return user_phone
 
+##############################
+USER_USERNAME_EMAIL_MIN = 2
+USER_USERNAME_EMAIL_MAX = 100
+REGEX_USERNAME_EMAIL_MAX = f"^.{{{USER_USERNAME_EMAIL_MIN},{USER_USERNAME_EMAIL_MAX}}}$"
 
 ##### need adjustment down from here ###############
 ##############################

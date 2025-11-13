@@ -39,8 +39,6 @@ def logout():
     except Exception as ex:
         ic(ex)
         return "error"
-    finally:
-        pass
 
 ##############################
 ##############################
@@ -74,6 +72,7 @@ def upload_file():
 ##############################
 ##############################
 
+@app.get("/home")
 @app.get("/")
 def view_index():
     try:
@@ -100,29 +99,16 @@ def login(lan = "en"):
 
         if request.method == "POST":
 
-            def check_password_and_return_home(user):
-                if not user: raise Exception(x.lans("user_not_found"), 400) #translate from here
-
-                user_password = x.validate_user_password
-
-                ic("XXXXXXXxx")          
-                ic(generate_password_hash(user["user_password"]))
-                ic(user_password)
-                    
-                if not check_password_hash(user["user_password"], user_password):
-                    raise Exception(x.lans("invalid_credentials"), 400) #translate from here  
-
-
+            def check_varified_and_return_home(user): 
                 if user["user_varified_at"] == "":
-                    raise Exception(x.lans("user_not_verified"), 400) #translate from here   
-
+                    raise Exception(f"x exception - {x.lans('user_not_verified')}", 400)  
 
                 user.pop("user_password")
                 user["user_language"] = lan
 
                 session["user"] = user
 
-                return f"""<browser mix-redirect="/home"></browser>"""
+                return f"""<browser mix-redirect='/home'></browser>"""
 
             user_email_or_username = request.form.get("user_email_username", "").strip()
 
@@ -133,23 +119,40 @@ def login(lan = "en"):
                 cursor.execute(q, (user_email,))
                 user = cursor.fetchone()
 
-                return check_password_and_return_home(user)
+                user_password = x.validate_user_password()
+                if not user: raise Exception(f"x exception - {x.lans('email_or_password_is_wrong')}", 400)
+                    
+                if not check_password_hash(user["user_password"], user_password):
+                    raise Exception(f"x exception - {x.lans('email_or_password_is_wrong')}", 400)
+
+                return check_varified_and_return_home(user)
 
             except Exception as ex:
-                if not "x exception" in ex: raise Exception(ex, 400)
-
+                if not "x exception" in str(ex): raise Exception(ex, 400)
+                if "@" in user_email_or_username: raise Exception(f"x exception - {x.lans('email_or_password_is_wrong')}", 400)
+                
                 user_username = x.validate_user_username(user_email_or_username)
                 db, cursor = x.db()
                 q = "SELECT * FROM users WHERE user_username = %s"
                 cursor.execute(q, (user_username,))
                 user = cursor.fetchone()
 
-                return check_password_and_return_home(user)
+                user_password = x.validate_user_password()
+                if not user: raise Exception(f"x exception - {x.lans('username_or_password_is_wrong')}", 400)
+                
+                if not check_password_hash(user["user_password"], user_password):
+                    raise Exception(f"x exception - {x.lans('username_or_password_is_wrong')}")
+
+                return check_varified_and_return_home(user)
 
     except Exception as ex:
-        #ic("XXXXXXXXXXXXXXXXX")
         ic(ex)
-        return "error"
+        error_code = str(ex)
+        error_msg = "error" #should i say system under maintenese?
+        if("x exception - " in error_code):
+            error_msg = error_code.replace("x exception - ", "")
+                
+        return f"""<browser mix-replace='error_response'>{error_msg}</browser>"""
     
     finally:
         if "cursor" in locals(): cursor.close()
