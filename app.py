@@ -2,8 +2,9 @@ from flask import Flask, render_template, request, session, redirect, url_for
 from flask_session import Session
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
-from icecream import ic
 import requests
+from icecream import ic
+ic.configureOutput(prefix=f'----- | ', includeContext=True)
 
 # standard python libaryes
 import csv, io, json, time, uuid, os
@@ -29,6 +30,17 @@ def global_variables():
         user_role = session.get("user", ""),
         x = x,
     )
+
+@app.get("/logout")
+def logout():
+    try:
+        session.clear()
+        return redirect(url_for("login"))
+    except Exception as ex:
+        ic(ex)
+        return "error"
+    finally:
+        pass
 
 ##############################
 ##############################
@@ -56,6 +68,7 @@ def upload_file():
     if file.filename == '':
         return 'No selected file'
     
+    # til senere sæt en path i x filen UPLOAD_ITEM_FOLDER = './images'
     file.save(os.path.join("static/uploads", file.filename))
     return redirect("/test")
 ##############################
@@ -74,7 +87,6 @@ def view_index():
 @app.route("/login/<lan>", methods=["GET", "POST"])
 def login(lan = "en"):
     try:
-        #mangler x.allowed_languages
         if lan not in x.allowed_languages: lan = "english"
         x.default_language = lan
 
@@ -87,11 +99,29 @@ def login(lan = "en"):
                 return "error"
 
         if request.method == "POST":
-            pass
+            user_email_or_username = request.form.get("user_email_username", "").strip()
+            user_password = x.validate_user_password
+
+            try:
+                user_email = x.validate_user_email(user_email_or_username)
+                db, cursor = x.db()
+                q = "SELECT * FROM users WHERE user_email = %s AND user_password = %s"
+                cursor.execute(q, (user_email, user_password))
+                user = cursor.fetchone()
+                if not user: raise Exception(x.lans("user_not_found"), 400)
+
+            except Exception as ex:
+                if not "x exception" in ex: raise Exception(ex, 400)
+                user_username = x.validate_user_username(user_email_or_username)
+
 
     except Exception as ex:
         ic(ex)
         return "error"
+    
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
 
 @app.route("/signup", methods=["GET", "POST"])
 @app.route("/signup/<lan>", methods=["GET", "POST"])

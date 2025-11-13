@@ -49,6 +49,11 @@
         "danish": "Log ind",
         "spanish": "Iniciar sesión"
     },
+    "signing_up...": {
+        "english": "Signing up...",
+        "danish": "Tilmelding...",
+        "spanish": "Registrarse..."
+    },
     "logging_in...": {
         "english": "Logging in...",
         "danish": "Logger ind...",
@@ -58,5 +63,75 @@
         "english": "Sign up",
         "danish": "Tilmeld dig",
         "spanish": "Inscribirse"
+    },
+    "danish": {
+        "english": "Danish",
+        "danish": "Dansk",
+        "spanish": "Danés"
+    },
+    "english": {
+        "english": "English",
+        "danish": "Engelsk",
+        "spanish": "Inglés"
+    },
+    "spanish": {
+        "english": "Spanish",
+        "danish": "Spansk",
+        "spanish": "Español"
+    },
+    "log_into": {
+        "english": "Log into",
+        "danish": "Log ind på",
+        "spanish": "Inicia sesión en"
+    },
+    "dont_have_an_account": {
+        "english": "Don't have an account?",
+        "danish": "Har du ikke en konto?",
+        "spanish": "¿No tienes una cuenta?"
+    },
+    "email_or_username": {
+        "english": "E-mail or Username",
+        "danish": "E-mail eller brugernavn",
+        "spanish": "Correo electrónico o nombre de usuario"
+    },
+    "username_to_short_must_be_above": {
+        "english": "Username to short, must be above",
+        "danish": "",
+        "spanish": ""
+    },
+    "username_to_long_must_be_below": {
+        "english": "Username to long, must be below",
+        "danish": "",
+        "spanish": ""
+    },
+    "invalid_email": {
+        "english": "Invalid E-mail",
+        "danish": "",
+        "spanish": ""
+    },
+    "first_name_to_short_must_be_above": {
+        "english": "First name to short, must be above",
+        "danish": "",
+        "spanish": ""
+    },
+    "first_name_to_long_must_be_below": {
+        "english": "First name to long, must be below",
+        "danish": "",
+        "spanish": ""
+    },
+    "password_to_short_must_be_above": {
+        "english": "Password to short, must be above",
+        "danish": "",
+        "spanish": ""
+    },
+    "password_to_long_must_be_below": {
+        "english": "Password to long, must be below",
+        "danish": "",
+        "spanish": ""
+    },
+    "confirm_password": {
+        "english": "Confirm password",
+        "danish": "",
+        "spanish": ""
     }
 }

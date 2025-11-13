@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Vært: mariadb
--- Genereringstid: 13. 11 2025 kl. 06:21:51
+-- Genereringstid: 13. 11 2025 kl. 13:01:48
 -- Serverversion: 10.6.20-MariaDB-ubu2004
 -- PHP-version: 8.3.26
 
@@ -320,7 +320,7 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_pk`, `user_first_name`, `user_last_name`, `user_username`, `user_email`, `user_password`, `role_fk`, `user_banner`, `user_avatar`, `user_bio`, `user_total_followers`, `user_total_following`, `user_total_likes`, `user_total_posts`, `user_created_at`, `user_varified_at`, `user_updated_at`, `user_deletet_at`) VALUES
 (3, 'Luca', 'klæø', 'Lucakl', 'a@a.com', 'jlawdhjbawdbhjwadhjbadwbhjadwhjbadw', 1, 'path:to.banner', 'path:to.avatar', 'cool bio', 1, 0, 1, 2, 1758708393, 0, 1758708393, 0),
-(4, 'Luca', 'klæø', 'Lucakl', 'a@b.com', 'jlawdhjbawdbhjwadhjbadwbhjadwhjbadw', 1, 'path:to.banner', 'path:to.avatar', 'cool bio 2', 0, 1, 0, 0, 1758708393, 0, 1758708393, 0);
+(4, 'Luca', 'klæø', 'Lucakl1', 'a@b.com', 'jlawdhjbawdbhjwadhjbadwbhjadwhjbadw', 1, 'path:to.banner', 'path:to.avatar', 'cool bio 2', 0, 1, 0, 0, 1758708393, 0, 1758708393, 0);
 
 --
 -- Begrænsninger for dumpede tabeller
@@ -393,6 +393,9 @@ ALTER TABLE `users`
   ADD PRIMARY KEY (`user_pk`),
   ADD UNIQUE KEY `user_pk` (`user_pk`),
   ADD UNIQUE KEY `user_username` (`user_username`,`user_email`),
+  ADD UNIQUE KEY `user_username_2` (`user_username`,`user_email`),
+  ADD UNIQUE KEY `user_username_3` (`user_username`),
+  ADD UNIQUE KEY `user_email` (`user_email`),
   ADD KEY `role_fk` (`role_fk`);
 
 --

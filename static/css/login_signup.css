@@ -40,13 +40,6 @@ main {
                     }
                 }
 
-                select {
-                    cursor: pointer;
-                    appearance: none;
-                    -webkit-appearance: none;
-                    -moz-appearance: none;
-                }
-
                 &.switch_language {
                     display: grid;
                     grid-template-columns: 3fr 1fr;
@@ -58,22 +51,73 @@ main {
                         * {
                             width: 100%;
                         }
-
-                        &:has(select)::after {
-                            content: "⮟";
-                            position: absolute;
-                            bottom: 0.75rem;
-                            right: 1em;
-                            pointer-events: none;
-                            transition: 0.5s;
-                        }
-
-                        &:has(select:focus)::after {
-                            content: "⮟";
-                            transform: rotate(180deg);
-                        }
                     }
-                    
+
+                    > div {
+                        .selector {
+                            cursor: pointer;
+                            text-align: left;
+                            background: white;
+                        }
+
+                        div:has(.selector) {
+                            position: relative;
+
+                            option-div {
+                                position: absolute;
+                                background: white;
+                                overflow: hidden;
+                                top: 100%;
+                                display: none;
+                                transition: opacity 0.5s;
+                                border-radius: 10px;
+
+                                height: fit-content;
+                                width: fit-content;
+                                border: 1px solid black;
+                                
+                                a {
+                                    padding: 0.5rem 1rem;
+                                    display: flex;
+                                    align-items: center;
+                                    flex-flow: row nowrap;
+                                    gap: 8px;
+
+                                    img {
+                                        height: 15px;
+                                        width: 15px;
+                                        display: inline;
+                                    }
+
+                                    &:hover {
+                                        background: #bebebe;
+                                    }
+                                }
+                            }
+
+                            &::after {
+                                content: "⮟";
+                                position: absolute;
+                                height: 20px;
+                                bottom: 0.75rem;
+                                right: 1em;
+                                pointer-events: none;
+                                transition: transform 0.5s;
+                            }
+                        }
+                        
+
+                        div.open:has(.selector) {
+                            option-div {
+                                display: block;
+                            }
+
+                            &::after {
+                                transform: rotate(180deg);
+                            }
+                        }
+                        
+                    }
                 }
 
                 &.two_inputs {

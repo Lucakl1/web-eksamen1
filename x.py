@@ -1,20 +1,16 @@
 from flask import request, make_response, render_template
 import mysql.connector
-import re 
-import json
-
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-
-from functools import wraps
-
 from icecream import ic
 ic.configureOutput(prefix=f'----- | ', includeContext=True)
 
-UPLOAD_ITEM_FOLDER = './images'
+# standard python libaryes
+import re, json, os
 
-##############################
+
+########### Set up ###########
 google_spread_sheet_key = "1UYgE2jJ__HYl0N7lA5JR3sMH75hwhzhPPsSRRA-WNdg"
 allowed_languages = ["english", "danish", "spanish"]
 default_language = "english"
@@ -29,17 +25,22 @@ def lans(key):
 ##############################
 def db():
     try:
+        host = "lucaklaeoe.mysql.eu.pythonanywhere-services.com" if "PYTHONANYWHERE_DOMAIN" in os.environ else "mariadb"
+        user = "lucaklaeoe" if "PYTHONANYWHERE_DOMAIN" in os.environ else "root"
+        password = "MyPasswordForYou" if "PYTHONANYWHERE_DOMAIN" in os.environ else "eksamen312luca"
+        database = "lucaklaeoe$default" if "PYTHONANYWHERE_DOMAIN" in os.environ else "x"
+
         db = mysql.connector.connect(
-            host = "mariadb",
-            user = "root",  
-            password = "password",
-            database = "x"
+            host = host,
+            user = user,  
+            password = password,
+            database = database
         )
         cursor = db.cursor(dictionary=True)
         return db, cursor
-    except Exception as e:
-        print(e, flush=True)
-        raise Exception("Twitter exception - Database under maintenance", 500)
+    except Exception as ex:
+        ic(ex)
+        raise Exception("x exception - Database under maintenance", 500)
 
 
 ##############################
@@ -56,22 +57,21 @@ def no_cache(view):
 
 ##############################
 REGEX_EMAIL = "^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$"
-def validate_user_email():
-    user_email = request.form.get("user_email", "").strip()
-    ic(default_language)
-    if not re.match(REGEX_EMAIL, user_email): raise Exception(lans("invalid_email"), 400)
+def validate_user_email(user_email = None):
+    if not user_email: user_email = request.form.get("user_email", "").strip()
+    if not re.match(REGEX_EMAIL, user_email): raise Exception(f"x exception - {lans('invalid_email')}", 400)
     return user_email
 
 ##############################
 USER_USERNAME_MIN = 2
 USER_USERNAME_MAX = 20
 REGEX_USER_USERNAME = f"^.{{{USER_USERNAME_MIN},{USER_USERNAME_MAX}}}$"
-def validate_user_username():
-    user_username = request.form.get("user_username", "").strip()
-    error = f"{lans('username_min')} {USER_USERNAME_MIN} {lans('max')} {USER_USERNAME_MAX} {lans('characters')}"
-    if len(user_username) < USER_USERNAME_MIN: raise Exception(error, 400)
-    if len(user_username) > USER_USERNAME_MAX: raise Exception(error, 400)
+def validate_user_username(user_username = None):
+    if not user_username: user_username = request.form.get("user_username", "").strip()
+    if len(user_username) < USER_USERNAME_MIN: raise Exception(f"x exception - {lans('username_to_short_must_be_above')} {USER_USERNAME_MIN}", 400)
+    if len(user_username) > USER_USERNAME_MAX: raise Exception(f"x exception - {lans('username_to_long_must_be_below')} {USER_USERNAME_MAX}", 400)
     return user_username
+
 
 ##############################
 USER_FIRST_NAME_MIN = 2
@@ -79,9 +79,8 @@ USER_FIRST_NAME_MAX = 20
 REGEX_USER_FIRST_NAME = f"^.{{{USER_FIRST_NAME_MIN},{USER_FIRST_NAME_MAX}}}$"
 def validate_user_first_name():
     user_first_name = request.form.get("user_first_name", "").strip()
-    error = f"{lans('first_name_min')} {USER_USERNAME_MIN} {lans('max')} {USER_USERNAME_MAX} {lans('characters')}"
-
-    if not re.match(REGEX_USER_FIRST_NAME, user_first_name): raise Exception(error, 400)
+    if len(user_first_name) < USER_FIRST_NAME_MIN: raise Exception(f"x exception - {lans('first_name_to_short_must_be_above')} {USER_FIRST_NAME_MIN}", 400)
+    if len(user_first_name) > USER_FIRST_NAME_MAX: raise Exception(f"x exception - {lans('first_name_to_long_must_be_below')} {USER_FIRST_NAME_MAX}", 400)
     return user_first_name
 
 
@@ -91,19 +90,22 @@ USER_PASSWORD_MAX = 50
 REGEX_USER_PASSWORD = f"^.{{{USER_PASSWORD_MIN},{USER_PASSWORD_MAX}}}$"
 def validate_user_password():
     user_password = request.form.get("user_password", "").strip()
-    if not re.match(REGEX_USER_PASSWORD, user_password): raise Exception(lans("invalid_password"), 400)
+    if len(user_password) < USER_PASSWORD_MIN: raise Exception(f"x exception - {lans('password_to_short_must_be_above')} {USER_PASSWORD_MIN}", 400)
+    if len(user_password) > USER_PASSWORD_MAX: raise Exception(f"x exception - {lans('password_to_long_must_be_below')} {USER_PASSWORD_MAX}", 400)
     return user_password
-
-
 
 
 ##############################
 def validate_user_password_confirm():
-    user_password = request.form.get("user_password_confirm", "").strip()
-    if not re.match(REGEX_USER_PASSWORD, user_password): raise Exception("Twitter exception - Invalid confirm password", 400)
-    return user_password
+    user_password_confirm = request.form.get("user_password_confirm", "").strip()
+    user_password = request.form.get("user_password", "").strip()
+    if user_password != user_password_confirm : raise Exception(f"x exception - {lans('confirm_passwords_dont_match')}", 400)
+    return user_password_confirm
 
 
+
+
+##### need adjustment down from here ###############
 ##############################
 REGEX_UUID4 = "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
 def validate_uuid4(uuid4 = ""):
