@@ -99,23 +99,55 @@ def login(lan = "en"):
                 return "error"
 
         if request.method == "POST":
+
+            def check_password_and_return_home(user):
+                if not user: raise Exception(x.lans("user_not_found"), 400) #translate from here
+
+                user_password = x.validate_user_password
+
+                ic("XXXXXXXxx")          
+                ic(generate_password_hash(user["user_password"]))
+                ic(user_password)
+                    
+                if not check_password_hash(user["user_password"], user_password):
+                    raise Exception(x.lans("invalid_credentials"), 400) #translate from here  
+
+
+                if user["user_varified_at"] == "":
+                    raise Exception(x.lans("user_not_verified"), 400) #translate from here   
+
+
+                user.pop("user_password")
+                user["user_language"] = lan
+
+                session["user"] = user
+
+                return f"""<browser mix-redirect="/home"></browser>"""
+
             user_email_or_username = request.form.get("user_email_username", "").strip()
-            user_password = x.validate_user_password
 
             try:
                 user_email = x.validate_user_email(user_email_or_username)
                 db, cursor = x.db()
-                q = "SELECT * FROM users WHERE user_email = %s AND user_password = %s"
-                cursor.execute(q, (user_email, user_password))
+                q = "SELECT * FROM users WHERE user_email = %s"
+                cursor.execute(q, (user_email,))
                 user = cursor.fetchone()
-                if not user: raise Exception(x.lans("user_not_found"), 400)
+
+                return check_password_and_return_home(user)
 
             except Exception as ex:
                 if not "x exception" in ex: raise Exception(ex, 400)
-                user_username = x.validate_user_username(user_email_or_username)
 
+                user_username = x.validate_user_username(user_email_or_username)
+                db, cursor = x.db()
+                q = "SELECT * FROM users WHERE user_username = %s"
+                cursor.execute(q, (user_username,))
+                user = cursor.fetchone()
+
+                return check_password_and_return_home(user)
 
     except Exception as ex:
+        #ic("XXXXXXXXXXXXXXXXX")
         ic(ex)
         return "error"
     

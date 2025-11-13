@@ -6,11 +6,11 @@
     </figure>
     <div>
         <h1>{{ x.lans('log_into') }} X</h1>
-        <form action="/login/{{ lan }}" mix-post autocomplete="off">
+        <form action="/login" mix-post autocomplete="off">
             <div class="switch_language">
                 <div>
                     <label for="user_email_username">{{ x.lans('email_or_username') }}</label>
-                    <input name="user_email_username" type="text" id="user_email_username" placeholder="{{ x.lans('email_or_username') }}" mix-check="{{ x.REGEX_EMAIL }}">
+                    <input value="a@a.com" name="user_email_username" type="text" id="user_email_username" placeholder="{{ x.lans('email_or_username') }}" mix-check="{{ x.REGEX_EMAIL }}">
                 </div>
                 <div>
                     <label for="user_language">{{ x.lans('language') }}</label>
@@ -32,7 +32,7 @@
             </div>
             <div>
                 <label for="user_password">{{ x.lans('password') }}</label>
-                <input name="user_password" type="password" id="user_password" placeholder="{{ x.lans('password') }}" mix-check="{{ x.REGEX_USER_PASSWORD }}">
+                <input value="password" name="user_password" type="password" id="user_password" placeholder="{{ x.lans('password') }}" mix-check="{{ x.REGEX_USER_PASSWORD }}">
             </div>
             <button mix-default="{{ x.lans('log_in') }}" mix-await="{{ x.lans('logging_in...') }}" type="submit">
                 {{ x.lans('log_in') }}
