@@ -87,7 +87,7 @@ def validate_user_first_name():
 USER_LAST_NAME_MIN = 2
 USER_LAST_NAME_MAX = 20
 REGEX_USER_LAST_NAME = f"^.{{{USER_LAST_NAME_MIN},{USER_LAST_NAME_MAX}}}$"
-def validate_user_first_name():
+def validate_user_last_name():
     user_last_name = request.form.get("user_last_name", "").strip()
     if len(user_last_name) < USER_LAST_NAME_MIN: raise Exception(f"x exception - {lans('last_name_to_short_must_be_above')} {USER_FIRST_NAME_MIN}", 400)
     if len(user_last_name) > USER_LAST_NAME_MAX: raise Exception(f"x exception - {lans('last_name_to_long_must_be_below')} {USER_FIRST_NAME_MAX}", 400)

@@ -34,3 +34,20 @@ main {
 .mix-error {
     background: rgb(255, 231, 231);
 }
+
+#error_response {
+    position: absolute;
+    top: 5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    max-width: calc(100% - 32px);
+    height: fit-content;
+    background-color: red;
+    color: white;
+    border-radius: 10px;
+
+    div {
+        padding: 1rem;
+    }
+}

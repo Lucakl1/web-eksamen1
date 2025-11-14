@@ -99,60 +99,56 @@ def login(lan = "en"):
 
         if request.method == "POST":
 
-            def check_varified_and_return_home(user): 
-                if user["user_varified_at"] == "":
-                    raise Exception(f"x exception - {x.lans('user_not_verified')}", 400)  
-
-                user.pop("user_password")
-                user["user_language"] = lan
-
-                session["user"] = user
-
-                return f"""<browser mix-redirect='/home'></browser>"""
-
             user_email_or_username = request.form.get("user_email_username", "").strip()
 
-            try:
+            if "@" in user_email_or_username:
                 user_email = x.validate_user_email(user_email_or_username)
+                user_password = x.validate_user_password()
+
                 db, cursor = x.db()
                 q = "SELECT * FROM users WHERE user_email = %s"
                 cursor.execute(q, (user_email,))
                 user = cursor.fetchone()
 
-                user_password = x.validate_user_password()
                 if not user: raise Exception(f"x exception - {x.lans('email_or_password_is_wrong')}", 400)
-                    
+
                 if not check_password_hash(user["user_password"], user_password):
                     raise Exception(f"x exception - {x.lans('email_or_password_is_wrong')}", 400)
 
-                return check_varified_and_return_home(user)
-
-            except Exception as ex:
-                if not "x exception" in str(ex): raise Exception(ex, 400)
-                if "@" in user_email_or_username: raise Exception(f"x exception - {x.lans('email_or_password_is_wrong')}", 400)
-                
+            else:
                 user_username = x.validate_user_username(user_email_or_username)
+                user_password = x.validate_user_password()
+
                 db, cursor = x.db()
                 q = "SELECT * FROM users WHERE user_username = %s"
                 cursor.execute(q, (user_username,))
                 user = cursor.fetchone()
 
-                user_password = x.validate_user_password()
                 if not user: raise Exception(f"x exception - {x.lans('username_or_password_is_wrong')}", 400)
-                
+
                 if not check_password_hash(user["user_password"], user_password):
                     raise Exception(f"x exception - {x.lans('username_or_password_is_wrong')}")
+                
+                
+            if user["user_varified_at"] == "":
+                raise Exception(f"x exception - {x.lans('user_not_verified')}", 400)  
 
-                return check_varified_and_return_home(user)
+            user.pop("user_password")
+            user["user_language"] = lan
+
+            session["user"] = user
+
+            return f"""<browser mix-redirect='/home'></browser>"""
 
     except Exception as ex:
         ic(ex)
         error_code = str(ex)
-        error_msg = "error" #should i say system under maintenese?
+        error_msg = "error" #should i say system under maintenese? #### TO ASK ####
         if("x exception - " in error_code):
-            error_msg = error_code.replace("x exception - ", "")
-                
-        return f"""<browser mix-replace='error_response'>{error_msg}</browser>"""
+            error_msg = error_code.replace("('x exception - ", "").split("', ")[0]
+        
+        error_template = render_template(("global/error_message.html"), message=error_msg)
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
     
     finally:
         if "cursor" in locals(): cursor.close()
@@ -174,11 +170,29 @@ def signup(lan = "en"):
                 return "error"
 
         if request.method == "POST":
+            
+            user_email = x.validate_user_email()
+            user_language = x.validate_user_language()
+            user_password = x.validate_user_password()
+            user_confirm_password = x.validate_user_password_confirm()
+            user_phone = x.validate_user_phone()
+            user_usernmae = x.validate_user_username()
+            user_first_name = x.validate_user_first_name()
+            user_last_name = x.validate_user_last_name()
+            current_time = time.time()                          # make epoch time if not allready
+
+            db, cursor = x.db()
+            q = "INSERT INTO users VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            # user_pk | user_first_name | user_last_name | user_last_name | user_username | user_email | user_password | user_language | role_fk | user_banner | user_avatar | user_bio | user_total_followers | user_total_following | user_total_likes | user_total_posts | user_created_at | user_varified_at | user_updated_at | user_deletet_at
+            cursor.execute(q, ('default', user_first_name, user_last_name, user_usernmae, user_email, user_password, x.default_language, 'default', 'default', 'default', 'default', 'default', 'default', 'default', 'default', current_time, varify, 'default', 'default'))
+
             pass
 
     except Exception as ex:
         ic(ex)
         return "error"
+    finally:
+        pass
 
 ##############################
 ########## utilities #########
