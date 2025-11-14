@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Vært: mariadb
--- Genereringstid: 13. 11 2025 kl. 13:01:48
+-- Genereringstid: 14. 11 2025 kl. 20:23:37
 -- Serverversion: 10.6.20-MariaDB-ubu2004
 -- PHP-version: 8.3.26
 
@@ -300,27 +300,29 @@ CREATE TABLE `users` (
   `user_username` varchar(20) NOT NULL,
   `user_email` varchar(100) NOT NULL,
   `user_password` varchar(255) NOT NULL,
+  `user_language` varchar(10) NOT NULL DEFAULT 'english',
   `role_fk` bigint(20) UNSIGNED NOT NULL DEFAULT 1,
-  `user_banner` varchar(100) NOT NULL,
-  `user_avatar` varchar(100) NOT NULL,
-  `user_bio` varchar(200) NOT NULL,
+  `user_banner` varchar(100) DEFAULT NULL,
+  `user_avatar` varchar(100) NOT NULL DEFAULT 'default.svg',
+  `user_bio` varchar(200) DEFAULT NULL,
   `user_total_followers` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
   `user_total_following` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
   `user_total_likes` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
   `user_total_posts` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
   `user_created_at` bigint(20) UNSIGNED NOT NULL,
   `user_varified_at` bigint(20) UNSIGNED NOT NULL,
-  `user_updated_at` bigint(20) UNSIGNED NOT NULL,
-  `user_deletet_at` bigint(20) UNSIGNED NOT NULL
+  `user_updated_at` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
+  `user_deletet_at` bigint(20) UNSIGNED NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Data dump for tabellen `users`
 --
 
-INSERT INTO `users` (`user_pk`, `user_first_name`, `user_last_name`, `user_username`, `user_email`, `user_password`, `role_fk`, `user_banner`, `user_avatar`, `user_bio`, `user_total_followers`, `user_total_following`, `user_total_likes`, `user_total_posts`, `user_created_at`, `user_varified_at`, `user_updated_at`, `user_deletet_at`) VALUES
-(3, 'Luca', 'klæø', 'Lucakl', 'a@a.com', 'jlawdhjbawdbhjwadhjbadwbhjadwhjbadw', 1, 'path:to.banner', 'path:to.avatar', 'cool bio', 1, 0, 1, 2, 1758708393, 0, 1758708393, 0),
-(4, 'Luca', 'klæø', 'Lucakl1', 'a@b.com', 'jlawdhjbawdbhjwadhjbadwbhjadwhjbadw', 1, 'path:to.banner', 'path:to.avatar', 'cool bio 2', 0, 1, 0, 0, 1758708393, 0, 1758708393, 0);
+INSERT INTO `users` (`user_pk`, `user_first_name`, `user_last_name`, `user_username`, `user_email`, `user_password`, `user_language`, `role_fk`, `user_banner`, `user_avatar`, `user_bio`, `user_total_followers`, `user_total_following`, `user_total_likes`, `user_total_posts`, `user_created_at`, `user_varified_at`, `user_updated_at`, `user_deletet_at`) VALUES
+(3, 'Luca', 'klæø', 'Lucakl', 'a@a.com', 'scrypt:32768:8:1$ol24v6mKK6OypKUh$011e499217b5c971e6eb4c20c1272550ffc0123d1bdd0aa7e503f56fd6e84d69882f0c32d2d4508b985d5494dc92df67686f602f9d19ed7bf21a9909ca7df147', 'english', 1, 'path:to.banner', 'path:to.avatar', 'cool bio', 1, 0, 1, 2, 1758708393, 0, 1758708393, 0),
+(4, 'Luca', 'klæø', 'Lucakl1', 'a@b.com', 'scrypt:32768:8:1$ol24v6mKK6OypKUh$011e499217b5c971e6eb4c20c1272550ffc0123d1bdd0aa7e503f56fd6e84d69882f0c32d2d4508b985d5494dc92df67686f602f9d19ed7bf21a9909ca7df147', 'english', 1, 'path:to.banner', 'path:to.avatar', 'cool bio 2', 0, 1, 0, 0, 1758708393, 0, 1758708393, 0),
+(5, 'test', 'user', 'test user', 'a@c.com', 'password', 'english', 1, NULL, 'default.svg', NULL, 0, 0, 0, 0, 1211221123123, 112312312123, 0, 0);
 
 --
 -- Begrænsninger for dumpede tabeller
@@ -430,7 +432,7 @@ ALTER TABLE `roles`
 -- Tilføj AUTO_INCREMENT i tabel `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_pk` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `user_pk` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Begrænsninger for dumpede tabeller
