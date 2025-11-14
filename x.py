@@ -113,75 +113,19 @@ def validate_user_password_confirm():
     return user_password_confirm
 
 ##############################
-# phone number regex
-# Denmark
-# England
-# USA
-# Spain
-
-REGEX_PHONE = """^(?:
-    (?:\+?45[ \-]?\d{2}[ \-]?\d{2}[ \-]?\d{2}[ \-]?\d{2}) |
-    (?:\+?44[ \-]?(?:\d{4}[ \-]?\d{6}|\d{3}[ \-]?\d{3}[ \-]?\d{4})) |
-    (?:\+?1[ \-]?(?:\d{3}[ \-]?\d{3}[ \-]?\d{4})) |
-    (?:\+?34[ \-]?\d{3}[ \-]?\d{2}[ \-]?\d{2}[ \-]?\d{2})
-)$"""
-def validate_user_phone():
-    user_phone = request.form.get("user_phone", "").strip()
-    if not re.match(REGEX_PHONE, user_phone): raise Exception(f"x exception - {lans('invalid_phone_number')}", 400)
-    return user_phone
-
-##############################
 USER_USERNAME_EMAIL_MIN = 2
 USER_USERNAME_EMAIL_MAX = 100
 REGEX_USERNAME_EMAIL_MAX = f"^.{{{USER_USERNAME_EMAIL_MIN},{USER_USERNAME_EMAIL_MAX}}}$"
 
-##### need adjustment down from here ###############
-##############################
-REGEX_UUID4 = "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-def validate_uuid4(uuid4 = ""):
-    if not uuid4:
-        uuid4 = request.values.get("uuid4", "").strip()
-    if not re.match(REGEX_UUID4, uuid4): raise Exception("Twitter exception - Invalid uuid4", 400)
-    return uuid4
-
-
-##############################
-REGEX_UUID4_WITHOUT_DASHES = "^[0-9a-f]{8}[0-9a-f]{4}4[0-9a-f]{3}[89ab][0-9a-f]{3}[0-9a-f]{12}$"
-def validate_uuid4_without_dashes(uuid4 = ""):
-    error = "Invalid uuid4 without dashes"
-    if not uuid4: raise Exception(error, 400)
-    uuid4 = uuid4.strip()
-    if not re.match(REGEX_UUID4_WITHOUT_DASHES, uuid4): raise Exception(error, 400)
-    return uuid4
-
-##############################
-POST_MIN_LEN = 2
-POST_MAX_LEN = 250
-REGEX_POST = f"^.{{{POST_MIN_LEN},{POST_MAX_LEN}}}$"
-def validate_post(post = ""):
-    post = post.strip()
-    if not re.match(REGEX_POST, post): raise Exception("x-error post", 400)
-    return post
-
-
 ##############################
 def send_email(to_email, subject, template):
     try:
-        # Create a gmail fullflaskdemomail
-        # Enable (turn on) 2 step verification/factor in the google account manager
-        # Visit: https://myaccount.google.com/apppasswords
-        # Copy the key : pdru ctfd jdhk xxci
-
-        # Email and password of the sender's Gmail account
-        sender_email = "fullflaskdemomail"
-        password = "wtop ukks heht ulzv "  # If 2FA is on, use an App Password instead
-
-        # Receiver email address
-        receiver_email = to_email
+        sender_email = "lucaklaeoeskole@gmail.com"
+        password = "yjno suwt geqp wcey"
         
         # Create the email message
         message = MIMEMultipart()
-        message["From"] = "X clone"
+        message["From"] = lans("x_clone_eksamens_project")
         message["To"] = to_email
         message["Subject"] = subject
 
@@ -192,13 +136,36 @@ def send_email(to_email, subject, template):
         with smtplib.SMTP("smtp.gmail.com", 587) as server:
             server.starttls()  # Upgrade the connection to secure
             server.login(sender_email, password)
-            server.sendmail(sender_email, receiver_email, message.as_string())
+            server.sendmail(sender_email, to_email, message.as_string())
         ic("Email sent successfully!")
 
         return "email sent"
        
     except Exception as ex:
         ic(ex)
-        raise Exception("cannot send email", 500)
-    finally:
-        pass
+        raise Exception("Cannot send email", 500)
+    
+##############################
+REGEX_UUID4_WITHOUT_DASHES = "^[0-9a-f]{8}[0-9a-f]{4}4[0-9a-f]{3}[89ab][0-9a-f]{3}[0-9a-f]{12}$"
+def validate_uuid4_without_dashes():
+    user_uuid4 = request.args.get("key", "")
+    if not re.match(REGEX_UUID4_WITHOUT_DASHES, user_uuid4): raise Exception(f"x exception - {lans('cannot_verify_user')}", 400) # TO ASK is this the right way to tell the user it wasn't a uuid
+    return user_uuid4
+
+##### need adjustment down from here ###############
+##############################
+REGEX_UUID4 = "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+def validate_uuid4(uuid4 = ""):
+    if not uuid4:
+        uuid4 = request.values.get("uuid4", "").strip()
+    if not re.match(REGEX_UUID4, uuid4): raise Exception("Twitter exception - Invalid uuid4", 400)
+    return uuid4
+
+##############################
+POST_MIN_LEN = 2
+POST_MAX_LEN = 250
+REGEX_POST = f"^.{{{POST_MIN_LEN},{POST_MAX_LEN}}}$"
+def validate_post(post = ""):
+    post = post.strip()
+    if not re.match(REGEX_POST, post): raise Exception("x-error post", 400)
+    return post

@@ -170,29 +170,57 @@ def signup(lan = "en"):
                 return "error"
 
         if request.method == "POST":
-            
             user_email = x.validate_user_email()
-            user_language = x.validate_user_language()
             user_password = x.validate_user_password()
-            user_confirm_password = x.validate_user_password_confirm()
-            user_phone = x.validate_user_phone()
-            user_usernmae = x.validate_user_username()
+            x.validate_user_password_confirm()
+            user_username = x.validate_user_username()
             user_first_name = x.validate_user_first_name()
             user_last_name = x.validate_user_last_name()
-            current_time = time.time()                          # make epoch time if not allready
+            current_time = int(time.time())
+
+            encrypted_user_password = generate_password_hash(user_password)
 
             db, cursor = x.db()
-            q = "INSERT INTO users VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-            # user_pk | user_first_name | user_last_name | user_last_name | user_username | user_email | user_password | user_language | role_fk | user_banner | user_avatar | user_bio | user_total_followers | user_total_following | user_total_likes | user_total_posts | user_created_at | user_varified_at | user_updated_at | user_deletet_at
-            cursor.execute(q, ('default', user_first_name, user_last_name, user_usernmae, user_email, user_password, x.default_language, 'default', 'default', 'default', 'default', 'default', 'default', 'default', 'default', current_time, varify, 'default', 'default'))
+            db.start_transaction()
 
-            pass
+            q = "INSERT INTO users (user_first_name, user_last_name, user_username, user_email, user_password, user_language, user_created_at) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+            
+            cursor.execute(q, ( user_first_name, user_last_name, user_username, user_email, encrypted_user_password, x.default_language, current_time))            
+            
+            user_pk = cursor.lastrowid
+            user_uuid = uuid.uuid4().hex
+
+            q = "INSERT INTO user_not_verifyed_accounts VALUES(%s, %s)"
+            cursor.execute(q, (user_pk, user_uuid))
+            db.commit()
+
+            # send verification email
+            email_verify_account = render_template("_email_verify_account.html", user_verification_key=user_uuid)
+            x.send_email(user_email, x.lans('verify_your_account'), email_verify_account)
+            
+            return f"""<browser mix-redirect="{ url_for('login') }"></browser>""", 400
 
     except Exception as ex:
         ic(ex)
-        return "error"
+        if "db" in locals(): db.rollback()
+
+        error_code = str(ex)
+        error_msg = "error"             #should i say system under maintenese? #### TO ASK ####
+        if "x exception - " in error_code:
+            error_msg = error_code.replace("('x exception - ", "").split("', ")[0]
+
+        if "Duplicate entry" in error_code and "user_username" in error_code:
+            error_msg = x.lans("username_allready_in_system")
+
+        if "Duplicate entry" in error_code and "user_email" in error_code:
+            error_msg = x.lans("email_allready_in_system")
+        
+        error_template = render_template(("global/error_message.html"), message=error_msg)
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
+    
     finally:
-        pass
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
 
 ##############################
 ########## utilities #########
@@ -234,5 +262,37 @@ def get_data_from_sheet():
     except Exception as ex:
         ic(ex)
         return str(ex)
+    
+@app.get("/verify-account")
+def view_verify_account():
+    try:
+        user_verification_key = x.validate_uuid4_without_dashes()
+        user_verified_at = int(time.time())
+
+        db, cursor = x.db()
+        db.start_transaction()
+        q = "SELECT user_fk FROM user_not_verifyed_accounts WHERE uuid = %s"
+        cursor.execute(q, (user_verification_key,))
+
+        user_fk = cursor.fetchone()["user_fk"]
+
+        q = "DELETE FROM user_not_verifyed_accounts WHERE uuid = %s"
+        cursor.execute(q, (user_verification_key,))
+
+        q = "UPDATE users SET user_varified_at = %s WHERE user_pk = %s" 
+        cursor.execute(q, (user_verified_at, user_fk))
+        db.commit()
+
+        if cursor.rowcount != 1: raise Exception(f"x exception - {x.lans('cannot_verify_user')}", 400)
+
+        return redirect( url_for('login') )
+    except Exception as ex:
+        ic(ex)
+        if "db" in locals(): db.rollback()  
+
+        # System or developer error
+        return x.lans('cannot_verify_user')
+
     finally:
-        pass
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()

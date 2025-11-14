@@ -158,5 +158,40 @@
         "english": "You are not varified - check your E mail",
         "danish": "",
         "spanish": ""
+    },
+    "x_clone_eksamens_project": {
+        "english": "X clone (Eksamens project)",
+        "danish": "",
+        "spanish": ""
+    },
+    "verify_your_account": {
+        "english": "Verify your account",
+        "danish": "",
+        "spanish": ""
+    },
+    "to_verify_your_account_please_click": {
+        "english": "To verify your account please click",
+        "danish": "",
+        "spanish": ""
+    },
+    "here": {
+        "english": "Here",
+        "danish": "",
+        "spanish": ""
+    },
+    "cannot_verify_user": {
+        "english": "Cannot verify user",
+        "danish": "",
+        "spanish": ""
+    },
+    "username_allready_in_system": {
+        "english": "Username allready in system",
+        "danish": "",
+        "spanish": ""
+    },
+    "email_allready_in_system": {
+        "english": "Email allready in system",
+        "danish": "",
+        "spanish": ""
     }
 }

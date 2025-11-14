@@ -6,7 +6,7 @@
     </figure>
     <div>
         <h1>{{ x.lans('sign_up_to') }} X</h1>
-        <form action="/signup/{{ lan }}" mix-post autocomplete="off">
+        <form action="/signup" mix-post autocomplete="off">
             <div class="switch_language">
                 <div>
                     <label for="user_email">{{ x.lans('email') }}</label>
@@ -37,10 +37,6 @@
             <div>
                 <label for="user_password_confirm">{{ x.lans('confirm_password') }}</label>
                 <input name="user_password_confirm" type="password" id="user_password_confirm" placeholder="{{ x.lans('confirm_password') }}" mix-check="{{ x.REGEX_USER_PASSWORD }}">
-            </div>
-            <div>
-                <label for="user_phone">{{ x.lans('phone_number') }}</label>
-                <input name="user_phone" type="tel" id="user_phone" placeholder="{{ x.lans('phone_number') }}" mix-check="{{ x.REGEX_PHONE }}">
             </div>
             <div>
                 <label for="user_username">{{ x.lans('username') }}</label>
