@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Vært: mariadb
--- Genereringstid: 14. 11 2025 kl. 20:23:37
+-- Genereringstid: 14. 11 2025 kl. 23:01:30
 -- Serverversion: 10.6.20-MariaDB-ubu2004
 -- PHP-version: 8.3.26
 
@@ -37,13 +37,6 @@ CREATE TABLE `comments` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Data dump for tabellen `comments`
---
-
-INSERT INTO `comments` (`comment_pk`, `post_fk`, `user_fk`, `comment_message`, `comment_created_at`, `comment_updated_at`) VALUES
-(1, 8, 3, 'jekejejed', 0, 0);
-
---
 -- Triggers/udløsere `comments`
 --
 DELIMITER $$
@@ -70,13 +63,6 @@ CREATE TABLE `followers` (
   `user_follows_fk` bigint(20) UNSIGNED NOT NULL,
   `follower_created_at` bigint(20) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Data dump for tabellen `followers`
---
-
-INSERT INTO `followers` (`user_fk`, `user_follows_fk`, `follower_created_at`) VALUES
-(3, 4, 0);
 
 --
 -- Triggers/udløsere `followers`
@@ -116,13 +102,6 @@ CREATE TABLE `likes` (
   `user_fk` bigint(20) UNSIGNED NOT NULL,
   `post_fk` bigint(20) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Data dump for tabellen `likes`
---
-
-INSERT INTO `likes` (`user_fk`, `post_fk`) VALUES
-(3, 8);
 
 --
 -- Triggers/udløsere `likes`
@@ -171,14 +150,6 @@ CREATE TABLE `posts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Data dump for tabellen `posts`
---
-
-INSERT INTO `posts` (`post_pk`, `user_fk`, `post_message`, `post_total_comments`, `post_total_likes`, `post_total_saved`, `post_created_at`, `post_updated_at`, `post_deleted_at`) VALUES
-(8, 3, 'hej', 1, 1, 1, 0, 0, 0),
-(10, 3, 'secound post', 0, 0, 0, 0, 0, 0);
-
---
 -- Triggers/udløsere `posts`
 --
 DELIMITER $$
@@ -205,13 +176,6 @@ CREATE TABLE `posts_media` (
   `post_media_path` varchar(100) NOT NULL,
   `posts_media_type_fk` bigint(3) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Data dump for tabellen `posts_media`
---
-
-INSERT INTO `posts_media` (`post_fk`, `post_media_path`, `posts_media_type_fk`) VALUES
-(8, 'post_path:somewhere.onetheserver.image', 1);
 
 -- --------------------------------------------------------
 
@@ -265,13 +229,6 @@ CREATE TABLE `saves` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Data dump for tabellen `saves`
---
-
-INSERT INTO `saves` (`user_fk`, `post_fk`, `save_created_at`) VALUES
-(3, 8, 0);
-
---
 -- Triggers/udløsere `saves`
 --
 DELIMITER $$
@@ -302,15 +259,15 @@ CREATE TABLE `users` (
   `user_password` varchar(255) NOT NULL,
   `user_language` varchar(10) NOT NULL DEFAULT 'english',
   `role_fk` bigint(20) UNSIGNED NOT NULL DEFAULT 1,
-  `user_banner` varchar(100) DEFAULT NULL,
+  `user_banner` varchar(100) NOT NULL DEFAULT 'default_banner.jpg',
   `user_avatar` varchar(100) NOT NULL DEFAULT 'default.svg',
-  `user_bio` varchar(200) DEFAULT NULL,
+  `user_bio` varchar(200) NOT NULL DEFAULT 'No bio',
   `user_total_followers` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
   `user_total_following` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
   `user_total_likes` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
   `user_total_posts` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
   `user_created_at` bigint(20) UNSIGNED NOT NULL,
-  `user_varified_at` bigint(20) UNSIGNED NOT NULL,
+  `user_varified_at` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
   `user_updated_at` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
   `user_deletet_at` bigint(20) UNSIGNED NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -320,9 +277,18 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_pk`, `user_first_name`, `user_last_name`, `user_username`, `user_email`, `user_password`, `user_language`, `role_fk`, `user_banner`, `user_avatar`, `user_bio`, `user_total_followers`, `user_total_following`, `user_total_likes`, `user_total_posts`, `user_created_at`, `user_varified_at`, `user_updated_at`, `user_deletet_at`) VALUES
-(3, 'Luca', 'klæø', 'Lucakl', 'a@a.com', 'scrypt:32768:8:1$ol24v6mKK6OypKUh$011e499217b5c971e6eb4c20c1272550ffc0123d1bdd0aa7e503f56fd6e84d69882f0c32d2d4508b985d5494dc92df67686f602f9d19ed7bf21a9909ca7df147', 'english', 1, 'path:to.banner', 'path:to.avatar', 'cool bio', 1, 0, 1, 2, 1758708393, 0, 1758708393, 0),
-(4, 'Luca', 'klæø', 'Lucakl1', 'a@b.com', 'scrypt:32768:8:1$ol24v6mKK6OypKUh$011e499217b5c971e6eb4c20c1272550ffc0123d1bdd0aa7e503f56fd6e84d69882f0c32d2d4508b985d5494dc92df67686f602f9d19ed7bf21a9909ca7df147', 'english', 1, 'path:to.banner', 'path:to.avatar', 'cool bio 2', 0, 1, 0, 0, 1758708393, 0, 1758708393, 0),
-(5, 'test', 'user', 'test user', 'a@c.com', 'password', 'english', 1, NULL, 'default.svg', NULL, 0, 0, 0, 0, 1211221123123, 112312312123, 0, 0);
+(10, 'luca', 'klæø', 'lucakl', 'lucaklaeoe@gmail.com', 'scrypt:32768:8:1$MZFtBIb7JQlGt54J$0ba3f3526360e93385fbe8b6a2339857eadb9cada39ba841133941039c16906ef4482b0ff517b9bd7aabcf0e6f2a5333acf411a023d895edc08d02ba5bb62d89', 'english', 1, 'default_banner.jpg', 'default.svg', 'No bio', 0, 0, 0, 0, 1763160252, 1763160261, 0, 0);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur-dump for tabellen `user_not_verifyed_accounts`
+--
+
+CREATE TABLE `user_not_verifyed_accounts` (
+  `user_fk` bigint(20) UNSIGNED NOT NULL,
+  `uuid` char(32) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Begrænsninger for dumpede tabeller
@@ -394,11 +360,16 @@ ALTER TABLE `saves`
 ALTER TABLE `users`
   ADD PRIMARY KEY (`user_pk`),
   ADD UNIQUE KEY `user_pk` (`user_pk`),
-  ADD UNIQUE KEY `user_username` (`user_username`,`user_email`),
-  ADD UNIQUE KEY `user_username_2` (`user_username`,`user_email`),
-  ADD UNIQUE KEY `user_username_3` (`user_username`),
   ADD UNIQUE KEY `user_email` (`user_email`),
+  ADD UNIQUE KEY `user_username` (`user_username`),
   ADD KEY `role_fk` (`role_fk`);
+
+--
+-- Indeks for tabel `user_not_verifyed_accounts`
+--
+ALTER TABLE `user_not_verifyed_accounts`
+  ADD UNIQUE KEY `uuid` (`uuid`),
+  ADD KEY `user_user_not_verifyed_accounts_pfk` (`user_fk`);
 
 --
 -- Brug ikke AUTO_INCREMENT for slettede tabeller
@@ -432,7 +403,7 @@ ALTER TABLE `roles`
 -- Tilføj AUTO_INCREMENT i tabel `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_pk` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `user_pk` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- Begrænsninger for dumpede tabeller
@@ -484,6 +455,12 @@ ALTER TABLE `saves`
 --
 ALTER TABLE `users`
   ADD CONSTRAINT `role_user_pfk` FOREIGN KEY (`role_fk`) REFERENCES `roles` (`role_pk`);
+
+--
+-- Begrænsninger for tabel `user_not_verifyed_accounts`
+--
+ALTER TABLE `user_not_verifyed_accounts`
+  ADD CONSTRAINT `user_user_not_verifyed_accounts_pfk` FOREIGN KEY (`user_fk`) REFERENCES `users` (`user_pk`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
