@@ -32,6 +32,7 @@
             <div>
                 <label for="user_password">{{ x.lans('password') }}</label>
                 <input name="user_password" type="password" id="user_password" placeholder="{{ x.lans('password') }}" mix-check="{{ x.REGEX_USER_PASSWORD }}">
+                <a href="/forgot_password/{{x.default_language}}"> {{ x.lans('forgot_password')}}</a>
             </div>
             <button mix-default="{{ x.lans('log_in') }}" mix-await="{{ x.lans('logging_in...') }}" type="submit">
                 {{ x.lans('log_in') }}

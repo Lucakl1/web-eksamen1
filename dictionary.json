@@ -95,103 +95,228 @@
         "spanish": "Correo electrónico o nombre de usuario"
     },
     "username_to_short_must_be_above": {
-        "english": "Username to short, must be above",
-        "danish": "",
-        "spanish": ""
+        "english": "Username too short, must be above",
+        "danish": "Brugernavn er for kort, skal være længere",
+        "spanish": "Nombre de usuario demasiado corto, debe ser más largo"
     },
     "username_to_long_must_be_below": {
-        "english": "Username to long, must be below",
-        "danish": "",
-        "spanish": ""
+        "english": "Username too long, must be below",
+        "danish": "Brugernavn er for langt, skal være kortere",
+        "spanish": "Nombre de usuario demasiado largo, debe ser más corto"
     },
     "invalid_email": {
         "english": "Invalid E-mail",
-        "danish": "",
-        "spanish": ""
+        "danish": "Ugyldig e-mail",
+        "spanish": "Correo electrónico inválido"
     },
     "first_name_to_short_must_be_above": {
-        "english": "First name to short, must be above",
-        "danish": "",
-        "spanish": ""
+        "english": "First name too short, must be above",
+        "danish": "Fornavn er for kort, skal være længere",
+        "spanish": "Nombre demasiado corto, debe ser más largo"
     },
     "first_name_to_long_must_be_below": {
-        "english": "First name to long, must be below",
-        "danish": "",
-        "spanish": ""
+        "english": "First name too long, must be below",
+        "danish": "Fornavn er for langt, skal være kortere",
+        "spanish": "Nombre demasiado largo, debe ser más corto"
     },
     "password_to_short_must_be_above": {
-        "english": "Password to short, must be above",
-        "danish": "",
-        "spanish": ""
+        "english": "Password too short, must be above",
+        "danish": "Adgangskode er for kort, skal være længere",
+        "spanish": "Contraseña demasiado corta, debe ser más larga"
     },
     "password_to_long_must_be_below": {
-        "english": "Password to long, must be below",
-        "danish": "",
-        "spanish": ""
+        "english": "Password too long, must be below",
+        "danish": "Adgangskode er for lang, skal være kortere",
+        "spanish": "Contraseña demasiado larga, debe ser más corta"
     },
     "confirm_password": {
         "english": "Confirm password",
-        "danish": "",
-        "spanish": ""
+        "danish": "Bekræft adgangskode",
+        "spanish": "Confirmar contraseña"
     },
     "confirm_passwords_dont_match": {
         "english": "Confirm password don't match",
-        "danish": "",
-        "spanish": ""
+        "danish": "Adgangskoderne matcher ikke",
+        "spanish": "Las contraseñas no coinciden"
     },
     "invalid_phone_number": {
         "english": "Invalid phone number",
-        "danish": "",
-        "spanish": ""
+        "danish": "Ugyldigt telefonnummer",
+        "spanish": "Número de teléfono inválido"
     },
     "username_or_password_is_wrong": {
         "english": "Username or password is wrong",
-        "danish": "",
-        "spanish": ""
+        "danish": "Brugernavn eller adgangskode er forkert",
+        "spanish": "Nombre de usuario o contraseña incorrectos"
     },
     "email_or_password_is_wrong": {
         "english": "Email or password is wrong",
-        "danish": "",
-        "spanish": ""
+        "danish": "E-mail eller adgangskode er forkert",
+        "spanish": "Correo electrónico o contraseña incorrectos"
     },
     "user_not_verified": {
-        "english": "You are not varified - check your E mail",
-        "danish": "",
-        "spanish": ""
+        "english": "You are not verified - check your E-mail",
+        "danish": "Du er ikke verificeret – tjek din e-mail",
+        "spanish": "No estás verificado - revisa tu correo electrónico"
     },
     "x_clone_eksamens_project": {
         "english": "X clone (Eksamens project)",
-        "danish": "",
-        "spanish": ""
+        "danish": "X-klon (Eksamensprojekt)",
+        "spanish": "Clon X (proyecto de examen)"
     },
     "verify_your_account": {
         "english": "Verify your account",
-        "danish": "",
-        "spanish": ""
+        "danish": "Bekræft din konto",
+        "spanish": "Verifica tu cuenta"
     },
     "to_verify_your_account_please_click": {
         "english": "To verify your account please click",
-        "danish": "",
-        "spanish": ""
+        "danish": "For at bekræfte din konto, klik venligst",
+        "spanish": "Para verificar tu cuenta, haz clic en"
     },
     "here": {
         "english": "Here",
-        "danish": "",
-        "spanish": ""
+        "danish": "Her",
+        "spanish": "Aquí"
     },
     "cannot_verify_user": {
         "english": "Cannot verify user",
-        "danish": "",
-        "spanish": ""
+        "danish": "Kan ikke verificere bruger",
+        "spanish": "No se puede verificar al usuario"
     },
     "username_allready_in_system": {
-        "english": "Username allready in system",
-        "danish": "",
-        "spanish": ""
+        "english": "Username already in system",
+        "danish": "Brugernavn findes allerede",
+        "spanish": "El nombre de usuario ya está en el sistema"
     },
     "email_allready_in_system": {
-        "english": "Email allready in system",
-        "danish": "",
-        "spanish": ""
+        "english": "Email already in system",
+        "danish": "E-mail findes allerede",
+        "spanish": "El correo electrónico ya está en el sistema"
+    },
+    "error_please_try_again": {
+        "english": "Error please try again",
+        "danish": "Fejl, prøv igen",
+        "spanish": "Error, por favor inténtalo de nuevo"
+    },
+    "home": {
+        "english": "Home",
+        "danish": "Hjem",
+        "spanish": "Inicio"
+    },
+    "explore": {
+        "english": "Explore",
+        "danish": "Udforsk",
+        "spanish": "Explorar"
+    },
+    "notifications": {
+        "english": "Notifications",
+        "danish": "Notifikationer",
+        "spanish": "Notificaciones"
+    },
+    "messages": {
+        "english": "Messages",
+        "danish": "Beskeder",
+        "spanish": "Mensajes"
+    },
+    "grok": {
+        "english": "Grok",
+        "danish": "Grok",
+        "spanish": "Grok"
+    },
+    "bookmarks": {
+        "english": "Bookmarks",
+        "danish": "Bogmærker",
+        "spanish": "Marcadores"
+    },
+    "jobs": {
+        "english": "Jobs",
+        "danish": "Job",
+        "spanish": "Empleos"
+    },
+    "communities": {
+        "english": "Communities",
+        "danish": "Fællesskaber",
+        "spanish": "Comunidades"
+    },
+    "premium": {
+        "english": "Premium",
+        "danish": "Premium",
+        "spanish": "Premium"
+    },
+    "profile": {
+        "english": "Profile",
+        "danish": "Profil",
+        "spanish": "Perfil"
+    },
+    "logout": {
+        "english": "Logout",
+        "danish": "Log ud",
+        "spanish": "Cerrar sesión"
+    },
+    "post": {
+        "english": "Post",
+        "danish": "Slå op",
+        "spanish": "Publicar"
+    },
+    "loading...": {
+        "english": "Loading...",
+        "danish": "Indlæser...",
+        "spanish": "Cargando..."
+    },
+    "to": {
+        "english": "To",
+        "danish": "Til",
+        "spanish": "A"
+    },
+    "charetors": {
+        "english": "Characters",
+        "danish": "Tegn",
+        "spanish": "Caracteres"
+    },
+    "repeat_password": {
+        "english": "Repeat password",
+        "danish": "Gentag adgangskode",
+        "spanish": "Repetir contraseña"
+    },
+    "forgot_password": {
+        "english": "Forgot Password?",
+        "danish": "Glemt adgangskode?",
+        "spanish": "¿Olvidaste tu contraseña?"
+    },
+    "reset_your_password": {
+        "english": "Reset your password",
+        "danish": "Nulstil din adgangskode",
+        "spanish": "Restablece tu contraseña"
+    },
+    "no_user_found": {
+        "english": "No user found",
+        "danish": "Ingen bruger fundet",
+        "spanish": "No se encontró ningún usuario"
+    },
+    "checking...": {
+        "english": "Checking...",
+        "danish": "Tjekker...",
+        "spanish": "Verificando..."
+    },
+    "welcome_to": {
+        "english": "Welcome to",
+        "danish": "Velkommen til",
+        "spanish": "Bienvenido a"
+    },
+    "reset_password_to_x": {
+        "english": "Reset password to x",
+        "danish": "Nulstil adgangskode til x",
+        "spanish": "Restablecer contraseña a x"
+    },
+    "to_reset_your_password_please_click": {
+        "english": "To reset your password please click",
+        "danish": "For at nulstille din adgangskode, klik venligst",
+        "spanish": "Para restablecer tu contraseña, haz clic"
+    },
+    "reset_my_password": {
+        "english": "Reset my password",
+        "danish": "Nulstil min adgangskode",
+        "spanish": "Restablecer mi contraseña"
     }
 }

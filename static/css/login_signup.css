@@ -21,6 +21,7 @@ main {
             align-items: center;
     
             > * {
+                position: relative;
                 width: 100%;
                 display: flex;
                 flex-flow: column;
@@ -28,6 +29,10 @@ main {
                 label {
                     padding: 0.75rem 0 0.3rem 0;
                     display: block;
+
+                    span {
+                        color: rgb(71, 71, 71)
+                    }
                 }
                 
                 input, select {
@@ -38,6 +43,12 @@ main {
                     ::placeholder {
                         font-family: var(--font);
                     }
+                }
+
+                > a {
+                    position: absolute;
+                    top: 100%;
+                    right: 0;
                 }
 
                 &.switch_language {
@@ -71,6 +82,7 @@ main {
                                 display: none;
                                 transition: opacity 0.5s;
                                 border-radius: 10px;
+                                z-index: 27;
 
                                 height: fit-content;
                                 width: fit-content;
@@ -161,5 +173,22 @@ main {
         > figure, > div {
             align-self: center;
         }
+    }
+}
+
+#succes_message {
+    position: absolute;
+    top: 5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    max-width: calc(100% - 32px);
+    height: fit-content;
+    background-color: green;
+    color: white;
+    border-radius: 10px;
+
+    div {
+        padding: 1rem;
     }
 }

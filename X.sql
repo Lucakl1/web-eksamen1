@@ -282,10 +282,10 @@ INSERT INTO `users` (`user_pk`, `user_first_name`, `user_last_name`, `user_usern
 -- --------------------------------------------------------
 
 --
--- Struktur-dump for tabellen `user_not_verifyed_accounts`
+-- Struktur-dump for tabellen `not_verifyed_accounts`
 --
 
-CREATE TABLE `user_not_verifyed_accounts` (
+CREATE TABLE `not_verifyed_accounts` (
   `user_fk` bigint(20) UNSIGNED NOT NULL,
   `uuid` char(32) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -365,11 +365,11 @@ ALTER TABLE `users`
   ADD KEY `role_fk` (`role_fk`);
 
 --
--- Indeks for tabel `user_not_verifyed_accounts`
+-- Indeks for tabel `not_verifyed_accounts`
 --
-ALTER TABLE `user_not_verifyed_accounts`
+ALTER TABLE `not_verifyed_accounts`
   ADD UNIQUE KEY `uuid` (`uuid`),
-  ADD KEY `user_user_not_verifyed_accounts_pfk` (`user_fk`);
+  ADD KEY `user_not_verifyed_accounts_pfk` (`user_fk`);
 
 --
 -- Brug ikke AUTO_INCREMENT for slettede tabeller
@@ -457,10 +457,10 @@ ALTER TABLE `users`
   ADD CONSTRAINT `role_user_pfk` FOREIGN KEY (`role_fk`) REFERENCES `roles` (`role_pk`);
 
 --
--- Begrænsninger for tabel `user_not_verifyed_accounts`
+-- Begrænsninger for tabel `not_verifyed_accounts`
 --
-ALTER TABLE `user_not_verifyed_accounts`
-  ADD CONSTRAINT `user_user_not_verifyed_accounts_pfk` FOREIGN KEY (`user_fk`) REFERENCES `users` (`user_pk`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `not_verifyed_accounts`
+  ADD CONSTRAINT `user_not_verifyed_accounts_pfk` FOREIGN KEY (`user_fk`) REFERENCES `users` (`user_pk`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

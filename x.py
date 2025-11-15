@@ -14,6 +14,7 @@ import re, json, os
 google_spread_sheet_key = "1UYgE2jJ__HYl0N7lA5JR3sMH75hwhzhPPsSRRA-WNdg"
 allowed_languages = ["english", "danish", "spanish"]
 default_language = "english"
+site_name = "Home"
 
 ##############################
  
@@ -149,6 +150,7 @@ def send_email(to_email, subject, template):
 REGEX_UUID4_WITHOUT_DASHES = "^[0-9a-f]{8}[0-9a-f]{4}4[0-9a-f]{3}[89ab][0-9a-f]{3}[0-9a-f]{12}$"
 def validate_uuid4_without_dashes():
     user_uuid4 = request.args.get("key", "")
+    ic(user_uuid4)
     if not re.match(REGEX_UUID4_WITHOUT_DASHES, user_uuid4): raise Exception(f"x exception - {lans('cannot_verify_user')}", 400) # TO ASK is this the right way to tell the user it wasn't a uuid
     return user_uuid4
 

@@ -1,4 +1,4 @@
-document.querySelectorAll(".selector").forEach(button => {
+document.querySelectorAll(".selector")?.forEach(button => {
     button.addEventListener("click", e => {
         e.target.parentNode.classList.toggle("open");
     });
@@ -7,3 +7,7 @@ document.querySelectorAll(".selector").forEach(button => {
         e.currentTarget.classList.remove("open");
     });
 });
+
+document.getElementById("burger_menu")?.addEventListener("click", e => {
+    document.querySelector("nav").classList.toggle("shown")
+})

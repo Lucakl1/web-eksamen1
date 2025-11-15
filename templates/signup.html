@@ -31,24 +31,24 @@
                 </div>
             </div>
             <div>
-                <label for="user_password">{{ x.lans('password') }}</label>
+                <label for="user_password">{{ x.lans('password') }} <span> - {{ x.USER_PASSWORD_MIN }} {{ x.lans('to') }} {{ x.USER_PASSWORD_MAX }} {{ x.lans('charetors') }}</span></label>
                 <input name="user_password" type="password" id="user_password" placeholder="{{ x.lans('password') }}" mix-check="{{ x.REGEX_USER_PASSWORD }}">
             </div>
             <div>
-                <label for="user_password_confirm">{{ x.lans('confirm_password') }}</label>
+                <label for="user_password_confirm">{{ x.lans('confirm_password') }} <span> - {{ x.lans('repeat_password') }}</span></label>
                 <input name="user_password_confirm" type="password" id="user_password_confirm" placeholder="{{ x.lans('confirm_password') }}" mix-check="{{ x.REGEX_USER_PASSWORD }}">
             </div>
             <div>
-                <label for="user_username">{{ x.lans('username') }}</label>
+                <label for="user_username">{{ x.lans('username') }} <span> - {{ x.USER_USERNAME_MIN }} {{ x.lans('to') }} {{ x.USER_USERNAME_MAX }} {{ x.lans('charetors') }}</span></label>
                 <input name="user_username" type="text" id="user_username" placeholder="{{ x.lans('username') }}" mix-check="{{ x.REGEX_USER_USERNAME }}">
             </div>
             <div class="two_inputs">
                 <div>
-                    <label for="user_first_name">{{ x.lans('first_name') }}</label>
+                    <label for="user_first_name">{{ x.lans('first_name') }} <span> - {{ x.USER_FIRST_NAME_MIN }} {{ x.lans('to') }} {{ x.USER_FIRST_NAME_MAX }} {{ x.lans('charetors') }}</span></label>
                     <input name="user_first_name" type="text" id="user_first_name" placeholder="{{ x.lans('first_name') }}" mix-check="{{ x.REGEX_USER_FIRST_NAME }}">
                 </div>
                 <div>
-                    <label for="user_last_name">{{ x.lans('last_name') }}</label>
+                    <label for="user_last_name">{{ x.lans('last_name') }} <span> - {{ x.USER_LAST_NAME_MIN }} {{ x.lans('to') }} {{ x.USER_LAST_NAME_MAX }} {{ x.lans('charetors') }}</span></label>
                     <input name="user_last_name" type="text" id="user_last_name" placeholder="{{ x.lans('last_name') }}" mix-check="{{ x.REGEX_USER_LAST_NAME }}">
                 </div>
             </div>
