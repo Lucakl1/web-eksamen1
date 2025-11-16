@@ -377,8 +377,9 @@ def view_forgot_password(lan = "english"):
                 q = "INSERT INTO not_verifyed_accounts VALUES(%s, %s)"
                 cursor.execute(q, (user_pk, new_user_uuid))
 
-            q = "UPDATE users SET user_varified_at = %s WHERE user_pk = %s" 
-            cursor.execute(q, (0, user_pk))
+                q = "UPDATE users SET user_varified_at = %s WHERE user_pk = %s" 
+                cursor.execute(q, (0, user_pk))
+                
             db.commit()
 
             # send reset password
