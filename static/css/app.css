@@ -23,6 +23,21 @@ body {
     }
 }
 
+.secoundary_button {
+    display: block;
+    padding: 8px 32px;
+    background: rgb(207, 207, 207);
+    border-radius: 50px;
+    color: rgb(0, 0, 0);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+        background: rgb(50, 50, 50);
+    }
+}
+
 #burger_menu {
     margin-top: 20px;
     width: 30px;
@@ -48,7 +63,7 @@ nav {
     ul {
         display: flex;
         flex-flow: column nowrap;
-        gap: 12px;
+        gap: 6px;
 
         li {
             list-style-type: none;
@@ -58,8 +73,8 @@ nav {
                 align-items: center;
                 gap: 24px;
                 position: relative;
-                height: 80px;
-                width: 80px;
+                height: 60px;
+                width: 60px;
                 background: none;
                 padding: 0;
                 font-size: 24px;
@@ -96,6 +111,7 @@ nav {
         left: unset;
         width: unset;
         padding: 16px 64px 0 0;
+        border-right: 0;
     }
 
     #profile_tag {
@@ -134,9 +150,79 @@ nav {
 }
 
 main {
-    /* remove later */
     height: 200vh;
     width: 100%;
+    position: relative;
+
+    &.profile {
+        --profile-avatar-width: 100px;
+
+        .images {
+            width: 100%;
+            height: 200px;
+            position: relative;
+
+            .banner_img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .profile_img {
+                position: absolute;
+                bottom: 0;
+                left: 16px;
+                height: var(--profile-avatar-width);
+                width: var(--profile-avatar-width);
+                border-radius: 100px;
+                overflow: hidden;
+                object-fit: cover;
+                transform: translatey(50%);
+            }
+        }
+
+        .info {
+            display: flex;
+            flex-flow: column nowrap;
+            gap: 16px;
+            width: 100%;
+            padding-left: calc(var(--profile-avatar-width) + 32px);
+
+            > div:first-child {
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                gap: 24px;
+                
+                header {
+                    margin-right: auto;
+
+                    h2 {
+                        font-size: 16px;
+                        color: #696969;
+                    }
+                }
+            }
+
+            > div:last-child {
+                display: flex;
+                justify-content: center;
+                gap: 32px;
+
+                div {
+                    display: flex;
+                    flex-flow: column nowrap;
+                    gap: 6px;
+                    text-align: start;
+                }
+            }
+        }
+    }
+
+    @media (width > 768px) {
+        border-right: 1px gray solid;
+        border-left: 1px gray solid;
+    }
 }
 
 aside {
@@ -144,5 +230,12 @@ aside {
 
     @media (width > 768px) {
         display: block;
+        padding: 64px 0 0 64px;
+        background: white;
+
+        > *.sticky {
+            position: sticky;
+            top: 16px;
+        }
     }
 }

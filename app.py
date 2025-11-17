@@ -26,8 +26,8 @@ Session(app)
 @app.context_processor
 def global_variables():
     return dict (
-        user_role = session.get("user", ""),
         x = x,
+        user = session.get("user", "")
     )
 
 @app.get("/logout")
@@ -76,7 +76,13 @@ def upload_file():
 def view_index():
     try:
         x.site_name = x.lans("home")
-        if not session.get("user", ""): return redirect(url_for("login"))
+        user = session.get("user", "")
+        if not user: return redirect(url_for("login"))
+
+        lan = x.default_language = user["user_language"]
+        if lan not in x.allowed_languages: lan = "english"
+        x.default_language = lan
+
         return render_template("index.html")
     except Exception as ex:
         ic(ex)
@@ -227,7 +233,7 @@ def signup(lan = "english"):
 def view_home():
     try:
         x.site_name = x.lans("home")
-        site = render_template("main_site/home.html")
+        site = render_template("main_pages/home.html")
         return f""" <browser mix-replace='#main'> {site} </browser> """
     except Exception as ex:
         ic(ex)
@@ -237,7 +243,7 @@ def view_home():
 def view_profile():
     try:
         x.site_name = x.lans("profile")
-        site = render_template("main_site/profile.html")
+        site = render_template("main_pages/profile.html")
         return f""" <browser mix-replace='#main'> {site} </browser> """
     except Exception as ex:
         ic(ex)

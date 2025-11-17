@@ -1,0 +1,48 @@
+<main id="main" class="profile">
+    <section class="images">
+        {% if user['user_banner'] == 'default_banner.jpg' %}
+        <img src="{{ url_for('static', filename='images/'~user['user_banner']) }}" alt="" class="banner_img">
+        {% else %}
+        <img src="{{ url_for('static', filename='uploads/'~user['user_banner']) }}" alt="" class="banner_img">
+        {% endif %}
+        
+        {% if user['user_avatar'] == 'default.svg' %}
+        <img src="{{ url_for('static', filename='images/'~user['user_avatar']) }}" alt="" class="profile_img">
+        {% else %}
+        <img src="{{ url_for('static', filename='uploads/'~user['user_avatar']) }}" alt="" class="profile_img">
+        {% endif %}
+        
+    </section>
+    <section class="info">
+        <div>
+            <header>
+                <h1>@{{ user['user_username'] }}</h1>
+                <h2>{{ user['user_first_name'] }} {{ user['user_last_name'] }}</h2>
+            </header>
+            <button class="secoundary_button">Edit</button>
+        </div>
+        <div>
+            <!-- Stats -->
+            <div>
+                <p>Followers</p>
+                <p>{{ user['user_total_followers'] }}</p>
+            </div>
+            <div>
+                <p>Fllowing</p>
+                <p>{{ user['user_total_following'] }}</p>
+            </div>
+            <div>
+                <p>Likes</p>
+                <p>{{ user['user_total_likes'] }}</p>
+            </div>
+            <div>
+                <p>Posts</p>
+                <p>{{ user['user_total_posts'] }}</p>
+            </div>
+            <!-- Stats -->
+        </div>
+    </section>
+    <section class="posts">
+
+    </section>
+</main>

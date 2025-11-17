@@ -75,23 +75,31 @@
 
 
     <div id="profile_tag">
-        <img src="{{ url_for('static', filename='images/avatar_1.jpg') }}" alt="Profile">
+        {% if user['user_avatar'] == 'default.svg' %}
+        <img src="{{ url_for('static', filename='images/'~user['user_avatar']) }}" alt="Profile">
+        {% else %}
+        <img src="{{ url_for('static', filename='uploads/'~user['user_avatar']) }}" alt="Profile">
+        {% endif %}
+        
         <div>
             <div class="name">
-                TEST
+                {{ user['user_first_name'] }} {{ user['user_last_name'] }}
             </div>
             <div class="handle">
-                testname
+                @{{ user['user_username']}}
             </div>
         </div>
         <p>icon</p>
     </div>
 </nav>
 
-{% include "main_site/home.html" %}
+{% include "main_pages/home.html" %}
 
 <aside>
-
+    <p>content</p>
+    <div class="sticky">
+        <p>HEJJJJJ</p>
+    </div>
 </aside>
 
 {% include "global/footer.html" %}
