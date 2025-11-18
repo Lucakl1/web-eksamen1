@@ -9,5 +9,13 @@ document.querySelectorAll(".selector")?.forEach(button => {
 });
 
 document.getElementById("burger_menu")?.addEventListener("click", e => {
-    document.querySelector("nav").classList.toggle("shown")
+    document.querySelector("nav").classList.toggle("shown");
+})
+
+nav_links = document.querySelectorAll("nav ul li a");
+nav_links?.forEach(link => {
+    link.addEventListener("click", e => {
+        document.querySelector("nav ul li a.active")?.classList.remove("active");
+        e.target.classList.add("active");
+    })
 })

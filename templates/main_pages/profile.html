@@ -15,34 +15,42 @@
     </section>
     <section class="info">
         <div>
-            <header>
-                <h1>@{{ user['user_username'] }}</h1>
-                <h2>{{ user['user_first_name'] }} {{ user['user_last_name'] }}</h2>
-            </header>
+            <div>
+                <header>
+                    <h1>{{ user['user_first_name'] }} {{ user['user_last_name'] }}</h1>
+                    <h2>@{{ user['user_username'] }}</h2>
+                </header>
+                <span>·</span>
+                <span>{{ x.lans('joined') }} {{ x.epoch_to_time(user.user_created_at) }}</span>
+            </div>
             <button class="secoundary_button">Edit</button>
         </div>
         <div>
             <!-- Stats -->
             <div>
-                <p>Followers</p>
+                <p>{{ x.lans('followers') }}</p>
                 <p>{{ user['user_total_followers'] }}</p>
             </div>
             <div>
-                <p>Fllowing</p>
+                <p>{{ x.lans('following') }}</p>
                 <p>{{ user['user_total_following'] }}</p>
             </div>
             <div>
-                <p>Likes</p>
+                <p>{{ x.lans('likes') }}</p>
                 <p>{{ user['user_total_likes'] }}</p>
             </div>
             <div>
-                <p>Posts</p>
+                <p>{{ x.lans('posts') }}</p>
                 <p>{{ user['user_total_posts'] }}</p>
             </div>
             <!-- Stats -->
         </div>
     </section>
-    <section class="posts">
+    <section id="posts">
 
+        {% for post in posts: %}
+            {% include "_post.html" %}
+        {% endfor %}
+    
     </section>
 </main>

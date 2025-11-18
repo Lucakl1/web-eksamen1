@@ -1,26 +1,56 @@
 <article class="post" mix-fade-in="1000">
-    <img src="{{ url_for('static', if filename='uploads/'~(post['user_avatar']) else  filename='images/'~(post['user_avatar']) ) }}">
-    <div>
-        <div class="post-header">
-            <span class="name">
-                {{ post.user_first_name }}
-                {{ post.user_last_name }}
-            </span>
-            <span class="handle">@{{ post.user_username }}</span> · <span class="time"> {{ if post.post_updated_at != 0 else post.post_created_at }}</span>
-        </div>
-        <p class="text">
-            {{ post.post_message }}
-        </p>
-        {% if tweet.post_image_path: %}
-        <img src="{{ url_for('static', filename='images/' ~ tweet.post_image_path) }}" alt="Post image">
+    {% if post.user_avatar == 'default.svg' %}
+    <img src="{{ url_for('static', filename='images/'~post.user_avatar) }}" alt="" class="profile_img">
+    {% else %}
+    <img src="{{ url_for('static', filename='uploads/'~post.user_avatar) }}" alt="" class="profile_img">
+    {% endif %}
+
+    <div class="mini_profile">
+        {% if post.user_banner == 'default_banner.jpg' %}
+        <img src="{{ url_for('static', filename='images/'~post.user_banner) }}" alt="" class="profile_img">
+        {% else %}
+        <img src="{{ url_for('static', filename='uploads/'~post.user_banner) }}" alt="" class="profile_img">
         {% endif %}
+        <div class="mini_profile_header">
+            <div>
+                <span class="name">
+                    {{ post.user_first_name }} {{ post.user_last_name }}
+                </span>
+                <span class="handle">@{{ post.user_username }}</span>
+            </div>
+            <span>·</span>
+            <span class="time">{{ x.lans('joined') }} {{ x.epoch_to_time(user.user_created_at) }}</span>
+        </div>
+        <p class="text">{{ post.user_bio }}</p>
+    </div>
+
+    <div class="post_info">
+        <div class="post_header">
+            <span class="name">
+                {{ post.user_first_name }} {{ post.user_last_name }}
+            </span>
+            <span class="handle">@{{ post.user_username }}</span> ·
+            {% if post.post_updated_at != 0 %} 
+                <span class="time">{{ x.lans('updated') }} {{ x.time_ago(post.post_updated_at) }}</span>
+            {% else %}
+                <span class="time">{{ x.lans('created') }} {{ x.time_ago(post.post_created_at) }}</span>
+            {% endif %}
+        </div>
+        <div class="post_content">
+            <p class="text">
+                {{ post.post_message }}
+            </p>
+        </div>
         
-        <div class="post-actions">
-            <span class="action"><i class="fa-regular fa-comment"></i> 12</span>
-            <span class="action"><i class="fa-solid fa-retweet"></i> 5</span>
-            {% include "___button_like_tweet.html" %}
-            <span class="action"><i class="fa-solid fa-chart-simple"></i> 230</span>
-            <span class="action"><i class="fa-solid fa-share"></i></span>
+        <div class="post_actions">
+            <span class="action"><i class="fa-regular fa-comment"></i>{{ post.post_total_comments }}</span>
+            {% if user_has_liked %}
+                {% include "___post_like.html" %}
+            {% else %}
+                {% include "___post_unlike.html" %}
+            {% endif %}
+            <span class="action"><i class="fa-regular fa-heart"></i>{{ post.post_total_likes }}</span>
+            <!-- <span class="action"><i class="fa-solid fa-share"></i></span> -->
         </div>
     </div>
 </article>

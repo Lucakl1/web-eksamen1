@@ -55,7 +55,7 @@ nav {
     left: -300px;
     width: 300px;
     height: 100vh;
-    border-right: 1px gray solid;
+    border-right: 1px var(--border-color) solid;
     padding: 64px 64px 0 16px;
     transition: left 0.5s;
     background: white;
@@ -90,10 +90,17 @@ nav {
             }
 
             a {
-                display: block;
+                display: flex;
+                align-items: center;
+                gap: 8px;
                 padding: 8px 16px;
                 color: black;
                 border-radius: 50px;
+                font-weight: 600;
+
+                &.active {
+                    background: rgb(242, 242, 242);
+                }
 
                 &:hover {
                     background: rgb(221, 221, 221);
@@ -125,8 +132,8 @@ nav {
         width: 100%;
 
         img {
-            height: 42px;
-            width: 42px;
+            height: 30px;
+            width: 30px;
             border-radius: 50px;
             object-fit: cover;
         }
@@ -153,6 +160,11 @@ main {
     height: 200vh;
     width: 100%;
     position: relative;
+
+    @media (width > 768px) {
+        border-right: 1px var(--border-color) solid;
+        border-left: 1px var(--border-color) solid;
+    }
 
     &.profile {
         --profile-avatar-width: 100px;
@@ -186,22 +198,36 @@ main {
             flex-flow: column nowrap;
             gap: 16px;
             width: 100%;
-            padding-left: calc(var(--profile-avatar-width) + 32px);
+            padding: 0 0 32px calc(var(--profile-avatar-width) + 32px);
+            border-bottom: 1px solid var(--border-color);
 
             > div:first-child {
                 display: flex;
-                justify-content: flex-start;
+                justify-content: space-between;
                 align-items: center;
                 gap: 24px;
-                
-                header {
-                    margin-right: auto;
 
-                    h2 {
+                > div {
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-start;
+                    gap: 8px;
+
+                    header {
+                        margin-right: auto;
+    
+                        h2 {
+                            font-size: 16px;
+                            color: #696969;
+                        }
+                    }
+
+                    span {
                         font-size: 16px;
                         color: #696969;
                     }
                 }
+                
             }
 
             > div:last-child {
@@ -219,9 +245,118 @@ main {
         }
     }
 
-    @media (width > 768px) {
-        border-right: 1px gray solid;
-        border-left: 1px gray solid;
+    --profile_pic_height: 50px;
+    --profile_pic_width: 50px;
+    #posts article {
+        position: relative;
+        padding: 32px 16px;
+        display: grid;
+        grid-template-columns: var(--profile_pic_width) 1fr;
+        gap: 16px;
+        transition: background 0.5s;
+        border-bottom: 1px var(--border-color) solid;
+
+        img {
+            width: var(--profile_pic_width);
+            height: var(--profile_pic_height);
+            border-radius: 50px;
+            z-index: 2;
+        }
+
+        .post_info {
+            display: flex;
+            flex-flow: column nowrap;
+            gap: 16px;
+            
+            .post_header {
+                display: flex;
+                align-items: center;
+                height: var(--profile_pic_height);;
+                gap: 16px;
+                font-size: 12px;
+                color: gray;
+                
+                .name {
+                    font-weight: 500;
+                    font-size: 14px;
+                    color: black;
+                }
+            }
+
+            .post_content {
+                padding: 8px 0;
+            }
+
+            .post_actions {
+                display: flex;
+                gap: 32px;
+
+                .action {
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                }
+            }
+        }
+
+        &:has(img:hover) .mini_profile, .mini_profile:hover {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .mini_profile {
+            transition: opacity 0.2s;
+            opacity: 0;
+            pointer-events: none;
+            position: absolute;
+            top: 16px;
+            left: 0;
+            width: 300px;
+            height: fit-content;
+            z-index: 1;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            padding: 16px 16px 16px calc(var(--profile_pic_width) + 32px);
+
+            img {
+                border-radius: 0;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 40px;
+                object-fit: cover;
+            }
+
+            .mini_profile_header {
+                margin-top: 25px;
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                height: calc(var(--profile_pic_height));
+                
+                > div {
+                    display: inline-flex;
+                    flex-flow: column;
+    
+                    .name {
+                        font-weight: 500;
+                        font-size: 14px;
+                        color: black;
+                    }
+                }
+            }
+
+            .text {
+                margin-top: 12px;
+            }
+        }
+
+        &:hover {
+            background: rgb(243, 243, 243);
+        }
     }
 }
 

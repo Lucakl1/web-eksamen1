@@ -10,7 +10,7 @@ ic.configureOutput(prefix=f'----- | ', includeContext=True)
 import csv, io, json, time, uuid, os
 
 # other python files
-import x
+import x, api
 
 app = Flask(__name__)
 
@@ -83,10 +83,33 @@ def view_index():
         if lan not in x.allowed_languages: lan = "english"
         x.default_language = lan
 
-        return render_template("index.html")
+        db, cursor = x.db()
+        q = """SELECT 
+        post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, post_updated_at, 
+        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username, user_pk
+        FROM users JOIN posts ON user_pk = user_fk WHERE post_deleted_at = 0 ORDER BY RAND() LIMIT 5"""
+        cursor.execute(q)
+        posts = cursor.fetchall()
+
+        for post in posts:
+            ic(post)
+            user_pk = post['user_pk']
+            post_pk = post['post_pk']
+
+            q = "SELECT * FROM likes WHERE user_fk = %s AND post_fk = %s LIMIT 1"
+            cursor.execute(q, (user_pk, post_pk))
+            liked = cursor.fetchone()
+
+            post['user_has_liked'] = False
+            if liked: post['user_has_liked'] = True
+
+        return render_template("index.html", posts=posts)
     except Exception as ex:
         ic(ex)
         return "error"
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
 
 @app.route("/login", methods=["GET", "POST"])
 @app.route("/login/<lan>", methods=["GET", "POST"])
@@ -149,7 +172,7 @@ def login(lan = "english"):
     except Exception as ex:
         ic(ex)
         error_code = str(ex)
-        error_msg = "error" #should i say system under maintenese? #### TO ASK ####
+        error_msg = x.lans('system_under_maintenance')
         if("x exception - " in error_code):
             error_msg = error_code.replace("('x exception - ", "").split("', ")[0]
         
@@ -212,7 +235,7 @@ def signup(lan = "english"):
         if "db" in locals(): db.rollback()
 
         error_code = str(ex)
-        error_msg = "error"             #should i say system under maintenese? #### TO ASK ####
+        error_msg = x.lans('system_under_maintenance')
         if "x exception - " in error_code:
             error_msg = error_code.replace("('x exception - ", "").split("', ")[0]
 
@@ -233,21 +256,47 @@ def signup(lan = "english"):
 def view_home():
     try:
         x.site_name = x.lans("home")
-        site = render_template("main_pages/home.html")
+
+        db, cursor = x.db()
+        q = """SELECT 
+        post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, post_updated_at, 
+        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username 
+        FROM users JOIN posts ON user_pk = user_fk WHERE post_deleted_at = 0 ORDER BY RAND() LIMIT 5"""
+        cursor.execute(q)
+        posts = cursor.fetchall()
+        
+        site = render_template("main_pages/home.html", posts=posts)
         return f""" <browser mix-replace='#main'> {site} </browser> """
     except Exception as ex:
         ic(ex)
         return "error"
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
     
 @app.get("/profile")
 def view_profile():
     try:
         x.site_name = x.lans("profile")
-        site = render_template("main_pages/profile.html")
+
+        user = session.get("user", "")
+        db, cursor = x.db()
+        q = """SELECT 
+        post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, post_updated_at, 
+        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_total_followers, user_total_following, user_username, user_created_at 
+        FROM users JOIN posts ON user_pk = user_fk WHERE post_deleted_at = 0 AND user_fk = %s ORDER BY RAND() LIMIT 5"""
+        cursor.execute(q, (user['user_pk'],))
+        posts = cursor.fetchall()
+
+        site = render_template("main_pages/profile.html", posts=posts)
         return f""" <browser mix-replace='#main'> {site} </browser> """
     except Exception as ex:
         ic(ex)
         return "error"
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
 
 ##############################
 ########## utilities #########
@@ -261,7 +310,7 @@ def get_data_from_sheet():
         # if not session.get("user", ""):
         #     return redirect("/login")
 
-        # user_role_number = session.get("user", "")["role_fk"]  # TO ASK is this the correct way to use pk and fk?
+        # user_role_number = session.get("user", "")["role_fk"]
         # db, cursor = x.db()
         # q = "SELECT * FROM roles WHERE role_pk = %s"
         # cursor.execute(q, (user_role_number,))
@@ -400,7 +449,7 @@ def view_forgot_password(lan = "english"):
         if "db" in locals(): db.rollback()
 
         error_code = str(ex)
-        error_msg = "error" #should i say system under maintenese? #### TO ASK ####
+        error_msg = x.lans('system_under_maintenance')
         if("x exception - " in error_code):
             error_msg = error_code.replace("('x exception - ", "").split("', ")[0]
         
@@ -456,7 +505,7 @@ def view_reset_password(lan = "english"):
         ic(ex)
         error_code = str(ex)
         if "db" in locals(): db.rollback()  
-        error_msg = "error" #should i say system under maintenese? #### TO ASK ####
+        error_msg = x.lans('system_under_maintenance')
         if("x exception - " in error_code):
             error_msg = error_code.replace("('x exception - ", "").split("', ")[0]
         

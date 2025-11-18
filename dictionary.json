@@ -318,5 +318,50 @@
         "english": "Reset my password",
         "danish": "Nulstil min adgangskode",
         "spanish": "Restablecer mi contraseña"
+    },
+    "@_cant_be_in_username": {
+        "english": "@ can't be in username",
+        "danish": "@ må ikke være i brugernavnet",
+        "spanish": "El asterisco (@) no puede estar en el nombre de usuario."
+    },
+    "system_under_maintenance": {
+        "english": "System under maintenance",
+        "danish": "Systemet er under vedligeholdelse",
+        "spanish": "Sistema en mantenimiento"
+    },
+    "followers": {
+        "english": "Followers",
+        "danish": "Følgere",
+        "spanish": "Seguidores"
+    },
+    "following": {
+        "english": "Following",
+        "danish": "Følger",
+        "spanish": "Siguiendo"
+    },
+    "likes": {
+        "english": "Likes",
+        "danish": "Synes godt om",
+        "spanish": "Me gusta"
+    },
+    "posts": {
+        "english": "Posts",
+        "danish": "Indlæg",
+        "spanish": "Publicaciones"
+    },
+    "updated": {
+        "english": "Updated",
+        "danish": "",
+        "spanish": ""
+    },
+    "created": {
+        "english": "Created",
+        "danish": "",
+        "spanish": ""
+    },
+    "joined": {
+        "english": "Joined",
+        "danish": "",
+        "spanish": ""
     }
 }

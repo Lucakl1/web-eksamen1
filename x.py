@@ -7,6 +7,7 @@ from icecream import ic
 ic.configureOutput(prefix=f'----- | ', includeContext=True)
 
 # standard python libaryes
+from datetime import datetime
 import re, json, os
 
 
@@ -69,6 +70,7 @@ USER_USERNAME_MAX = 20
 REGEX_USER_USERNAME = f"^.{{{USER_USERNAME_MIN},{USER_USERNAME_MAX}}}$"
 def validate_user_username(user_username = None):
     if not user_username: user_username = request.form.get("user_username", "").strip()
+    if "@" in user_username : raise Exception(f"x exception - {lans('@_cant_be_in_username')} {USER_USERNAME_MIN}", 400)
     if len(user_username) < USER_USERNAME_MIN: raise Exception(f"x exception - {lans('username_to_short_must_be_above')} {USER_USERNAME_MIN}", 400)
     if len(user_username) > USER_USERNAME_MAX: raise Exception(f"x exception - {lans('username_to_long_must_be_below')} {USER_USERNAME_MAX}", 400)
     return user_username
@@ -151,7 +153,7 @@ REGEX_UUID4_WITHOUT_DASHES = "^[0-9a-f]{8}[0-9a-f]{4}4[0-9a-f]{3}[89ab][0-9a-f]{
 def validate_uuid4_without_dashes():
     user_uuid4 = request.args.get("key", "")
     ic(user_uuid4)
-    if not re.match(REGEX_UUID4_WITHOUT_DASHES, user_uuid4): raise Exception(f"x exception - {lans('cannot_verify_user')}", 400) # TO ASK is this the right way to tell the user it wasn't a uuid
+    if not re.match(REGEX_UUID4_WITHOUT_DASHES, user_uuid4): raise Exception(f"x exception - {lans('cannot_verify_user')}", 400)
     return user_uuid4
 
 ##### need adjustment down from here ###############
@@ -171,3 +173,38 @@ def validate_post(post = ""):
     post = post.strip()
     if not re.match(REGEX_POST, post): raise Exception("x-error post", 400)
     return post
+
+##############################
+def time_ago(epoch_time):
+    if epoch_time == 0:
+        return ""
+    
+    current_time = datetime.utcnow()
+    datetimet = datetime.utcfromtimestamp(epoch_time)
+    diff = current_time - datetimet
+
+    seconds = diff.total_seconds()
+    minutes = seconds / 60
+    hours = minutes / 60
+    days = hours / 24
+    months = days / 30
+    years = days / 365
+
+    if seconds < 60:
+        return f"{int(seconds)} seconds ago"
+    elif minutes < 60:
+        return f"{int(minutes)} minutes ago"
+    elif hours < 24:
+        return f"{int(hours)} hours ago"
+    elif days < 30:
+        return f"{int(days)} days ago"
+    elif days < 365:
+        return f"{int(months)} months ago"
+    else:
+        return f"{int(years)} years ago"
+    
+def epoch_to_time(epoch_time):
+    if epoch_time == 0:
+        return ""
+    
+    return datetime.utcfromtimestamp(epoch_time).strftime("%Y %m")
