@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Vært: mariadb
--- Genereringstid: 17. 11 2025 kl. 05:25:24
+-- Genereringstid: 18. 11 2025 kl. 13:35:39
 -- Serverversion: 10.6.20-MariaDB-ubu2004
 -- PHP-version: 8.3.26
 
@@ -152,13 +152,21 @@ CREATE TABLE `posts` (
   `post_pk` bigint(20) UNSIGNED NOT NULL,
   `user_fk` bigint(20) UNSIGNED NOT NULL,
   `post_message` varchar(200) NOT NULL,
-  `post_total_comments` bigint(20) UNSIGNED NOT NULL,
-  `post_total_likes` bigint(20) UNSIGNED NOT NULL,
-  `post_total_saved` bigint(20) UNSIGNED NOT NULL,
+  `post_total_comments` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
+  `post_total_likes` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
+  `post_total_saved` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
   `post_created_at` bigint(20) UNSIGNED NOT NULL,
-  `post_updated_at` bigint(20) UNSIGNED NOT NULL,
-  `post_deleted_at` bigint(20) UNSIGNED NOT NULL
+  `post_updated_at` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
+  `post_deleted_at` bigint(20) UNSIGNED NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Data dump for tabellen `posts`
+--
+
+INSERT INTO `posts` (`post_pk`, `user_fk`, `post_message`, `post_total_comments`, `post_total_likes`, `post_total_saved`, `post_created_at`, `post_updated_at`, `post_deleted_at`) VALUES
+(11, 10, 'This is a post', 0, 0, 0, 1231213321, 0, 0),
+(12, 10, 'This is a test for time', 0, 0, 0, 1763455801, 1763455826, 0);
 
 --
 -- Triggers/udløsere `posts`
@@ -288,7 +296,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_pk`, `user_first_name`, `user_last_name`, `user_username`, `user_email`, `user_password`, `user_language`, `role_fk`, `user_banner`, `user_avatar`, `user_bio`, `user_total_followers`, `user_total_following`, `user_total_likes`, `user_total_posts`, `user_created_at`, `user_varified_at`, `user_updated_at`, `user_deletet_at`) VALUES
-(10, 'luca', 'klæø', 'lucakl', 'lucaklaeoe@gmail.com', 'scrypt:32768:8:1$6NmFWjNGnCMRYqyh$3642d4ae60ebe0e3a602b965d8aefc1dbcb4a0a28d9b2214c848f0e5b76813a8f7bf890e53751edba25dd0eca91d1602a83b86c8bf3cbb82abe87dcf709885c4', 'english', 2, 'default_banner.jpg', 'default.svg', 'No bio', 0, 0, 0, 0, 1763160252, 1763244248, 0, 0),
+(10, 'luca', 'klæø', 'lucakl', 'lucaklaeoe@gmail.com', 'scrypt:32768:8:1$6NmFWjNGnCMRYqyh$3642d4ae60ebe0e3a602b965d8aefc1dbcb4a0a28d9b2214c848f0e5b76813a8f7bf890e53751edba25dd0eca91d1602a83b86c8bf3cbb82abe87dcf709885c4', 'english', 2, 'default_banner.jpg', 'default.svg', 'No bio', 0, 0, 0, 2, 1763160252, 1763244248, 0, 0),
 (21, 'Luca', 'Klæø', 'tester', 'a@b.com', 'scrypt:32768:8:1$wWl0mOYaUXQBJxd6$17e50b0290403c1f943c501be90d406501beb714b7337c85b5045d0b17a39e4b4d081632ba9ca9f95ccd0cfe3275399a3532c040500369107a75ccab5c173a33', 'english', 1, 'default_banner.jpg', 'default.svg', 'No bio', 0, 0, 0, 0, 1763234764, 1763234764, 0, 0);
 
 --
@@ -386,7 +394,7 @@ ALTER TABLE `comments`
 -- Tilføj AUTO_INCREMENT i tabel `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `post_pk` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `post_pk` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- Tilføj AUTO_INCREMENT i tabel `posts_media_types`
