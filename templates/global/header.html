@@ -14,8 +14,19 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='css/login_signup.css') }}">
     {% endif %}
 
+    {% if user['user_role'] == 'admin' %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    {% endif %}
+
     <script src="{{ url_for('static', filename='mixhtml.js') }}" defer></script>
     <script src="{{ url_for('static', filename='app.js') }}" defer></script>
 </head> 
 <body>
+    {% if user['user_role'] == 'admin' %}
+        <admin-bar>
+            <a href="/">Home page</a>
+            <a href="/get-data-from-sheet">Update dictionary</a>
+        </admin-bar>
+    {% endif %}
     <div id="error_response"></div>
+    <div id="succes_message"></div>

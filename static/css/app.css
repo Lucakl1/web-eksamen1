@@ -34,7 +34,7 @@ body {
     cursor: pointer;
 
     &:hover {
-        background: rgb(50, 50, 50);
+        background: rgb(162, 162, 162);
     }
 }
 
@@ -256,11 +256,16 @@ main {
         transition: background 0.5s;
         border-bottom: 1px var(--border-color) solid;
 
-        img {
-            width: var(--profile_pic_width);
-            height: var(--profile_pic_height);
-            border-radius: 50px;
+        a {
+            width: fit-content;
+            height: fit-content;
             z-index: 2;
+
+            img {
+                width: var(--profile_pic_width);
+                height: var(--profile_pic_height);
+                border-radius: 50px;
+            }
         }
 
         .post_info {
@@ -295,11 +300,12 @@ main {
                     display: flex;
                     align-items: center;
                     gap: 4px;
+                    cursor: pointer;
                 }
             }
         }
 
-        &:has(img:hover) .mini_profile, .mini_profile:hover {
+        &:has(a:hover) .mini_profile, .mini_profile:hover {
             opacity: 1;
             pointer-events: all;
         }

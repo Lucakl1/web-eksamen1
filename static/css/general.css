@@ -38,7 +38,7 @@ main {
     background: rgb(255, 231, 231);
 }
 
-#error_response {
+#error_response, #succes_message {
     position: absolute;
     top: 5rem;
     left: 50%;
@@ -53,4 +53,8 @@ main {
     div {
         padding: 1rem;
     }
+}
+
+#succes_message {
+    background-color: green;
 }

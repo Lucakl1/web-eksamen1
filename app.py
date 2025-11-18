@@ -10,7 +10,7 @@ ic.configureOutput(prefix=f'----- | ', includeContext=True)
 import csv, io, json, time, uuid, os
 
 # other python files
-import x, api
+import x
 
 app = Flask(__name__)
 
@@ -92,7 +92,6 @@ def view_index():
         posts = cursor.fetchall()
 
         for post in posts:
-            ic(post)
             user_pk = post['user_pk']
             post_pk = post['post_pk']
 
@@ -162,7 +161,12 @@ def login(lan = "english"):
                 
             if user["user_varified_at"] == "":
                 raise Exception(f"x exception - {x.lans('user_not_verified')}", 400)  
+            
+            q = "SELECT * FROM roles WHERE role_pk = %s"
+            cursor.execute(q, (user["role_fk"],))
+            user_role = cursor.fetchone()["role_title"]
 
+            user['user_role'] = user_role
             user.pop("user_password")
 
             session["user"] = user
@@ -276,20 +280,26 @@ def view_home():
 
     
 @app.get("/profile")
-def view_profile():
+@app.get("/profile/<user_username>")
+def view_profile(user_username = ""):
     try:
-        x.site_name = x.lans("profile")
-
+        x.site_name = f"{x.lans('profile')} {user_username}"
         user = session.get("user", "")
+        if not user_username: user_username = user['user_username']
+
         db, cursor = x.db()
         q = """SELECT 
         post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, post_updated_at, 
-        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_total_followers, user_total_following, user_username, user_created_at 
-        FROM users JOIN posts ON user_pk = user_fk WHERE post_deleted_at = 0 AND user_fk = %s ORDER BY RAND() LIMIT 5"""
-        cursor.execute(q, (user['user_pk'],))
+        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username 
+        FROM users JOIN posts ON user_pk = user_fk WHERE post_deleted_at = 0 AND user_username = %s ORDER BY RAND() LIMIT 5"""
+        cursor.execute(q, (user_username,))
         posts = cursor.fetchall()
 
-        site = render_template("main_pages/profile.html", posts=posts)
+        q = "SELECT * FROM users WHERE user_username = %s"
+        cursor.execute(q, (user_username,))
+        user = cursor.fetchone()
+
+        site = render_template("main_pages/profile.html", posts=posts, userprofile=user)
         return f""" <browser mix-replace='#main'> {site} </browser> """
     except Exception as ex:
         ic(ex)
@@ -298,98 +308,19 @@ def view_profile():
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
-##############################
-########## utilities #########
-##############################
-@app.get("/get-data-from-sheet")
-def get_data_from_sheet():
+@app.get("/edit_profile")
+def view_edit_profile():
     try:
+        x.site_name = x.lans("edit_profile")
+        user = session.get("user", "")
 
-        # Validate user is admin
-        ################
-        # if not session.get("user", ""):
-        #     return redirect("/login")
 
-        # user_role_number = session.get("user", "")["role_fk"]
-        # db, cursor = x.db()
-        # q = "SELECT * FROM roles WHERE role_pk = %s"
-        # cursor.execute(q, (user_role_number,))
-        # user_role = cursor.fetchone()["role_title"]
 
-        # if "admin" not in user_role:
-        #     return redirect("/")
-        ################
- 
-        # key: 1UYgE2jJ__HYl0N7lA5JR3sMH75hwhzhPPsSRRA-WNdg
-        url= f"https://docs.google.com/spreadsheets/d/{x.google_spread_sheet_key}/export?format=csv&id={x.google_spread_sheet_key}"
-        res=requests.get(url=url)
-        # return(res.text) # retuns a page if there is an error
-        csv_text = res.content.decode('utf-8')
-        csv_file = io.StringIO(csv_text) # Use StringIO to treat the string as a file
-       
-        data = {}
-        reader = csv.DictReader(csv_file)
-        #ic(reader)
-        # Convert each row into the desired structure
-        for row in reader:
-            item = {
-                    'english': row['english'],
-                    'danish': row['danish'],
-                    'spanish': row['spanish']
-               
-            }
-            data[row['key']] = (item)
- 
-        # Convert the data to JSON
-        json_data = json.dumps(data, ensure_ascii=False, indent=4)
-        # ic(data)
- 
-        # Save data to the file
-        with open("dictionary.json", 'w', encoding='utf-8') as f:
-            f.write(json_data)
- 
-        return f"""
-            <h1>Hi admin user</h1>
-            <h2> Data has been saved! </h2> 
-            {json_data}
-        """
+        site = render_template("main_pages/edit_profile.html")
+        return f""" <browser mix-replace='#main'> {site} </browser> """
     except Exception as ex:
         ic(ex)
-        return str(ex)
-    finally:
-        if "cursor" in locals(): cursor.close()
-        if "db" in locals(): db.close()
-    
-@app.get("/verify-account")
-def view_verify_account():
-    try:
-        user_verification_key = x.validate_uuid4_without_dashes()
-        user_verified_at = int(time.time())
-
-        db, cursor = x.db()
-        db.start_transaction()
-        q = "SELECT user_fk FROM not_verifyed_accounts WHERE uuid = %s"
-        cursor.execute(q, (user_verification_key,))
-
-        user_fk = cursor.fetchone()["user_fk"]
-
-        q = "DELETE FROM not_verifyed_accounts WHERE uuid = %s"
-        cursor.execute(q, (user_verification_key,))
-
-        q = "UPDATE users SET user_varified_at = %s WHERE user_pk = %s" 
-        cursor.execute(q, (user_verified_at, user_fk))
-
-        if cursor.rowcount != 1: raise Exception(f"x exception - {x.lans('cannot_verify_user')}", 400)
-        db.commit()
-
-        return redirect( url_for('login') )
-    except Exception as ex:
-        ic(ex)
-        if "db" in locals(): db.rollback()  
-
-        # System or developer error
-        return x.lans('cannot_verify_user')
-
+        return "error"
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
@@ -510,7 +441,132 @@ def view_reset_password(lan = "english"):
             error_msg = error_code.replace("('x exception - ", "").split("', ")[0]
         
         error_template = render_template(("global/error_message.html"), message=error_msg)
-        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>""", 40
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>""", 400
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+##############################
+######### Minor calls ########
+##############################
+
+@app.patch("/like-post") #TO ASK see ___post_like.html
+def api_like_post():
+    try:
+        button_unlike_tweet = render_template("___post_unlike.html")
+
+        raise Exception("test")
+
+        return f"""
+            <browser mix-replace="#button_1">
+                {button_unlike_tweet}
+            </browser>
+        """
+    
+    except Exception as ex:
+        ic(ex)
+        error_msg = {x.lans('something_happend_and_like_did_not_get_saved')}
+        error_template = render_template(("global/error_message.html"), message=error_msg)
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>""", 400
+    
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close() 
+
+##############################
+########## utilities #########
+##############################
+@app.get("/get-data-from-sheet")
+def get_data_from_sheet():
+    try:
+
+        # Validate user is admin
+        ################
+        user = session.get("user", "")
+        if not user:
+            return redirect("/login")
+
+        if "admin" not in user['user_role']:
+            return redirect("/")
+        ################
+ 
+        # key: 1UYgE2jJ__HYl0N7lA5JR3sMH75hwhzhPPsSRRA-WNdg
+        url= f"https://docs.google.com/spreadsheets/d/{x.google_spread_sheet_key}/export?format=csv&id={x.google_spread_sheet_key}"
+        res=requests.get(url=url)
+        # return(res.text) # retuns a page if there is an error
+        csv_text = res.content.decode('utf-8')
+        csv_file = io.StringIO(csv_text) # Use StringIO to treat the string as a file
+       
+        data = {}
+        reader = csv.DictReader(csv_file)
+        #ic(reader)
+        # Convert each row into the desired structure
+        for row in reader:
+            item = {
+                    'english': row['english'],
+                    'danish': row['danish'],
+                    'spanish': row['spanish']
+               
+            }
+            data[row['key']] = (item)
+ 
+        # Convert the data to JSON
+        json_data = json.dumps(data, ensure_ascii=False, indent=4)
+        # ic(data)
+ 
+        # Save data to the file
+        with open("dictionary.json", 'w', encoding='utf-8') as f:
+            f.write(json_data)
+
+        header = render_template("global/header.html")
+ 
+        return f""" 
+            {header}
+            <main class="dictionary"> 
+                <h1>Hi admin user</h1>
+                <h2> Data has been saved! </h2>
+                <br>
+                {json_data}
+            </main>
+            </body></html>
+        """
+    except Exception as ex:
+        ic(ex)
+        return str(ex)
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+    
+@app.get("/verify-account")
+def view_verify_account():
+    try:
+        user_verification_key = x.validate_uuid4_without_dashes()
+        user_verified_at = int(time.time())
+
+        db, cursor = x.db()
+        db.start_transaction()
+        q = "SELECT user_fk FROM not_verifyed_accounts WHERE uuid = %s"
+        cursor.execute(q, (user_verification_key,))
+
+        user_fk = cursor.fetchone()["user_fk"]
+
+        q = "DELETE FROM not_verifyed_accounts WHERE uuid = %s"
+        cursor.execute(q, (user_verification_key,))
+
+        q = "UPDATE users SET user_varified_at = %s WHERE user_pk = %s" 
+        cursor.execute(q, (user_verified_at, user_fk))
+
+        if cursor.rowcount != 1: raise Exception(f"x exception - {x.lans('cannot_verify_user')}", 400)
+        db.commit()
+
+        return redirect( url_for('login') )
+    except Exception as ex:
+        ic(ex)
+        if "db" in locals(): db.rollback()  
+
+        # System or developer error
+        return x.lans('cannot_verify_user')
+
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()

@@ -1,21 +1,25 @@
-<article class="post" mix-fade-in="1000">
-    {% if post.user_avatar == 'default.svg' %}
-    <img src="{{ url_for('static', filename='images/'~post.user_avatar) }}" alt="" class="profile_img">
-    {% else %}
-    <img src="{{ url_for('static', filename='uploads/'~post.user_avatar) }}" alt="" class="profile_img">
-    {% endif %}
+<article>
+    <a mix-get href="/profile/{{post.user_username}}">  <!-- TO ASK -- Why does link not work? -->
+        {% if post.user_avatar == 'default.svg' %}
+            <img src="{{ url_for('static', filename='images/'~post.user_avatar) }}" alt="" class="profile_img">
+        {% else %}
+            <img src="{{ url_for('static', filename='uploads/'~post.user_avatar) }}" alt="" class="profile_img">
+        {% endif %}
+    </a>
 
     <div class="mini_profile">
         {% if post.user_banner == 'default_banner.jpg' %}
-        <img src="{{ url_for('static', filename='images/'~post.user_banner) }}" alt="" class="profile_img">
+            <img src="{{ url_for('static', filename='images/'~post.user_banner) }}" alt="" class="profile_img">
         {% else %}
-        <img src="{{ url_for('static', filename='uploads/'~post.user_banner) }}" alt="" class="profile_img">
+            <img src="{{ url_for('static', filename='uploads/'~post.user_banner) }}" alt="" class="profile_img">
         {% endif %}
         <div class="mini_profile_header">
             <div>
-                <span class="name">
-                    {{ post.user_first_name }} {{ post.user_last_name }}
-                </span>
+                <a mix-get href="/profile/{{post.user_username}}"> <!-- TO ASK -- Why does link not work? -->
+                    <span class="name">
+                        {{ post.user_first_name }} {{ post.user_last_name }}
+                    </span>
+                </a>
                 <span class="handle">@{{ post.user_username }}</span>
             </div>
             <span>·</span>
@@ -44,12 +48,12 @@
         
         <div class="post_actions">
             <span class="action"><i class="fa-regular fa-comment"></i>{{ post.post_total_comments }}</span>
-            {% if user_has_liked %}
+            {% if post.user_has_liked == False %}
                 {% include "___post_like.html" %}
             {% else %}
                 {% include "___post_unlike.html" %}
             {% endif %}
-            <span class="action"><i class="fa-regular fa-heart"></i>{{ post.post_total_likes }}</span>
+            <span class="action"><i class="fa-regular fa-bookmark"></i>{{ post.post_total_saved }}</span>
             <!-- <span class="action"><i class="fa-solid fa-share"></i></span> -->
         </div>
     </div>

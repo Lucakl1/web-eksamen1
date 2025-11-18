@@ -388,7 +388,7 @@ function mix_convert(){
                 if( ! /^[0-9]\d*$/.test(ttl) ){
                     ttl = 2000
                 }
-                console.log(ttl)
+                //console.log(ttl)
                 el.setAttribute("style", `animation: mix-fade-in ${ttl}ms forwards;`) 
                 el.removeAttribute("mix-fade-in")                               
                 setTimeout(()=>{ el.removeAttribute("style")  }, ttl)                           

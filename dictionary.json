@@ -363,5 +363,20 @@
         "english": "Joined",
         "danish": "",
         "spanish": ""
+    },
+    "something_happend_and_like_did_not_get_saved": {
+        "english": "Something happend and like did not get saved",
+        "danish": "",
+        "spanish": ""
+    },
+    "edit": {
+        "english": "Edit",
+        "danish": "",
+        "spanish": ""
+    },
+    "edit_profile": {
+        "english": "Edit profile",
+        "danish": "",
+        "spanish": ""
     }
 }

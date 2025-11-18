@@ -1,15 +1,15 @@
 <main id="main" class="profile">
     <section class="images">
-        {% if user['user_banner'] == 'default_banner.jpg' %}
-        <img src="{{ url_for('static', filename='images/'~user['user_banner']) }}" alt="" class="banner_img">
+        {% if userprofile['user_banner'] == 'default_banner.jpg' %}
+        <img src="{{ url_for('static', filename='images/'~userprofile['user_banner']) }}" alt="" class="banner_img">
         {% else %}
-        <img src="{{ url_for('static', filename='uploads/'~user['user_banner']) }}" alt="" class="banner_img">
+        <img src="{{ url_for('static', filename='uploads/'~userprofile['user_banner']) }}" alt="" class="banner_img">
         {% endif %}
         
-        {% if user['user_avatar'] == 'default.svg' %}
-        <img src="{{ url_for('static', filename='images/'~user['user_avatar']) }}" alt="" class="profile_img">
+        {% if userprofile['user_avatar'] == 'default.svg' %}
+        <img src="{{ url_for('static', filename='images/'~userprofile['user_avatar']) }}" alt="" class="profile_img">
         {% else %}
-        <img src="{{ url_for('static', filename='uploads/'~user['user_avatar']) }}" alt="" class="profile_img">
+        <img src="{{ url_for('static', filename='uploads/'~userprofile['user_avatar']) }}" alt="" class="profile_img">
         {% endif %}
         
     </section>
@@ -17,33 +17,33 @@
         <div>
             <div>
                 <header>
-                    <h1>{{ user['user_first_name'] }} {{ user['user_last_name'] }}</h1>
-                    <h2>@{{ user['user_username'] }}</h2>
+                    <h1>{{ userprofile['user_first_name'] }} {{ userprofile['user_last_name'] }}</h1>
+                    <h2>@{{ userprofile['user_username'] }}</h2>
                 </header>
                 <span>·</span>
-                <span>{{ x.lans('joined') }} {{ x.epoch_to_time(user.user_created_at) }}</span>
+                <span>{{ x.lans('joined') }} {{ x.epoch_to_time(userprofile.user_created_at) }}</span>
             </div>
-            <button class="secoundary_button">Edit</button>
+            {% if userprofile['user_username'] == user['user_username'] %}
+                <a class="secoundary_button" mix-get href="/edit_profile">{{ x.lans('edit') }}</a>
+            {% endif %}
         </div>
         <div>
-            <!-- Stats -->
             <div>
                 <p>{{ x.lans('followers') }}</p>
-                <p>{{ user['user_total_followers'] }}</p>
+                <p>{{ userprofile['user_total_followers'] }}</p>
             </div>
             <div>
                 <p>{{ x.lans('following') }}</p>
-                <p>{{ user['user_total_following'] }}</p>
+                <p>{{ userprofile['user_total_following'] }}</p>
             </div>
             <div>
                 <p>{{ x.lans('likes') }}</p>
-                <p>{{ user['user_total_likes'] }}</p>
+                <p>{{ userprofile['user_total_likes'] }}</p>
             </div>
             <div>
                 <p>{{ x.lans('posts') }}</p>
-                <p>{{ user['user_total_posts'] }}</p>
+                <p>{{ userprofile['user_total_posts'] }}</p>
             </div>
-            <!-- Stats -->
         </div>
     </section>
     <section id="posts">
