@@ -1,21 +1,57 @@
-document.querySelectorAll(".selector")?.forEach(button => {
-    button.addEventListener("click", e => {
-        e.target.parentNode.classList.toggle("open");
+function addSelectorButton() {
+    document.querySelectorAll(".selector")?.forEach(button => {
+        button.addEventListener("click", e => {
+            e.target.parentNode.classList.toggle("open");
+        });
+    
+        button.parentNode.addEventListener("mouseleave", e => {
+            e.currentTarget.classList.remove("open");
+        });
     });
+}
+addSelectorButton();
 
-    button.parentNode.addEventListener("mouseleave", e => {
-        e.currentTarget.classList.remove("open");
+function previewEditProfileImage() {
+    document.getElementById("user_avatar")?.addEventListener("change", function (event) {
+        const file = event.target.files[0];
+
+        if (!file) return;
+
+        const img = document.querySelector(".profile_img");
+        img.src = URL.createObjectURL(file);
     });
-});
+    document.getElementById("user_banner")?.addEventListener("change", function (event) {
+        const file = event.target.files[0];
 
-document.getElementById("burger_menu")?.addEventListener("click", e => {
+        if (!file) return;
+
+        const img = document.querySelector(".banner_img");
+        img.src = URL.createObjectURL(file);
+    });
+}
+previewEditProfileImage();
+
+document.getElementById("edit_profile")?.addEventListener("click", e => {
+    document.querySelector("nav ul li a.active")?.classList.remove("active");
+    document.getElementById("profile").classList.add("active");
+})
+
+document.getElementById("burger_menu")?.addEventListener("click", () => {
     document.querySelector("nav").classList.toggle("shown");
 })
 
-nav_links = document.querySelectorAll("nav ul li a");
-nav_links?.forEach(link => {
+document.querySelectorAll("nav ul li a")?.forEach(link => {
     link.addEventListener("click", e => {
         document.querySelector("nav ul li a.active")?.classList.remove("active");
         e.target.classList.add("active");
     })
 })
+
+
+const observer = new MutationObserver( () => {
+    addSelectorButton();
+    previewEditProfileImage();
+});
+
+const mainContainer = document.querySelector("body");
+observer.observe(mainContainer, { childList: true, subtree: true });

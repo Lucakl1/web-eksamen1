@@ -39,6 +39,7 @@ main {
 }
 
 #error_response, #succes_message {
+    z-index: 20;
     position: absolute;
     top: 5rem;
     left: 50%;

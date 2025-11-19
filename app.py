@@ -110,6 +110,130 @@ def view_index():
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
+@app.get("/home")
+def view_home():
+    try:
+        x.site_name = x.lans("home")
+
+        db, cursor = x.db()
+        q = """SELECT 
+        post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, post_updated_at, 
+        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username 
+        FROM users JOIN posts ON user_pk = user_fk WHERE post_deleted_at = 0 ORDER BY RAND() LIMIT 5"""
+        cursor.execute(q)
+        posts = cursor.fetchall()
+        
+        site = render_template("main_pages/home.html", posts=posts)
+        return f""" <browser mix-replace='#main'> {site} </browser> """
+    except Exception as ex:
+        ic(ex)
+        return "error"
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+    
+@app.get("/profile")
+@app.get("/profile/<user_username>")
+def view_profile(user_username = ""):
+    try:
+        x.site_name = f"{x.lans('profile')} {user_username}"
+        user = session.get("user", "")
+        if not user_username: user_username = user['user_username']
+
+        db, cursor = x.db()
+        q = """SELECT 
+        post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, post_updated_at, 
+        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username 
+        FROM users JOIN posts ON user_pk = user_fk WHERE post_deleted_at = 0 AND user_username = %s ORDER BY RAND() LIMIT 5"""
+        cursor.execute(q, (user_username,))
+        posts = cursor.fetchall()
+
+        q = "SELECT * FROM users WHERE user_username = %s"
+        cursor.execute(q, (user_username,))
+        user = cursor.fetchone()
+
+        site = render_template("main_pages/profile.html", posts=posts, userprofile=user)
+        return f""" <browser mix-replace='#main'> {site} </browser> """
+    except Exception as ex:
+        ic(ex)
+        error_msg = "error"
+        error_template = render_template(("global/error_message.html"), message=error_msg)
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+@app.route("/edit_profile", methods=["GET", "POST"])
+def view_edit_profile():
+    try:
+        if request.method == "GET": 
+            x.site_name = x.lans("edit_profile")
+
+            site = render_template("main_pages/edit_profile.html")
+            return f""" <browser mix-replace='#main'> {site} </browser> """
+        
+        if request.method == "POST":
+            user = session.get("user", "")
+            user_avatar = x.validate_user_avatar()
+            user_banner = x.validate_user_banner()
+            user_username = x.validate_user_username()
+            user_first_name = x.validate_user_first_name()
+            user_last_name = x.validate_user_last_name()
+            user_bio = x.validate_user_bio()
+
+            if user_avatar:
+                user_avatar.save(os.path.join("static/uploads", user_avatar.filename))
+                user_avatar = user_avatar.filename
+            else:
+                user_avatar = user['user_avatar']
+
+            if user_banner:
+                user_banner.save(os.path.join("static/uploads", user_banner.filename))
+                user_banner = user_banner.filename
+            else:
+                user_avatar = user['user_avatar']
+
+            db, cursor = x.db()
+            q = "UPDATE users SET user_avatar = %s, user_banner = %s, user_username = %s, user_first_name = %s, user_last_name = %s, user_bio = %s WHERE user_pk = %s"
+            cursor.execute(q, (user_avatar, user_banner, user_username, user_first_name, user_last_name, user_bio, user['user_pk']))
+            db.commit()
+
+            session["user"]["user_avatar"] = user_avatar
+            session["user"]["user_banner"] = user_banner
+            session["user"]["user_username"] = user_username
+            session["user"]["user_first_name"] = user_first_name
+            session["user"]["user_last_name"] = user_last_name
+            session["user"]["user_bio"] = user_bio
+
+
+            succes_template = render_template(("global/succes_message.html"), message="succes")
+            profile_tag = render_template(("___profile_tag.html"))
+            return f"""
+                <browser mix-bottom='#succes_message'>{succes_template}</browser>
+                <browser mix-replace='#profile_tag'>{profile_tag}</browser>
+            """
+
+    except Exception as ex:
+        ic(ex)
+        error_code = str(ex)
+        error_msg = x.lans('system_under_maintenance')
+        if "x exception - " in error_code:
+            error_msg = error_code.split("x exception - ")[1].split('",')[0]
+
+        if "Duplicate entry" in error_code:
+            error_msg = x.lans("username_allready_in_system")
+        
+        error_template = render_template(("global/error_message.html"), message=error_msg)
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+##############################
+#### Login | signup flow #####
+##############################
+
 @app.route("/login", methods=["GET", "POST"])
 @app.route("/login/<lan>", methods=["GET", "POST"])
 def login(lan = "english"):
@@ -178,7 +302,7 @@ def login(lan = "english"):
         error_code = str(ex)
         error_msg = x.lans('system_under_maintenance')
         if("x exception - " in error_code):
-            error_msg = error_code.replace("('x exception - ", "").split("', ")[0]
+            error_msg = error_code.split("x exception - ")[1].split('",')[0]
         
         error_template = render_template(("global/error_message.html"), message=error_msg)
         return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>""", 400
@@ -241,7 +365,7 @@ def signup(lan = "english"):
         error_code = str(ex)
         error_msg = x.lans('system_under_maintenance')
         if "x exception - " in error_code:
-            error_msg = error_code.replace("('x exception - ", "").split("', ")[0]
+            error_msg = error_code.split("x exception - ")[1].split('",')[0]
 
         if "Duplicate entry" in error_code and "user_username" in error_code:
             error_msg = x.lans("username_allready_in_system")
@@ -252,75 +376,6 @@ def signup(lan = "english"):
         error_template = render_template(("global/error_message.html"), message=error_msg)
         return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
     
-    finally:
-        if "cursor" in locals(): cursor.close()
-        if "db" in locals(): db.close()
-
-@app.get("/home")
-def view_home():
-    try:
-        x.site_name = x.lans("home")
-
-        db, cursor = x.db()
-        q = """SELECT 
-        post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, post_updated_at, 
-        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username 
-        FROM users JOIN posts ON user_pk = user_fk WHERE post_deleted_at = 0 ORDER BY RAND() LIMIT 5"""
-        cursor.execute(q)
-        posts = cursor.fetchall()
-        
-        site = render_template("main_pages/home.html", posts=posts)
-        return f""" <browser mix-replace='#main'> {site} </browser> """
-    except Exception as ex:
-        ic(ex)
-        return "error"
-    finally:
-        if "cursor" in locals(): cursor.close()
-        if "db" in locals(): db.close()
-
-    
-@app.get("/profile")
-@app.get("/profile/<user_username>")
-def view_profile(user_username = ""):
-    try:
-        x.site_name = f"{x.lans('profile')} {user_username}"
-        user = session.get("user", "")
-        if not user_username: user_username = user['user_username']
-
-        db, cursor = x.db()
-        q = """SELECT 
-        post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, post_updated_at, 
-        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username 
-        FROM users JOIN posts ON user_pk = user_fk WHERE post_deleted_at = 0 AND user_username = %s ORDER BY RAND() LIMIT 5"""
-        cursor.execute(q, (user_username,))
-        posts = cursor.fetchall()
-
-        q = "SELECT * FROM users WHERE user_username = %s"
-        cursor.execute(q, (user_username,))
-        user = cursor.fetchone()
-
-        site = render_template("main_pages/profile.html", posts=posts, userprofile=user)
-        return f""" <browser mix-replace='#main'> {site} </browser> """
-    except Exception as ex:
-        ic(ex)
-        return "error"
-    finally:
-        if "cursor" in locals(): cursor.close()
-        if "db" in locals(): db.close()
-
-@app.get("/edit_profile")
-def view_edit_profile():
-    try:
-        x.site_name = x.lans("edit_profile")
-        user = session.get("user", "")
-
-
-
-        site = render_template("main_pages/edit_profile.html")
-        return f""" <browser mix-replace='#main'> {site} </browser> """
-    except Exception as ex:
-        ic(ex)
-        return "error"
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
@@ -372,7 +427,7 @@ def view_forgot_password(lan = "english"):
             reset_password = render_template("___email_reset_password.html", user_reset_key=new_user_uuid)
             x.send_email(user_email, x.lans('reset_your_password'), reset_password)
 
-            succes_template = render_template(("global/succes_message.html"), message="Tjeck your email")
+            succes_template = render_template(("global/succes_message.html"), message=f"{x.lans('tjeck_your_email')}")
             return f"""<browser mix-bottom='#succes_message'>{succes_template}</browser>"""
 
     except Exception as ex:
@@ -382,7 +437,7 @@ def view_forgot_password(lan = "english"):
         error_code = str(ex)
         error_msg = x.lans('system_under_maintenance')
         if("x exception - " in error_code):
-            error_msg = error_code.replace("('x exception - ", "").split("', ")[0]
+            error_msg = error_code.split("x exception - ")[1].split('",')[0]
         
         error_template = render_template(("global/error_message.html"), message=error_msg)
         return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>""", 40
@@ -438,7 +493,7 @@ def view_reset_password(lan = "english"):
         if "db" in locals(): db.rollback()  
         error_msg = x.lans('system_under_maintenance')
         if("x exception - " in error_code):
-            error_msg = error_code.replace("('x exception - ", "").split("', ")[0]
+            error_msg = error_code.split("x exception - ")[1].split('",')[0]
         
         error_template = render_template(("global/error_message.html"), message=error_msg)
         return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>""", 400
@@ -473,6 +528,31 @@ def api_like_post():
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close() 
 
+@app.get("/change_lan/<lan>")
+def api_change_lan(lan = "english"):
+    try:
+        if lan not in x.allowed_languages: lan = "english"
+
+        user = session.get("user", "")
+        if lan in user['user_language']:
+            return redirect("/")
+
+        db, cursor = x.db()
+        q = "UPDATE users SET user_language = %s WHERE user_pk = %s"
+        cursor.execute(q, (lan, user['user_pk']))
+        db.commit()
+
+        session["user"]["user_language"] = lan
+
+        return redirect("/")
+    
+    except Exception as ex:
+        ic(ex)
+        return {x.lans('system_under_maintenance')}, 400
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close() 
+
 ##############################
 ########## utilities #########
 ##############################
@@ -482,12 +562,12 @@ def get_data_from_sheet():
 
         # Validate user is admin
         ################
-        user = session.get("user", "")
-        if not user:
-            return redirect("/login")
+        # user = session.get("user", "")
+        # if not user:
+        #     return redirect("/login")
 
-        if "admin" not in user['user_role']:
-            return redirect("/")
+        # if "admin" not in user['user_role']:
+        #     return redirect("/")
         ################
  
         # key: 1UYgE2jJ__HYl0N7lA5JR3sMH75hwhzhPPsSRRA-WNdg

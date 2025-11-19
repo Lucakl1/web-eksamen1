@@ -3,12 +3,13 @@ import mysql.connector
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+
 from icecream import ic
 ic.configureOutput(prefix=f'----- | ', includeContext=True)
 
 # standard python libaryes
 from datetime import datetime
-import re, json, os
+import re, json, os, uuid
 
 
 ########### Set up ###########
@@ -16,6 +17,11 @@ google_spread_sheet_key = "1UYgE2jJ__HYl0N7lA5JR3sMH75hwhzhPPsSRRA-WNdg"
 allowed_languages = ["english", "danish", "spanish"]
 default_language = "english"
 site_name = "Home"
+MAGIC_BYTES = {
+    "png": b"\x89PNG\r\n\x1a\n",
+    "jpg": {b"\xff\xd8\xff\xe0", b"\xff\xd8\xff\xe1", b"\xff\xd8\xff\xe8"},
+    "webp": [b"RIFF", b"WEBP"]
+}
 
 ##############################
  
@@ -70,11 +76,10 @@ USER_USERNAME_MAX = 20
 REGEX_USER_USERNAME = f"^.{{{USER_USERNAME_MIN},{USER_USERNAME_MAX}}}$"
 def validate_user_username(user_username = None):
     if not user_username: user_username = request.form.get("user_username", "").strip()
-    if "@" in user_username : raise Exception(f"x exception - {lans('@_cant_be_in_username')} {USER_USERNAME_MIN}", 400)
+    if "@" in user_username : raise Exception(f"x exception - {lans('@_cant_be_in_username')}", 400)
     if len(user_username) < USER_USERNAME_MIN: raise Exception(f"x exception - {lans('username_to_short_must_be_above')} {USER_USERNAME_MIN}", 400)
     if len(user_username) > USER_USERNAME_MAX: raise Exception(f"x exception - {lans('username_to_long_must_be_below')} {USER_USERNAME_MAX}", 400)
     return user_username
-
 
 ##############################
 USER_FIRST_NAME_MIN = 2
@@ -82,6 +87,7 @@ USER_FIRST_NAME_MAX = 20
 REGEX_USER_FIRST_NAME = f"^.{{{USER_FIRST_NAME_MIN},{USER_FIRST_NAME_MAX}}}$"
 def validate_user_first_name():
     user_first_name = request.form.get("user_first_name", "").strip()
+    if "@" in user_first_name : raise Exception(f"x exception - {lans('@_cant_be_in_first_name')}", 400)
     if len(user_first_name) < USER_FIRST_NAME_MIN: raise Exception(f"x exception - {lans('first_name_to_short_must_be_above')} {USER_FIRST_NAME_MIN}", 400)
     if len(user_first_name) > USER_FIRST_NAME_MAX: raise Exception(f"x exception - {lans('first_name_to_long_must_be_below')} {USER_FIRST_NAME_MAX}", 400)
     return user_first_name
@@ -92,10 +98,21 @@ USER_LAST_NAME_MAX = 20
 REGEX_USER_LAST_NAME = f"^.{{{USER_LAST_NAME_MIN},{USER_LAST_NAME_MAX}}}$"
 def validate_user_last_name():
     user_last_name = request.form.get("user_last_name", "").strip()
+    if "@" in user_last_name : raise Exception(f"x exception - {lans('@_cant_be_in_first_name')}", 400)
     if len(user_last_name) < USER_LAST_NAME_MIN: raise Exception(f"x exception - {lans('last_name_to_short_must_be_above')} {USER_FIRST_NAME_MIN}", 400)
     if len(user_last_name) > USER_LAST_NAME_MAX: raise Exception(f"x exception - {lans('last_name_to_long_must_be_below')} {USER_FIRST_NAME_MAX}", 400)
     return user_last_name
 
+
+##############################
+USER_BIO_MIN = 1
+USER_BIO_MAX = 200
+REGEX_USER_BIO = f"^.{{{USER_BIO_MIN},{USER_BIO_MAX}}}$"
+def validate_user_bio():
+    user_bio = request.form.get("user_bio", "").strip()
+    if len(user_bio) < USER_BIO_MIN: raise Exception(f"x exception - {lans('bio_to_short_must_be_above')} {USER_BIO_MIN}", 400)
+    if len(user_bio) > USER_BIO_MAX: raise Exception(f"x exception - {lans('bio_to_long_must_be_below')} {USER_BIO_MAX}", 400)
+    return user_bio
 
 ##############################
 USER_PASSWORD_MIN = 6
@@ -120,6 +137,65 @@ USER_USERNAME_EMAIL_MIN = 2
 USER_USERNAME_EMAIL_MAX = 100
 REGEX_USERNAME_EMAIL_MAX = f"^.{{{USER_USERNAME_EMAIL_MIN},{USER_USERNAME_EMAIL_MAX}}}$"
 
+##############################
+def validate_img(image, allowed_extenstions, allowed_mime_types, max_filesize_mb):
+    ext = image.filename.rsplit(".", 1)[-1].lower()
+    if ext not in allowed_extenstions:
+        raise Exception(f"x exception - {lans('file_extension')} .{ext} {lans('is_not_allowed')}", 400)
+
+    image.filename = f"{uuid.uuid4().hex}.{ext}"
+    if not image.filename:
+        raise Exception("x exception - Invalid filename", 400)
+    
+    if image.mimetype not in allowed_mime_types:
+        raise Exception(f"x exception - {lans('file_type')} '{image.mimetype}' {lans('is_not_allowed')}", 400)
+
+    image.seek(0, 2)
+    file_size = image.tell()
+    # 1048576 = 1MB
+    if file_size > max_filesize_mb * 1048576 :
+        raise Exception(f"x exception - {lans('file_exceeds_max_size_of')} {max_filesize_mb} MB", 400)
+    image.seek(0)
+
+    header = image.read(12)
+    image.seek(0)
+
+    if ext == "png":
+        if not header.startswith(MAGIC_BYTES["png"]):
+            raise Exception(f"x exception - {lans('file_content_does_not_match')} PNG {lans('format')}", 400)
+    elif ext == "jpg":
+        if not header.startswith(tuple(MAGIC_BYTES["jpg"])):
+            raise Exception(f"x exception - {lans('file_content_does_not_match')} JPEG {lans('format')}", 400)
+    elif ext == "webp":
+        if not (header[:4] == MAGIC_BYTES["webp"][0] and header[8:12] == MAGIC_BYTES["webp"][1]):
+            raise Exception(f"x exception - {lans('file_content_does_not_match')} WebP {lans('format')}", 400)
+        
+    return image
+
+ALLOWED_AVATAR_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
+ALLOWED_AVATAR_MIME_TYPES = {"image/png", "image/jpeg", "image/webp"}
+MAX_AVATAR_FILESIZE_MB = 2
+
+def validate_user_avatar():
+    user_avatar = request.files.get("user_avatar", "")
+    if not user_avatar or user_avatar.filename == "" or user_avatar.content_type == "application/octet-stream": return ""
+    
+    user_avatar = validate_img(user_avatar, ALLOWED_AVATAR_EXTENSIONS, ALLOWED_AVATAR_MIME_TYPES, MAX_AVATAR_FILESIZE_MB)
+
+    return user_avatar
+
+ALLOWED_BANNER_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
+ALLOWED_BANNER_MIME_TYPES = {"image/png", "image/jpeg", "image/webp"}
+MAX_BANNER_FILESIZE_MB = 5
+
+def validate_user_banner():
+    user_banner = request.files.get("user_banner", "")
+    if not user_banner or user_banner.filename == "" or user_banner.content_type == "application/octet-stream": return ""
+    
+    user_banner = validate_img(user_banner, ALLOWED_BANNER_EXTENSIONS, ALLOWED_BANNER_MIME_TYPES, MAX_BANNER_FILESIZE_MB)
+
+    return user_banner
+    
 ##############################
 def send_email(to_email, subject, template):
     try:
@@ -174,6 +250,8 @@ def validate_post(post = ""):
     if not re.match(REGEX_POST, post): raise Exception("x-error post", 400)
     return post
 
+##############################
+##############################
 ##############################
 def time_ago(epoch_time):
     if epoch_time == 0:

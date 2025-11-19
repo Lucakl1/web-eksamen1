@@ -1,3 +1,81 @@
 <main id="main" class="edit_profile">
-    <h1>edit profile</h1>
+    <section class="images">
+        {% if user['user_banner'] == 'default_banner.jpg' %}
+        <img src="{{ url_for('static', filename='images/'~user['user_banner']) }}" alt="" class="banner_img">
+        {% else %}
+        <img src="{{ url_for('static', filename='uploads/'~user['user_banner']) }}" alt="" class="banner_img">
+        {% endif %}
+        
+        {% if user['user_avatar'] == 'default.svg' %}
+        <img src="{{ url_for('static', filename='images/'~user['user_avatar']) }}" alt="" class="profile_img">
+        {% else %}
+        <img src="{{ url_for('static', filename='uploads/'~user['user_avatar']) }}" alt="" class="profile_img">
+        {% endif %}
+        
+    </section>
+
+    <form action="/edit_profile" mix-post autocomplete="off" enctype="multipart/form-data">
+        <div class="two_inputs">
+            <div>
+                <label for="user_avatar"> {{ x.lans('user_avatar') }} 
+                    <span> - {{ x.lans('file_formats') }}: 
+                        {% for ext in x.ALLOWED_AVATAR_EXTENSIONS %} 
+                            "{{ ext }}"
+                        {% endfor %}
+                    </span> 
+                </label>
+                <input name="user_avatar" type="file" id="user_avatar">
+            </div>
+            <div>
+                <label for="user_banner"> {{ x.lans('user_banner') }} 
+                    <span> - {{ x.lans('file_formats') }}: 
+                        {% for ext in x.ALLOWED_BANNER_EXTENSIONS %} 
+                            "{{ ext }}"
+                        {% endfor %}
+                    </span> 
+                </label>
+                <input name="user_banner" type="file" id="user_banner">
+            </div>
+        </div>
+        <div class="two_inputs">
+            <div>
+                <label for="user_username">{{ x.lans('username') }} <span> - {{ x.USER_USERNAME_MIN }} {{ x.lans('to') }} {{ x.USER_USERNAME_MAX }} {{ x.lans('charetors') }}</span></label>
+                <input name="user_username" type="text" id="user_username" value="{{ user['user_username'] }}" placeholder="{{ x.lans('username') }}">
+            </div>
+            <div>
+                <label for="user_language">{{ x.lans('language') }} <span> - {{ x.lans('will_change_immediately_and_reload_to_home') }}</span></label>
+                <div>
+                    <input name="user_language" type="button" id="user_language" class="selector" value="{{ x.lans(x.default_language) }}" placeholder="{{ x.lans('language') }}">
+                    <option-div>
+                        {% if x.default_language != 'danish' %}
+                        <a href="/change_lan/danish"><img src="/static/images/flag_danish.png" alt="Danish"> Dansk</a>
+                        {% endif %}
+                        {% if x.default_language != 'english' %}
+                        <a href="/change_lan/english"><img src="/static/images/flag_english.png" alt="English"> English</a>
+                        {% endif %}
+                        {% if x.default_language != 'spanish' %}
+                        <a href="/change_lan/spanish"><img src="/static/images/flag_spanish.png" alt="Spanish"> Español</a>
+                        {% endif %}
+                    </option-div>
+                </div>
+            </div>
+        </div>
+        <div class="two_inputs">
+            <div>
+                <label for="user_first_name">{{ x.lans('first_name') }} <span> - {{ x.USER_FIRST_NAME_MIN }} {{ x.lans('to') }} {{ x.USER_FIRST_NAME_MAX }} {{ x.lans('charetors') }}</span></label>
+                <input name="user_first_name" type="text" id="user_first_name" value="{{ user['user_first_name'] }}" placeholder="{{ x.lans('first_name') }}" mix-check="{{ x.REGEX_USER_FIRST_NAME }}">
+            </div>
+            <div>
+                <label for="user_last_name">{{ x.lans('last_name') }} <span> - {{ x.USER_LAST_NAME_MIN }} {{ x.lans('to') }} {{ x.USER_LAST_NAME_MAX }} {{ x.lans('charetors') }}</span></label>
+                <input name="user_last_name" type="text" id="user_last_name" value="{{ user['user_last_name'] }}" placeholder="{{ x.lans('last_name') }}" mix-check="{{ x.REGEX_USER_LAST_NAME }}">
+            </div>
+        </div>
+        <div class="user_bio">
+            <label for="user_bio">{{ x.lans('user_bio') }} <span> - {{ x.USER_BIO_MIN }} {{ x.lans('to') }} {{ x.USER_BIO_MAX }} {{ x.lans('charetors') }}</span></label>
+            <textarea name="user_bio" id="user_bio" mix-check="{{ x.REGEX_USER_BIO }}">{{ user['user_bio'] }}</textarea>
+            </div>
+        <button mix-default="{{ x.lans('change_profile') }}" mix-await="{{ x.lans('submiting...') }}" type="submit">
+            {{ x.lans('change_profile') }}
+        </button>
+    </form>
 </main>

@@ -59,7 +59,7 @@
             </a>
         </li>
         <li>
-            <a href="/profile" mix-get mix-default="<i class='fa-regular fa-user'></i>{{ x.lans('profile') }}" mix-await="<i class='fa-regular fa-user'></i>{{ x.lans('loading...') }}">
+            <a id="profile" href="/profile" mix-get mix-default="<i class='fa-regular fa-user'></i>{{ x.lans('profile') }}" mix-await="<i class='fa-regular fa-user'></i>{{ x.lans('loading...') }}">
                 <i class='fa-regular fa-user'></i>{{ x.lans('profile') }}
             </a>
         </li>
@@ -74,23 +74,9 @@
     </ul>
 
 
-    <div id="profile_tag">
-        {% if user['user_avatar'] == 'default.svg' %}
-        <img src="{{ url_for('static', filename='images/'~user['user_avatar']) }}" alt="Profile">
-        {% else %}
-        <img src="{{ url_for('static', filename='uploads/'~user['user_avatar']) }}" alt="Profile">
-        {% endif %}
-        
-        <div>
-            <div class="name">
-                {{ user['user_first_name'] }} {{ user['user_last_name'] }}
-            </div>
-            <div class="handle">
-                @{{ user['user_username']}}
-            </div>
-        </div>
-        <p>icon</p>
-    </div>
+    <a href="/edit_profile" mix-get id="edit_profile">
+        {% include "___profile_tag.html" %}
+    </a>
 </nav>
 
 {% include "main_pages/home.html" %}

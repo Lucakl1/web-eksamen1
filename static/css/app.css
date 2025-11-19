@@ -59,6 +59,7 @@ nav {
     padding: 64px 64px 0 16px;
     transition: left 0.5s;
     background: white;
+    z-index: 100;
 
     ul {
         display: flex;
@@ -121,36 +122,48 @@ nav {
         border-right: 0;
     }
 
-    #profile_tag {
+    #edit_profile {
         position: absolute;
         bottom: 0;
-        padding: 16px 64px 16px 0;
-        display: grid;
-        grid-template-columns: 1fr 4fr 1fr;
-        align-items: center;
-        gap: 16px;
         width: 100%;
+        height: fit-content;
 
-        img {
-            height: 30px;
-            width: 30px;
-            border-radius: 50px;
-            object-fit: cover;
-        }
+        #profile_tag {
+            border-top: 1px solid var(--border-color);
+            padding: 16px 64px 16px 0;
+            display: grid;
+            grid-template-columns: 1fr 4fr 1fr;
+            align-items: center;
+            gap: 16px;
+            width: calc(100% - 16px);
+            pointer-events: none;
+            
+            * {
+                color: black;
+            }
 
-        div {
-            display: flex;
-            flex-flow: column wrap;
-            justify-content: center;
-            text-align: center;
-            overflow: hidden;
-            width: 100%;
+            img {
+                pointer-events: none;
+                height: 30px;
+                width: 30px;
+                border-radius: 50px;
+                object-fit: cover;
+            }
 
-            .name {
-                font-weight: 600;
-                white-space: nowrap;
+            div {
+                display: flex;
+                flex-flow: column wrap;
+                justify-content: center;
+                text-align: center;
                 overflow: hidden;
-                text-overflow: ellipsis;
+                width: 100%;
+
+                .name {
+                    font-weight: 600;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
             }
         }
     }
@@ -265,6 +278,7 @@ main {
                 width: var(--profile_pic_width);
                 height: var(--profile_pic_height);
                 border-radius: 50px;
+                object-fit: cover;
             }
         }
 
@@ -362,6 +376,178 @@ main {
 
         &:hover {
             background: rgb(243, 243, 243);
+        }
+    }
+
+    &.edit_profile {
+        --profile-avatar-width: 100px;
+
+        .images {
+            width: 100%;
+            height: 200px;
+            position: relative;
+            margin-bottom: calc(var(--profile-avatar-width) * 0.5 + 25px);
+
+            .banner_img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .profile_img {
+                position: absolute;
+                bottom: 0;
+                left: 16px;
+                height: var(--profile-avatar-width);
+                width: var(--profile-avatar-width);
+                border-radius: 100px;
+                overflow: hidden;
+                object-fit: cover;
+                transform: translatey(50%);
+            }
+        }
+
+        form {
+            display: flex;
+            flex-flow: column;
+            align-items: center;
+    
+            > * {
+                position: relative;
+                width: 100%;
+                display: flex;
+                flex-flow: column;
+    
+                label {
+                    padding: 0.75rem 0 0.3rem 0;
+                    display: block;
+
+                    span {
+                        color: rgb(71, 71, 71)
+                    }
+                }
+                
+                input, textarea {
+                    padding: 0.75rem 1rem;
+                    border: 1px solid black;
+                    border-radius: 50px;
+    
+                    ::placeholder {
+                        font-family: var(--font);
+                    }
+                }
+
+                > a {
+                    position: absolute;
+                    top: 100%;
+                    right: 0;
+                }
+
+                &.two_inputs {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 32px;
+
+                    > div {
+                        position: relative;
+                        * {
+                            width: 100%;
+                        }
+
+                    }
+
+                    > div {
+                        .selector {
+                            cursor: pointer;
+                            text-align: left;
+                            background: white;
+                        }
+
+                        div:has(.selector) {
+                            position: relative;
+
+                            option-div {
+                                position: absolute;
+                                background: white;
+                                overflow: hidden;
+                                top: 100%;
+                                display: none;
+                                transition: opacity 0.5s;
+                                border-radius: 10px;
+                                z-index: 27;
+
+                                height: fit-content;
+                                width: 100%;
+                                border: 1px solid black;
+                                
+                                a {
+                                    padding: 0.5rem 1rem;
+                                    display: flex;
+                                    align-items: center;
+                                    flex-flow: row nowrap;
+                                    gap: 8px;
+
+                                    img {
+                                        height: 15px;
+                                        width: 15px;
+                                        display: inline;
+                                    }
+
+                                    &:hover {
+                                        background: #bebebe;
+                                    }
+                                }
+                            }
+
+                            &::after {
+                                content: "⮟";
+                                position: absolute;
+                                height: 20px;
+                                bottom: 0.75rem;
+                                right: 1em;
+                                pointer-events: none;
+                                transition: transform 0.5s;
+                            }
+                        }
+                        
+
+                        div.open:has(.selector) {
+                            option-div {
+                                display: block;
+                            }
+
+                            &::after {
+                                transform: rotate(180deg);
+                            }
+                        }
+                        
+                    }
+                }
+
+                &.user_bio textarea {
+                    width: 100%;
+                    min-width: 100%;
+                    border-radius: 20px;
+                    min-height: 100px;
+                    height: fit-content;
+                    font-family: var(--font);
+                }
+            }
+    
+            button {
+                margin-top: 1rem;
+                padding: 0.75rem 2rem;
+                width: fit-content;
+                align-self: flex-start;
+                border-radius: 50px;
+                background: black;
+                color: white;
+                cursor: pointer;
+            }
+        }
+
+        p {
+            margin-top: 1rem;
         }
     }
 }

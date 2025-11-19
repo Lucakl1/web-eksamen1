@@ -1,0 +1,16 @@
+<div id="profile_tag">
+    {% if user['user_avatar'] == 'default.svg' %}
+    <img src="{{ url_for('static', filename='images/'~user['user_avatar']) }}" alt="Profile">
+    {% else %}
+    <img src="{{ url_for('static', filename='uploads/'~user['user_avatar']) }}" alt="Profile">
+    {% endif %}
+    <div>
+        <div class="name">
+            {{ user['user_first_name'] }} {{ user['user_last_name'] }}
+        </div>
+        <div class="handle">
+            @{{ user['user_username']}}
+        </div>
+    </div>
+    <i class="fa-solid fa-ellipsis option"></i>
+</div>

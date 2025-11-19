@@ -189,10 +189,10 @@
         "danish": "Brugernavn findes allerede",
         "spanish": "El nombre de usuario ya está en el sistema"
     },
-    "email_allready_in_system": {
-        "english": "Email already in system",
-        "danish": "E-mail findes allerede",
-        "spanish": "El correo electrónico ya está en el sistema"
+    "language_allready_chosen": {
+        "english": "Language already chosen",
+        "danish": "Sprog allerede valgt",
+        "spanish": "Idioma ya seleccionado"
     },
     "error_please_try_again": {
         "english": "Error please try again",
@@ -351,32 +351,127 @@
     },
     "updated": {
         "english": "Updated",
-        "danish": "",
-        "spanish": ""
+        "danish": "Opdateret",
+        "spanish": "Actualizado"
     },
     "created": {
         "english": "Created",
-        "danish": "",
-        "spanish": ""
+        "danish": "Oprettet",
+        "spanish": "Creado"
     },
     "joined": {
         "english": "Joined",
-        "danish": "",
-        "spanish": ""
+        "danish": "Tilsluttet / Medlem siden",
+        "spanish": "Unido / Se unió"
     },
     "something_happend_and_like_did_not_get_saved": {
-        "english": "Something happend and like did not get saved",
-        "danish": "",
-        "spanish": ""
+        "english": "Something happened and like did not get saved",
+        "danish": "Noget gik galt, og like blev ikke gemt",
+        "spanish": "Algo salió mal y el “me gusta” no se guardó"
     },
     "edit": {
         "english": "Edit",
-        "danish": "",
-        "spanish": ""
+        "danish": "Rediger",
+        "spanish": "Editar"
     },
     "edit_profile": {
         "english": "Edit profile",
-        "danish": "",
-        "spanish": ""
+        "danish": "Rediger profil",
+        "spanish": "Editar perfil"
+    },
+    "user_avatar": {
+        "english": "Avatar image",
+        "danish": "Avatarbillede",
+        "spanish": "Imagen de avatar"
+    },
+    "file_extension_is_not_allowed": {
+        "english": "File extension is not allowed",
+        "danish": "Filendelse er ikke tilladt",
+        "spanish": "La extensión del archivo no está permitida"
+    },
+    "tjeck_your_email": {
+        "english": "Tjeck your email",
+        "danish": "Tjek din e-mail",
+        "spanish": "Revisa tu correo electrónico"
+    },
+    "user_banner": {
+        "english": "Banner image",
+        "danish": "Bannerbillede",
+        "spanish": "Imagen de banner"
+    },
+    "file_extension": {
+        "english": "File extension",
+        "danish": "Filendelse",
+        "spanish": "Extensión del archivo"
+    },
+    "file_type": {
+        "english": "File type",
+        "danish": "Filtype",
+        "spanish": "Tipo de archivo"
+    },
+    "is_not_allowed": {
+        "english": "is not allowed",
+        "danish": "er ikke tilladt",
+        "spanish": "no está permitido"
+    },
+    "file_exceeds_max_size_of": {
+        "english": "File exceeds max size of",
+        "danish": "Filen overstiger den maksimale størrelse på",
+        "spanish": "El archivo supera el tamaño máximo de"
+    },
+    "file_content_does_not_match": {
+        "english": "File content does not match",
+        "danish": "Filindholdet stemmer ikke overens med",
+        "spanish": "El contenido del archivo no coincide con"
+    },
+    "format": {
+        "english": "format",
+        "danish": "formatet",
+        "spanish": "el formato"
+    },
+    "file_formats": {
+        "english": "File formats",
+        "danish": "Filformater",
+        "spanish": "Formatos de archivo"
+    },
+    "change_profile": {
+        "english": "Change profile",
+        "danish": "Skift profil",
+        "spanish": "Cambiar perfil"
+    },
+    "submiting...": {
+        "english": "Submitting...",
+        "danish": "Indsender...",
+        "spanish": "Enviando..."
+    },
+    "will_change_immediately_and_reload_to_home": {
+        "english": "Will change immediately and reload to home",
+        "danish": "Ændres straks og genindlæser til forside",
+        "spanish": "Se cambiará de inmediato y se recargará a inicio"
+    },
+    "bio_to_short_must_be_above": {
+        "english": "Bio too short must be above",
+        "danish": "Bio er for kort, skal være længere",
+        "spanish": "Biografía demasiado corta, debe ser más larga"
+    },
+    "bio_to_long_must_be_below": {
+        "english": "Bio too long must be below",
+        "danish": "Bio er for lang, skal være kortere",
+        "spanish": "Biografía demasiado larga, debe ser más corta"
+    },
+    "user_bio": {
+        "english": "Biography",
+        "danish": "Biografi",
+        "spanish": "Biografía"
+    },
+    "@_cant_be_in_first_name": {
+        "english": "@ can't be in first name",
+        "danish": "@ kan ikke være i fornavn",
+        "spanish": "@ no puede estar en el nombre"
+    },
+    "@_cant_be_in_last_name": {
+        "english": "@ can't be in last name",
+        "danish": "@ kan ikke være i efternavn",
+        "spanish": "@ no puede estar en el apellido"
     }
 }
