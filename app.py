@@ -92,15 +92,15 @@ def view_index():
         posts = cursor.fetchall()
 
         for post in posts:
-            user_pk = post['user_pk']
+            user_pk = user['user_pk']
             post_pk = post['post_pk']
 
-            q = "SELECT * FROM likes WHERE user_fk = %s AND post_fk = %s LIMIT 1"
+            q = "SELECT * FROM likes WHERE user_fk = %s AND post_fk = %s"
             cursor.execute(q, (user_pk, post_pk))
-            liked = cursor.fetchone()
+            existing_like = cursor.fetchone()
 
             post['user_has_liked'] = False
-            if liked: post['user_has_liked'] = True
+            if existing_like: post['user_has_liked'] = True
 
         return render_template("index.html", posts=posts)
     except Exception as ex:
@@ -181,6 +181,7 @@ def view_edit_profile():
             user_first_name = x.validate_user_first_name()
             user_last_name = x.validate_user_last_name()
             user_bio = x.validate_user_bio()
+            current_time = int(time.time())
 
             if user_avatar != "":
                 user_avatar.save(os.path.join(x.upload_folder_path, user_avatar.filename))
@@ -195,8 +196,8 @@ def view_edit_profile():
                 user_banner = user['user_banner']
 
             db, cursor = x.db()
-            q = "UPDATE users SET user_avatar = %s, user_banner = %s, user_username = %s, user_first_name = %s, user_last_name = %s, user_bio = %s WHERE user_pk = %s"
-            cursor.execute(q, (user_avatar, user_banner, user_username, user_first_name, user_last_name, user_bio, user['user_pk']))
+            q = "UPDATE users SET user_avatar = %s, user_banner = %s, user_username = %s, user_first_name = %s, user_last_name = %s, user_bio = %s WHERE user_pk = %s, user_updated_at = %s"
+            cursor.execute(q, (user_avatar, user_banner, user_username, user_first_name, user_last_name, user_bio, user['user_pk'], current_time))
             db.commit()
 
             session["user"]["user_avatar"] = user_avatar
@@ -459,7 +460,7 @@ def view_reset_password(lan = "english"):
             
         if request.method == "POST":
             user_verification_key = x.validate_uuid4_without_dashes()
-            user_verified_at = int(time.time())
+            current_time = int(time.time())
 
             user_password = x.validate_user_password()
             x.validate_user_password_confirm()
@@ -479,8 +480,8 @@ def view_reset_password(lan = "english"):
             q = "DELETE FROM not_verifyed_accounts WHERE uuid = %s"
             cursor.execute(q, (user_verification_key,))
 
-            q = "UPDATE users SET user_varified_at = %s, user_password = %s WHERE user_pk = %s" 
-            cursor.execute(q, (user_verified_at, encrypted_user_password, user_fk))
+            q = "UPDATE users SET user_varified_at = %s, user_password = %s, user_updated_at = %s WHERE user_pk = %s" 
+            cursor.execute(q, (current_time, encrypted_user_password, current_time, user_fk))
 
             if cursor.rowcount != 1: raise Exception(f"x exception - {x.lans('cannot_verify_user')}", 400)
             db.commit()
@@ -505,14 +506,38 @@ def view_reset_password(lan = "english"):
 ######### Minor calls ########
 ##############################
 
-@app.patch("/like-post")
+@app.patch("/like_post")
 def api_like_post():
     try:
-        button_unlike_tweet = render_template("___post_unlike.html")
+        user_pk = session.get("user", "")["user_pk"]
+        post_pk = int(request.args.get("post_pk"))
+
+        db, cursor = x.db()
+
+        q = "SELECT * FROM likes WHERE user_fk = %s AND post_fk = %s"
+        cursor.execute(q, (user_pk, post_pk))
+        existing_like = cursor.fetchone()
+
+        if existing_like:
+            q = "DELETE FROM likes WHERE user_fk = %s AND post_fk = %s"
+            existing_like = False
+        else:
+            q = "INSERT INTO likes VALUES(%s, %s)"
+            existing_like = True
+
+        cursor.execute(q, (user_pk, post_pk))
+        db.commit()
+
+        q = "SELECT post_total_likes FROM posts WHERE post_pk = %s"
+        cursor.execute(q, (post_pk,))
+        post_info = cursor.fetchone()
+
+        post = {"post_total_likes": post_info["post_total_likes"], "post_pk": post_pk, "user_has_liked": existing_like}
+        like_template = render_template("___post_like.html", post=post)
 
         return f"""
-            <browser mix-replace="#button_1">
-                {button_unlike_tweet}
+            <browser mix-replace='#like_post{post_pk}'>
+                {like_template}
             </browser>
         """
     

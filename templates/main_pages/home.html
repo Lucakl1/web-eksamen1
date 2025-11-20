@@ -1,6 +1,17 @@
 <main id="main">
     <h1>home</h1>
 
+    <section>
+        {% if userprofile['user_avatar'] == 'default.svg' %}
+        <img src="{{ url_for('static', filename='images/'~userprofile['user_avatar']) }}" alt="" class="profile_img">
+        {% else %}
+        <img src="{{ url_for('static', filename='uploads/'~userprofile['user_avatar']) }}" alt="" class="profile_img">
+        {% endif %}
+        <form action="/make_a_post" mix-post>
+            
+        </form>
+    </section>
+
     <section id="posts">
         
     {% for post in posts: %}

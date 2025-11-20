@@ -48,11 +48,7 @@
         
         <div class="post_actions">
             <span class="action"><i class="fa-regular fa-comment"></i>{{ post.post_total_comments }}</span>
-            {% if post.user_has_liked == False %}
-                {% include "___post_like.html" %}
-            {% else %}
-                {% include "___post_unlike.html" %}
-            {% endif %}
+            {% include "___post_like.html" %}
             <span class="action"><i class="fa-regular fa-bookmark"></i>{{ post.post_total_saved }}</span>
             <!-- <span class="action"><i class="fa-solid fa-share"></i></span> -->
         </div>

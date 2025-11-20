@@ -1,6 +1,10 @@
-<button class="action" mix-patch="/like-post?post_pk={{ post.post_pk }}">
+<button id="like_post{{ post.post_pk }}"  mix-patch="/like_post?post_pk={{ post.post_pk }}" class="action">
     <span class="no_event">
-        <i class="fa-regular fa-heart"></i>
-        {{ post.post_total_saved }}
+        {% if post.user_has_liked %}
+            <i class="fa-solid fa-heart"></i>
+        {% else %}
+            <i class="fa-regular fa-heart"></i>
+        {% endif %}
+        {{ post.post_total_likes }}
     </span>
 </button>

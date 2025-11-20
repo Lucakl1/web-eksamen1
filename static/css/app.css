@@ -130,7 +130,7 @@ nav {
 
         #profile_tag {
             border-top: 1px solid var(--border-color);
-            padding: 16px 64px 16px 0;
+            padding: 16px 0;
             display: grid;
             grid-template-columns: 1fr 4fr 1fr;
             align-items: center;
