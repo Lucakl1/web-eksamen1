@@ -168,7 +168,7 @@ nav {
 }
 
 main {
-    height: 200vh;
+    padding-top: 16px;
     width: 100%;
     position: relative;
 
@@ -302,6 +302,23 @@ main {
 
             .post_content {
                 padding: 8px 0;
+                display: flex;
+                flex-flow: column;
+                gap: 16px;
+
+                .media {
+                    max-height: 300px;
+                    height: 100%;
+                    width: fit-content;
+                    position: relative;
+
+                    * {
+                        height: 100%;
+                        width: 100%;
+                        border-radius: 10px;
+                        object-fit: contain;
+                    }
+                }
             }
 
             .post_actions {
@@ -547,6 +564,73 @@ main {
 
         p {
             margin-top: 1rem;
+        }
+    }
+
+    &.home {
+        .quick_post {
+            --user-img-width: 50px;
+            display: grid;
+            grid-template-columns: var(--user-img-width) 1fr;
+            gap: 8px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+
+            img {
+                height: var(--user-img-width);
+                width: var(--user-img-width);
+                border-radius: 50px;
+                object-fit: cover;
+            }
+
+            form {
+                margin-top: calc(var(--user-img-width) * 0.20);
+                display: flex;
+                flex-flow: column;
+
+                label {
+                    padding-bottom: 16px;
+                    font-size: 20px;
+                    font-weight: 600;
+                }
+
+                textarea {
+                    border: 1px solid black;
+                    min-height: 70px;
+                    border-radius: 10px;
+                    font-family: var(--font);
+                    padding: 8px;
+                }
+
+                .file_with_submit {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-end;
+                    gap: 16px;
+
+                    div {
+                        display: flex;
+                        flex-flow: column;
+
+                        label {
+                            padding: 0.75rem 0 0.3rem 0;
+                            display: block;
+                            font-size: 14px;
+                            font-weight: 400;
+
+                            span {
+                                color: rgb(71, 71, 71)
+                            }
+                        }
+
+                        input {
+                            padding: 0.75rem 1rem;
+                            border: 1px solid black;
+                            border-radius: 50px;
+                        }
+                    }
+                }
+            }
         }
     }
 }

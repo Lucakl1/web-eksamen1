@@ -18,9 +18,22 @@ allowed_languages = ["english", "danish", "spanish"]
 default_language = "english"
 site_name = "Home"
 MAGIC_BYTES = {
+    #images
     "png": b"\x89PNG\r\n\x1a\n",
     "jpg": {b"\xff\xd8\xff\xe0", b"\xff\xd8\xff\xe1", b"\xff\xd8\xff\xe8"},
-    "webp": [b"RIFF", b"WEBP"]
+    "webp": [b"RIFF", b"WEBP"],
+
+    #text files
+    "pdf": [b"%PDF"],
+
+    #audio
+    "mp3": {b"ID3", b"\xff\xfb", b"\xff\xf3", b"\xff\xf2"},  
+
+    #video
+    "mp4": b"ftyp", 
+    
+    # Text
+    "txt": None,
 }
 
 ##############################
@@ -139,39 +152,55 @@ REGEX_USERNAME_EMAIL_MAX = f"^.{{{USER_USERNAME_EMAIL_MIN},{USER_USERNAME_EMAIL_
 
 ##############################
 upload_folder_path = "static/uploads"
-def validate_img(image, allowed_extenstions, allowed_mime_types, max_filesize_mb):
-    ext = image.filename.rsplit(".", 1)[-1].lower()
+def validate_file(file, allowed_extenstions, allowed_mime_types, max_filesize_mb):
+
+    if file.content_type == "application/octet-stream":
+        raise Exception(f"x exception - {lans('file_is_not_recognized')}", 400)
+
+    ext = file.filename.rsplit(".", 1)[-1].lower()
     if ext not in allowed_extenstions:
         raise Exception(f"x exception - {lans('file_extension')} .{ext} {lans('is_not_allowed')}", 400)
 
-    image.filename = f"{uuid.uuid4().hex}.{ext}"
-    if not image.filename:
+    file.filename = f"{uuid.uuid4().hex}.{ext}"
+    if not file.filename:
         raise Exception("x exception - Invalid filename", 400)
     
-    if image.mimetype not in allowed_mime_types:
-        raise Exception(f"x exception - {lans('file_type')} '{image.mimetype}' {lans('is_not_allowed')}", 400)
+    if file.mimetype not in allowed_mime_types:
+        raise Exception(f"x exception - {lans('file_type')} '{file.mimetype}' {lans('is_not_allowed')}", 400)
 
-    image.seek(0, 2)
-    file_size = image.tell()
+    file.seek(0, 2)
+    file_size = file.tell()
     # 1048576 = 1MB
     if file_size > max_filesize_mb * 1048576 :
         raise Exception(f"x exception - {lans('file_exceeds_max_size_of')} {max_filesize_mb} MB", 400)
-    image.seek(0)
+    file.seek(0)
 
-    header = image.read(12)
-    image.seek(0)
+    header = file.read(32)
+    file.seek(0)
 
     if ext == "png":
         if not header.startswith(MAGIC_BYTES["png"]):
             raise Exception(f"x exception - {lans('file_content_does_not_match')} PNG {lans('format')}", 400)
     elif ext == "jpg":
         if not header.startswith(tuple(MAGIC_BYTES["jpg"])):
+            raise Exception(f"x exception - {lans('file_content_does_not_match')} JPG {lans('format')}", 400)
+    elif ext == "jpeg":
+        if not header.startswith(tuple(MAGIC_BYTES["jpg"])):
             raise Exception(f"x exception - {lans('file_content_does_not_match')} JPEG {lans('format')}", 400)
     elif ext == "webp":
         if not (header[:4] == MAGIC_BYTES["webp"][0] and header[8:12] == MAGIC_BYTES["webp"][1]):
             raise Exception(f"x exception - {lans('file_content_does_not_match')} WebP {lans('format')}", 400)
-        
-    return image
+    elif ext == "pdf":
+        if not header.startswith(MAGIC_BYTES["pdf"][0]):
+            raise Exception(f"x exception - {lans('file_content_does_not_match')} PDF {lans('format')}", 400)
+    elif ext == "mp3":
+        if not header.startswith(tuple(MAGIC_BYTES["mp3"])):
+            raise Exception(f"x exception - {lans('file_content_does_not_match')} MP3 {lans('format')}", 400)
+    elif ext == "mp4":
+        if MAGIC_BYTES["mp4"] not in header:
+            raise Exception(f"x exception - {lans('file_content_does_not_match')} MP4 {lans('format')}", 400)
+
+    return file
 
 ALLOWED_AVATAR_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
 ALLOWED_AVATAR_MIME_TYPES = {"image/png", "image/jpeg", "image/webp"}
@@ -181,7 +210,7 @@ def validate_user_avatar():
     user_avatar = request.files.get("user_avatar", "")
     if not user_avatar or user_avatar.filename == "" or user_avatar.content_type == "application/octet-stream": return ""
     
-    user_avatar = validate_img(user_avatar, ALLOWED_AVATAR_EXTENSIONS, ALLOWED_AVATAR_MIME_TYPES, MAX_AVATAR_FILESIZE_MB)
+    user_avatar = validate_file(user_avatar, ALLOWED_AVATAR_EXTENSIONS, ALLOWED_AVATAR_MIME_TYPES, MAX_AVATAR_FILESIZE_MB)
 
     return user_avatar
 
@@ -193,9 +222,32 @@ def validate_user_banner():
     user_banner = request.files.get("user_banner", "")
     if not user_banner or user_banner.filename == "" or user_banner.content_type == "application/octet-stream": return ""
     
-    user_banner = validate_img(user_banner, ALLOWED_BANNER_EXTENSIONS, ALLOWED_BANNER_MIME_TYPES, MAX_BANNER_FILESIZE_MB)
+    user_banner = validate_file(user_banner, ALLOWED_BANNER_EXTENSIONS, ALLOWED_BANNER_MIME_TYPES, MAX_BANNER_FILESIZE_MB)
 
     return user_banner
+
+##############################
+ALLOWED_POST_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "txt", "mp4", "pdf", "mp3"}
+ALLOWED_POST_MIME_TYPES = {"image/png", "image/jpeg", "image/webp", "text/plain", "video/mp4", "application/pdf", "audio/mpeg"}
+MAX_POST_FILESIZE_MB = 50
+def validate_post_media():
+    post_media = request.files.get("post_media", "")
+
+    if not post_media or post_media.filename == "": return ""
+    
+    post_media = validate_file(post_media, ALLOWED_POST_EXTENSIONS, ALLOWED_POST_MIME_TYPES, MAX_POST_FILESIZE_MB)
+
+    return post_media
+
+##############################
+POST_MESSAGE_MIN = 1
+POST_MESSAGE_MAX = 200
+REGEX_USER_PASSWORD = f"^.{{{POST_MESSAGE_MIN},{POST_MESSAGE_MAX}}}$"
+def validate_post_message():
+    post_message = request.form.get("post_message", "").strip()
+    if len(post_message) < POST_MESSAGE_MIN: raise Exception(f"x exception - {lans('post_to_short_must_be_above')} {USER_BIO_MIN}", 400)
+    if len(post_message) > POST_MESSAGE_MAX: raise Exception(f"x exception - {lans('post_to_long_must_be_below')} {USER_BIO_MAX}", 400)
+    return post_message
     
 ##############################
 def send_email(to_email, subject, template):

@@ -72,7 +72,7 @@
         </div>
         <div class="user_bio">
             <label for="user_bio">{{ x.lans('user_bio') }} <span> - {{ x.USER_BIO_MIN }} {{ x.lans('to') }} {{ x.USER_BIO_MAX }} {{ x.lans('charetors') }}</span></label>
-            <textarea name="user_bio" id="user_bio" mix-check="{{ x.REGEX_USER_BIO }}">{{ user['user_bio'] }}</textarea>
+            <textarea name="user_bio" id="user_bio" mix-check="{{ x.REGEX_USER_BIO }}" placeholder="{{ x.lans('whats_on_your_mind') }}">{{ user['user_bio'] }}</textarea>
             </div>
         <button mix-default="{{ x.lans('change_profile') }}" mix-await="{{ x.lans('submiting...') }}" type="submit">
             {{ x.lans('change_profile') }}

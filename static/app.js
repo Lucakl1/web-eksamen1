@@ -47,7 +47,6 @@ document.querySelectorAll("nav ul li a")?.forEach(link => {
     })
 })
 
-
 const observer = new MutationObserver( () => {
     addSelectorButton();
     previewEditProfileImage();

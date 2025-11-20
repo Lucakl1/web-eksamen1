@@ -84,14 +84,20 @@ def view_index():
         x.default_language = lan
 
         db, cursor = x.db()
-        q = """SELECT 
-        post_pk, post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, 
-        post_updated_at, user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username, user_pk
-        FROM users JOIN posts ON user_pk = user_fk WHERE post_deleted_at = 0 ORDER BY RAND() LIMIT 5"""
+        q = """
+        SELECT 
+        post_pk, post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, post_updated_at,
+        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username, user_pk,
+        post_media_type_fk, post_media_path
+        FROM users 
+        JOIN posts ON user_pk = user_fk
+        LEFT JOIN post_medias ON post_pk = post_fk
+        WHERE post_deleted_at = 0 ORDER BY RAND() LIMIT 5"""
         cursor.execute(q)
         posts = cursor.fetchall()
 
         for post in posts:
+            # wether or not current user have liked
             user_pk = user['user_pk']
             post_pk = post['post_pk']
 
@@ -101,6 +107,14 @@ def view_index():
 
             post['user_has_liked'] = False
             if existing_like: post['user_has_liked'] = True
+
+            # what type of media
+            if post["post_media_type_fk"]:
+                q = "SELECT post_media_type_type FROM post_media_types WHERE post_media_type_pk = %s"
+                cursor.execute(q, (post["post_media_type_fk"],))
+                post_media_type = cursor.fetchone()["post_media_type_type"]
+
+                if post_media_type: post['post_media_type'] = post_media_type
 
         return render_template("index.html", posts=posts)
     except Exception as ex:
@@ -196,8 +210,8 @@ def view_edit_profile():
                 user_banner = user['user_banner']
 
             db, cursor = x.db()
-            q = "UPDATE users SET user_avatar = %s, user_banner = %s, user_username = %s, user_first_name = %s, user_last_name = %s, user_bio = %s WHERE user_pk = %s, user_updated_at = %s"
-            cursor.execute(q, (user_avatar, user_banner, user_username, user_first_name, user_last_name, user_bio, user['user_pk'], current_time))
+            q = "UPDATE users SET user_avatar = %s, user_banner = %s, user_username = %s, user_first_name = %s, user_last_name = %s, user_bio = %s, user_updated_at = %s WHERE user_pk = %s"
+            cursor.execute(q, (user_avatar, user_banner, user_username, user_first_name, user_last_name, user_bio, current_time, user['user_pk']))
             db.commit()
 
             session["user"]["user_avatar"] = user_avatar
@@ -220,7 +234,7 @@ def view_edit_profile():
         error_code = str(ex)
         error_msg = x.lans('system_under_maintenance')
         if "x exception - " in error_code:
-            error_msg = error_code.split("x exception - ")[1].split('",')[0]
+            error_msg = error_code.split("x exception - ")[1].split("',")[0]
 
         if "Duplicate entry" in error_code:
             error_msg = x.lans("username_allready_in_system")
@@ -260,7 +274,7 @@ def login(lan = "english"):
                 user_password = x.validate_user_password()
 
                 db, cursor = x.db()
-                q = "SELECT * FROM users WHERE user_email = %s"
+                q = "SELECT * FROM users WHERE user_email = %s AND user_deleted_at = 0"
                 cursor.execute(q, (user_email,))
                 user = cursor.fetchone()
 
@@ -274,7 +288,7 @@ def login(lan = "english"):
                 user_password = x.validate_user_password()
 
                 db, cursor = x.db()
-                q = "SELECT * FROM users WHERE user_username = %s"
+                q = "SELECT * FROM users WHERE user_username = %s AND user_deleted_at = 0"
                 cursor.execute(q, (user_username,))
                 user = cursor.fetchone()
 
@@ -303,7 +317,7 @@ def login(lan = "english"):
         error_code = str(ex)
         error_msg = x.lans('system_under_maintenance')
         if("x exception - " in error_code):
-            error_msg = error_code.split("x exception - ")[1].split('",')[0]
+            error_msg = error_code.split("x exception - ")[1].split("',")[0]
         
         error_template = render_template(("global/error_message.html"), message=error_msg)
         return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>""", 400
@@ -366,7 +380,7 @@ def signup(lan = "english"):
         error_code = str(ex)
         error_msg = x.lans('system_under_maintenance')
         if "x exception - " in error_code:
-            error_msg = error_code.split("x exception - ")[1].split('",')[0]
+            error_msg = error_code.split("x exception - ")[1].split("',")[0]
 
         if "Duplicate entry" in error_code and "user_username" in error_code:
             error_msg = x.lans("username_allready_in_system")
@@ -438,7 +452,7 @@ def view_forgot_password(lan = "english"):
         error_code = str(ex)
         error_msg = x.lans('system_under_maintenance')
         if("x exception - " in error_code):
-            error_msg = error_code.split("x exception - ")[1].split('",')[0]
+            error_msg = error_code.split("x exception - ")[1].split("',")[0]
         
         error_template = render_template(("global/error_message.html"), message=error_msg)
         return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>""", 40
@@ -494,7 +508,7 @@ def view_reset_password(lan = "english"):
         if "db" in locals(): db.rollback()  
         error_msg = x.lans('system_under_maintenance')
         if("x exception - " in error_code):
-            error_msg = error_code.split("x exception - ")[1].split('",')[0]
+            error_msg = error_code.split("x exception - ")[1].split("',")[0]
         
         error_template = render_template(("global/error_message.html"), message=error_msg)
         return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>""", 400
@@ -572,6 +586,82 @@ def api_change_lan(lan = "english"):
     except Exception as ex:
         ic(ex)
         return {x.lans('system_under_maintenance')}, 400
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+@app.post("/make_a_post")
+def api_make_a_post():
+    try:
+        user = session.get("user", "")
+        post_message = x.validate_post_message()
+        post_media = x.validate_post_media()
+
+        current_time = int(time.time())
+
+        db, cursor = x.db()
+        db.start_transaction()
+        q = "INSERT INTO posts (user_fk, post_message, post_created_at) VALUES (%s, %s, %s)"
+        cursor.execute(q, (user['user_pk'], post_message, current_time))
+        post_pk = cursor.lastrowid
+
+        if post_media != "":
+            ext = post_media.filename.rsplit(".", 1)[-1].lower()
+            post_media.save(os.path.join(x.upload_folder_path, post_media.filename))
+            post_media = post_media.filename
+
+            if ext in {"jpg", "jpeg", "png", "webp"}:
+                category = "image"
+            elif ext in {"mp4"}:
+                category = "video"
+            elif ext in {"mp3"}:
+                category = "audio"
+            elif ext in {"pdf", "txt"}:
+                category = "file"
+
+            q = "SELECT post_media_type_pk FROM post_media_types WHERE post_media_type_type = %s"
+            cursor.execute(q, (category,))
+            post_media_type_pk = cursor.fetchone()["post_media_type_pk"]
+
+            q = "INSERT INTO post_medias (post_fk, post_media_path, post_media_type_fk) VALUES (%s, %s, %s)"
+            cursor.execute(q, (post_pk, post_media, post_media_type_pk))
+
+        db.commit()
+
+        #FROM users JOIN posts ON user_pk = user_fk WHERE
+
+        q = "SELECT * FROM posts JOIN post_medias ON post_pk = post_fk WHERE post_pk = %s"
+        cursor.execute(q, (post_pk,))
+        post = cursor.fetchone()
+
+        q = "SELECT post_media_type_type FROM post_media_types WHERE post_media_type_pk = %s"
+        cursor.execute(q, (post["post_media_type_fk"],))
+        post_media_type = cursor.fetchone()
+
+        post["user_username"] = user["user_username"]
+        post["user_banner"] = user["user_banner"]
+        post["user_avatar"] = user["user_avatar"]
+        post["user_first_name"] = user["user_first_name"]
+        post["user_last_name"] = user["user_last_name"]
+        post["user_created_at"] = user["user_created_at"]
+        post["user_bio"] = user["user_bio"]
+        post["post_media_type"] = post_media_type["post_media_type_type"]
+
+        post = render_template("_post.html", post=post)
+        return f"""
+            <browser mix-top='#posts'>
+                {post}
+            </browser>
+        """
+    except Exception as ex:
+        ic(ex)
+        error_code = str(ex)
+        error_msg = x.lans('system_under_maintenance')
+        if "x exception - " in error_code:
+            error_msg = error_code.split("x exception - ")[1].split("',")[0]
+        
+        error_template = render_template(("global/error_message.html"), message=error_msg)
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close() 

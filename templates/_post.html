@@ -44,6 +44,21 @@
             <p class="text">
                 {{ post.post_message }}
             </p>
+            {% if post.post_media_type %}
+            <div class="media">
+                {% if post.post_media_type == "image" %}
+                    <img src="{{ url_for('static', filename='uploads/'~post.post_media_path) }}" alt="user content">
+                {% elif post.post_media_type == "video" %}
+                    <video controls src="{{ url_for('static', filename='uploads/'~post.post_media_path) }}"></video>
+                {% elif post.post_media_type == "file" %}
+                    <a href="{{ url_for('static', filename='uploads/'~post.post_media_path) }}">
+                        <i class="fa-regular fa-file"></i>
+                    </a>
+                {% elif post.post_media_type == "audio" %}
+                    <audio controls src="{{ url_for('static', filename='uploads/'~post.post_media_path) }}"></audio>
+                {% endif %}
+            </div>
+            {% endif %}
         </div>
         
         <div class="post_actions">
