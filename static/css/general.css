@@ -34,6 +34,10 @@ main {
     }
 }
 
+.no_event {
+    pointer-events: none;
+}
+
 .mix-error {
     background: rgb(255, 231, 231);
 }

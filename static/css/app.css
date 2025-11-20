@@ -136,14 +136,12 @@ nav {
             align-items: center;
             gap: 16px;
             width: calc(100% - 16px);
-            pointer-events: none;
             
             * {
                 color: black;
             }
 
             img {
-                pointer-events: none;
                 height: 30px;
                 width: 30px;
                 border-radius: 50px;
@@ -315,6 +313,7 @@ main {
                     align-items: center;
                     gap: 4px;
                     cursor: pointer;
+                    background: none;
                 }
             }
         }

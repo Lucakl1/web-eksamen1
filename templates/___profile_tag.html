@@ -1,4 +1,4 @@
-<div id="profile_tag">
+<div id="profile_tag" class="no_event">
     {% if user['user_avatar'] == 'default.svg' %}
     <img src="{{ url_for('static', filename='images/'~user['user_avatar']) }}" alt="Profile">
     {% else %}

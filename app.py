@@ -85,8 +85,8 @@ def view_index():
 
         db, cursor = x.db()
         q = """SELECT 
-        post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, post_updated_at, 
-        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username, user_pk
+        post_pk, post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, 
+        post_updated_at, user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username, user_pk
         FROM users JOIN posts ON user_pk = user_fk WHERE post_deleted_at = 0 ORDER BY RAND() LIMIT 5"""
         cursor.execute(q)
         posts = cursor.fetchall()
@@ -117,8 +117,8 @@ def view_home():
 
         db, cursor = x.db()
         q = """SELECT 
-        post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, post_updated_at, 
-        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username 
+        post_pk, post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, 
+        post_updated_at, user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username 
         FROM users JOIN posts ON user_pk = user_fk WHERE post_deleted_at = 0 ORDER BY RAND() LIMIT 5"""
         cursor.execute(q)
         posts = cursor.fetchall()
@@ -143,8 +143,8 @@ def view_profile(user_username = ""):
 
         db, cursor = x.db()
         q = """SELECT 
-        post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, post_updated_at, 
-        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username 
+        post_pk, post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, 
+        post_updated_at, user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username 
         FROM users JOIN posts ON user_pk = user_fk WHERE post_deleted_at = 0 AND user_username = %s ORDER BY RAND() LIMIT 5"""
         cursor.execute(q, (user_username,))
         posts = cursor.fetchall()
@@ -182,17 +182,17 @@ def view_edit_profile():
             user_last_name = x.validate_user_last_name()
             user_bio = x.validate_user_bio()
 
-            if user_avatar:
-                user_avatar.save(os.path.join("static/uploads", user_avatar.filename))
+            if user_avatar != "":
+                user_avatar.save(os.path.join(x.upload_folder_path, user_avatar.filename))
                 user_avatar = user_avatar.filename
             else:
                 user_avatar = user['user_avatar']
 
-            if user_banner:
-                user_banner.save(os.path.join("static/uploads", user_banner.filename))
+            if user_banner != "":
+                user_banner.save(os.path.join(x.upload_folder_path, user_banner.filename))
                 user_banner = user_banner.filename
             else:
-                user_avatar = user['user_avatar']
+                user_banner = user['user_banner']
 
             db, cursor = x.db()
             q = "UPDATE users SET user_avatar = %s, user_banner = %s, user_username = %s, user_first_name = %s, user_last_name = %s, user_bio = %s WHERE user_pk = %s"
@@ -505,12 +505,10 @@ def view_reset_password(lan = "english"):
 ######### Minor calls ########
 ##############################
 
-@app.patch("/like-post") #TO ASK see ___post_like.html
+@app.patch("/like-post")
 def api_like_post():
     try:
         button_unlike_tweet = render_template("___post_unlike.html")
-
-        raise Exception("test")
 
         return f"""
             <browser mix-replace="#button_1">

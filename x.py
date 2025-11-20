@@ -138,6 +138,7 @@ USER_USERNAME_EMAIL_MAX = 100
 REGEX_USERNAME_EMAIL_MAX = f"^.{{{USER_USERNAME_EMAIL_MIN},{USER_USERNAME_EMAIL_MAX}}}$"
 
 ##############################
+upload_folder_path = "static/uploads"
 def validate_img(image, allowed_extenstions, allowed_mime_types, max_filesize_mb):
     ext = image.filename.rsplit(".", 1)[-1].lower()
     if ext not in allowed_extenstions:

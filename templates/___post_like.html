@@ -1,5 +1,5 @@
-<button class="action" mix-patch="/like-post"> <!-- TO ASK -- Why does fetch not work? -->
-    <span style="pointer-events: none;">
+<button class="action" mix-patch="/like-post?post_pk={{ post.post_pk }}">
+    <span class="no_event">
         <i class="fa-regular fa-heart"></i>
         {{ post.post_total_saved }}
     </span>
