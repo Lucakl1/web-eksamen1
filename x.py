@@ -16,7 +16,6 @@ import re, json, os, uuid
 google_spread_sheet_key = "1UYgE2jJ__HYl0N7lA5JR3sMH75hwhzhPPsSRRA-WNdg"
 allowed_languages = ["english", "danish", "spanish"]
 default_language = "english"
-site_name = "Home"
 MAGIC_BYTES = {
     #images
     "png": b"\x89PNG\r\n\x1a\n",
@@ -37,7 +36,8 @@ MAGIC_BYTES = {
 }
 
 ##############################
- 
+###### Helper functions ######
+##############################
 def lans(key):
     with open("dictionary.json", 'r', encoding='utf-8') as file:
         data = json.load(file)
@@ -63,6 +63,9 @@ def db():
         ic(ex)
         raise Exception("x exception - Database under maintenance", 500)
 
+site_name = "Home"
+def page_title(title = "Home"):
+    return f""" <browser mix-replace="#title"> <title id="title">X - {title}</title> </browser> """
 
 ##############################
 def no_cache(view):
@@ -76,6 +79,8 @@ def no_cache(view):
     return no_cache_view
 
 
+##############################
+#### Validater functions #####
 ##############################
 REGEX_EMAIL = "^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$"
 def validate_user_email(user_email = None):
@@ -93,6 +98,11 @@ def validate_user_username(user_username = None):
     if len(user_username) < USER_USERNAME_MIN: raise Exception(f"x exception - {lans('username_to_short_must_be_above')} {USER_USERNAME_MIN}", 400)
     if len(user_username) > USER_USERNAME_MAX: raise Exception(f"x exception - {lans('username_to_long_must_be_below')} {USER_USERNAME_MAX}", 400)
     return user_username
+
+##############################
+USER_USERNAME_EMAIL_MIN = 2
+USER_USERNAME_EMAIL_MAX = 100
+REGEX_USERNAME_EMAIL_MAX = f"^.{{{USER_USERNAME_EMAIL_MIN},{USER_USERNAME_EMAIL_MAX}}}$"
 
 ##############################
 USER_FIRST_NAME_MIN = 2
@@ -144,11 +154,6 @@ def validate_user_password_confirm():
     user_password = request.form.get("user_password", "").strip()
     if user_password != user_password_confirm : raise Exception(f"x exception - {lans('confirm_passwords_dont_match')}", 400)
     return user_password_confirm
-
-##############################
-USER_USERNAME_EMAIL_MIN = 2
-USER_USERNAME_EMAIL_MAX = 100
-REGEX_USERNAME_EMAIL_MAX = f"^.{{{USER_USERNAME_EMAIL_MIN},{USER_USERNAME_EMAIL_MAX}}}$"
 
 ##############################
 upload_folder_path = "static/uploads"
@@ -278,6 +283,61 @@ def send_email(to_email, subject, template):
         raise Exception("Cannot send email", 500)
     
 ##############################
+# db = database
+# cursor = cursor
+# user = current user (to see if user have likeed and more)
+# user_username = get only post from that user (used in profile)
+def get_posts(db, cursor, user, user_username = ""):
+    if user_username != "":
+        q = """
+        SELECT 
+        post_pk, post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, post_updated_at,
+        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username, user_pk,
+        post_media_type_fk, post_media_path
+        FROM users 
+        JOIN posts ON user_pk = user_fk
+        LEFT JOIN post_medias ON post_pk = post_fk
+        WHERE post_deleted_at = 0 AND user_username = %s
+        ORDER BY post_created_at DESC LIMIT 5"""
+        cursor.execute(q, (user_username,))
+    else:
+        q = """
+        SELECT 
+        post_pk, post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, post_updated_at,
+        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username, user_pk,
+        post_media_type_fk, post_media_path
+        FROM users 
+        JOIN posts ON user_pk = user_fk
+        LEFT JOIN post_medias ON post_pk = post_fk
+        WHERE post_deleted_at = 0
+        ORDER BY post_created_at DESC LIMIT 5"""
+        cursor.execute(q)
+        
+    posts = cursor.fetchall()
+
+    for post in posts:
+        # wether or not current user have liked
+        user_pk = user['user_pk']
+        post_pk = post['post_pk']
+
+        q = "SELECT * FROM likes WHERE user_fk = %s AND post_fk = %s"
+        cursor.execute(q, (user_pk, post_pk))
+        existing_like = cursor.fetchone()
+
+        post['user_has_liked'] = False
+        if existing_like: post['user_has_liked'] = True
+
+        # what type of media
+        if post["post_media_type_fk"]:
+            q = "SELECT post_media_type_type FROM post_media_types WHERE post_media_type_pk = %s"
+            cursor.execute(q, (post["post_media_type_fk"],))
+            post_media_type = cursor.fetchone()["post_media_type_type"]
+
+            if post_media_type: post['post_media_type'] = post_media_type
+    
+    return posts
+    
+##############################
 REGEX_UUID4_WITHOUT_DASHES = "^[0-9a-f]{8}[0-9a-f]{4}4[0-9a-f]{3}[89ab][0-9a-f]{3}[0-9a-f]{12}$"
 def validate_uuid4_without_dashes():
     user_uuid4 = request.args.get("key", "")
@@ -285,26 +345,8 @@ def validate_uuid4_without_dashes():
     if not re.match(REGEX_UUID4_WITHOUT_DASHES, user_uuid4): raise Exception(f"x exception - {lans('cannot_verify_user')}", 400)
     return user_uuid4
 
-##### need adjustment down from here ###############
 ##############################
-REGEX_UUID4 = "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-def validate_uuid4(uuid4 = ""):
-    if not uuid4:
-        uuid4 = request.values.get("uuid4", "").strip()
-    if not re.match(REGEX_UUID4, uuid4): raise Exception("Twitter exception - Invalid uuid4", 400)
-    return uuid4
-
-##############################
-POST_MIN_LEN = 2
-POST_MAX_LEN = 250
-REGEX_POST = f"^.{{{POST_MIN_LEN},{POST_MAX_LEN}}}$"
-def validate_post(post = ""):
-    post = post.strip()
-    if not re.match(REGEX_POST, post): raise Exception("x-error post", 400)
-    return post
-
-##############################
-##############################
+### Jinja helper functions ###
 ##############################
 def time_ago(epoch_time):
     if epoch_time == 0:

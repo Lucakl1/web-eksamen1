@@ -31,6 +31,21 @@ function previewEditProfileImage() {
 }
 previewEditProfileImage();
 
+function auto_show_more_onscroll() {
+    document.querySelectorAll(".auto_show_more")?.forEach(button => {
+        console.log("hej")
+        // TODO make scroll work eventlistenere dont start
+        button.addEventListener("scroll", () => {
+            console.log(button.getBoundingClientRect().top)
+            console.log(screenTop)
+            if (button.getBoundingClientRect().top >= screenTop) {
+                console.log("HEJ")
+            }
+        })
+    })
+}
+auto_show_more_onscroll();
+
 document.getElementById("edit_profile")?.addEventListener("click", e => {
     document.querySelector("nav ul li a.active")?.classList.remove("active");
     document.getElementById("profile").classList.add("active");
@@ -50,6 +65,7 @@ document.querySelectorAll("nav ul li a")?.forEach(link => {
 const observer = new MutationObserver( () => {
     addSelectorButton();
     previewEditProfileImage();
+    auto_show_more_onscroll();
 });
 
 const mainContainer = document.querySelector("body");

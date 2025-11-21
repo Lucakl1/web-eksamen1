@@ -84,37 +84,7 @@ def view_index():
         x.default_language = lan
 
         db, cursor = x.db()
-        q = """
-        SELECT 
-        post_pk, post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, post_updated_at,
-        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username, user_pk,
-        post_media_type_fk, post_media_path
-        FROM users 
-        JOIN posts ON user_pk = user_fk
-        LEFT JOIN post_medias ON post_pk = post_fk
-        WHERE post_deleted_at = 0 ORDER BY RAND() LIMIT 5"""
-        cursor.execute(q)
-        posts = cursor.fetchall()
-
-        for post in posts:
-            # wether or not current user have liked
-            user_pk = user['user_pk']
-            post_pk = post['post_pk']
-
-            q = "SELECT * FROM likes WHERE user_fk = %s AND post_fk = %s"
-            cursor.execute(q, (user_pk, post_pk))
-            existing_like = cursor.fetchone()
-
-            post['user_has_liked'] = False
-            if existing_like: post['user_has_liked'] = True
-
-            # what type of media
-            if post["post_media_type_fk"]:
-                q = "SELECT post_media_type_type FROM post_media_types WHERE post_media_type_pk = %s"
-                cursor.execute(q, (post["post_media_type_fk"],))
-                post_media_type = cursor.fetchone()["post_media_type_type"]
-
-                if post_media_type: post['post_media_type'] = post_media_type
+        posts = x.get_posts(db, cursor, user)
 
         return render_template("index.html", posts=posts)
     except Exception as ex:
@@ -127,18 +97,16 @@ def view_index():
 @app.get("/home")
 def view_home():
     try:
-        x.site_name = x.lans("home")
+        user = session.get("user", "")
 
         db, cursor = x.db()
-        q = """SELECT 
-        post_pk, post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, 
-        post_updated_at, user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username 
-        FROM users JOIN posts ON user_pk = user_fk WHERE post_deleted_at = 0 ORDER BY RAND() LIMIT 5"""
-        cursor.execute(q)
-        posts = cursor.fetchall()
+        posts = x.get_posts(db, cursor, user)
         
         site = render_template("main_pages/home.html", posts=posts)
-        return f""" <browser mix-replace='#main'> {site} </browser> """
+        return f""" 
+        <browser mix-replace='#main'> {site} </browser> 
+        {x.page_title(x.lans("home"))}
+        """
     except Exception as ex:
         ic(ex)
         return "error"
@@ -151,24 +119,18 @@ def view_home():
 @app.get("/profile/<user_username>")
 def view_profile(user_username = ""):
     try:
-        x.site_name = f"{x.lans('profile')} {user_username}"
         user = session.get("user", "")
         if not user_username: user_username = user['user_username']
 
         db, cursor = x.db()
-        q = """SELECT 
-        post_pk, post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, 
-        post_updated_at, user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username 
-        FROM users JOIN posts ON user_pk = user_fk WHERE post_deleted_at = 0 AND user_username = %s ORDER BY RAND() LIMIT 5"""
-        cursor.execute(q, (user_username,))
-        posts = cursor.fetchall()
+        posts = x.get_posts(db, cursor, user, user_username)
 
         q = "SELECT * FROM users WHERE user_username = %s"
         cursor.execute(q, (user_username,))
         user = cursor.fetchone()
 
         site = render_template("main_pages/profile.html", posts=posts, userprofile=user)
-        return f""" <browser mix-replace='#main'> {site} </browser> """
+        return f""" <browser mix-replace='#main'> {site} </browser> {x.page_title( x.lans('profile') + " - " + user_username )} """
     except Exception as ex:
         ic(ex)
         error_msg = "error"
@@ -182,10 +144,12 @@ def view_profile(user_username = ""):
 def view_edit_profile():
     try:
         if request.method == "GET": 
-            x.site_name = x.lans("edit_profile")
-
+            user_username = session.get("user", "")["user_username"]
             site = render_template("main_pages/edit_profile.html")
-            return f""" <browser mix-replace='#main'> {site} </browser> """
+            return f""" 
+                <browser mix-replace='#main'> {site} </browser>
+                {x.page_title( x.lans('edit_profile') + " - " + user_username )} 
+            """
         
         if request.method == "POST":
             user = session.get("user", "")
@@ -665,6 +629,15 @@ def api_make_a_post():
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close() 
+
+@app.get("/get_more_posts")
+def api_get_more_posts():
+    try:
+        pass
+    except Exception as ex:
+        pass
+    finally:
+        pass
 
 ##############################
 ########## utilities #########
