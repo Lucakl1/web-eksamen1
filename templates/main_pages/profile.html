@@ -53,4 +53,10 @@
         {% endfor %}
     
     </section>
+
+    {% if count > posts|length %}
+    <button href="/get_more_posts_profile?username={{ userprofile['user_username'] }}" mix-get mix-default="{{ x.lans('more_posts') }}" mix-await="{{ x.lans('loading...') }}" class="main_button" id="auto_show_more">
+        {{ x.lans('more_posts') }}
+    </button>
+    {% endif %}
 </main>

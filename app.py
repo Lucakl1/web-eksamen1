@@ -76,6 +76,7 @@ def upload_file():
 def view_index():
     try:
         x.site_name = x.lans("home")
+        session["current_post_number"] = 0
         user = session.get("user", "")
         if not user: return redirect(url_for("login"))
 
@@ -84,6 +85,11 @@ def view_index():
         x.default_language = lan
 
         db, cursor = x.db()
+
+        cursor.execute("SELECT COUNT(*) FROM posts WHERE post_deleted_at = 0")
+        count = cursor.fetchone()["COUNT(*)"]
+        session["max_number_of_posts"] = int(count)     
+        
         posts = x.get_posts(db, cursor, user)
 
         return render_template("index.html", posts=posts)
@@ -98,8 +104,14 @@ def view_index():
 def view_home():
     try:
         user = session.get("user", "")
+        session["current_post_number"] = 0
 
         db, cursor = x.db()
+
+        cursor.execute("SELECT COUNT(*) FROM posts WHERE post_deleted_at = 0")
+        count = cursor.fetchone()["COUNT(*)"]
+        session["max_number_of_posts"] = int(count) 
+
         posts = x.get_posts(db, cursor, user)
         
         site = render_template("main_pages/home.html", posts=posts)
@@ -120,17 +132,25 @@ def view_home():
 def view_profile(user_username = ""):
     try:
         user = session.get("user", "")
+        session["current_post_number"] = 0
         if not user_username: user_username = user['user_username']
 
         db, cursor = x.db()
-        posts = x.get_posts(db, cursor, user, user_username)
+        
+        cursor.execute("SELECT COUNT(*) as total FROM posts JOIN users ON user_pk = user_fk WHERE post_deleted_at = 0 AND user_username = %s", (user_username,))
+        count = cursor.fetchone()["total"]
+        session["max_number_of_posts"] = int(count)
+        
+        posts = x.get_posts(db, cursor, user, "profile", user_username)
 
         q = "SELECT * FROM users WHERE user_username = %s"
         cursor.execute(q, (user_username,))
         user = cursor.fetchone()
 
-        site = render_template("main_pages/profile.html", posts=posts, userprofile=user)
-        return f""" <browser mix-replace='#main'> {site} </browser> {x.page_title( x.lans('profile') + " - " + user_username )} """
+        site = render_template("main_pages/profile.html", posts=posts, userprofile=user, count=count)
+        return f""" 
+            <browser mix-replace='#main'> {site} </browser> {x.page_title( x.lans('profile') + " - " + user_username )} 
+        """
     except Exception as ex:
         ic(ex)
         error_msg = "error"
@@ -186,7 +206,7 @@ def view_edit_profile():
             session["user"]["user_bio"] = user_bio
 
 
-            succes_template = render_template(("global/succes_message.html"), message="succes")
+            succes_template = render_template(("global/succes_message.html"), message=x.lans("succes"))
             profile_tag = render_template(("___profile_tag.html"))
             return f"""
                 <browser mix-bottom='#succes_message'>{succes_template}</browser>
@@ -488,7 +508,7 @@ def view_reset_password(lan = "english"):
 def api_like_post():
     try:
         user_pk = session.get("user", "")["user_pk"]
-        post_pk = int(request.args.get("post_pk"))
+        post_pk = int(request.args.get("post"))
 
         db, cursor = x.db()
 
@@ -592,15 +612,18 @@ def api_make_a_post():
 
         db.commit()
 
-        #FROM users JOIN posts ON user_pk = user_fk WHERE
+        if post_media != "":
+            q = "SELECT * FROM posts JOIN post_medias ON post_pk = post_fk WHERE post_pk = %s"
+            cursor.execute(q, (post_pk,))
+            post = cursor.fetchone()
 
-        q = "SELECT * FROM posts JOIN post_medias ON post_pk = post_fk WHERE post_pk = %s"
-        cursor.execute(q, (post_pk,))
-        post = cursor.fetchone()
-
-        q = "SELECT post_media_type_type FROM post_media_types WHERE post_media_type_pk = %s"
-        cursor.execute(q, (post["post_media_type_fk"],))
-        post_media_type = cursor.fetchone()
+            q = "SELECT post_media_type_type FROM post_media_types WHERE post_media_type_pk = %s"
+            cursor.execute(q, (post["post_media_type_fk"],))
+            post_media_type = cursor.fetchone()
+        else:
+            q = "SELECT * FROM posts WHERE post_pk = %s"
+            cursor.execute(q, (post_pk,))
+            post = cursor.fetchone()
 
         post["user_username"] = user["user_username"]
         post["user_banner"] = user["user_banner"]
@@ -609,13 +632,244 @@ def api_make_a_post():
         post["user_last_name"] = user["user_last_name"]
         post["user_created_at"] = user["user_created_at"]
         post["user_bio"] = user["user_bio"]
-        post["post_media_type"] = post_media_type["post_media_type_type"]
+        if post_media != "": post["post_media_type"] = post_media_type["post_media_type_type"]
 
         post = render_template("_post.html", post=post)
         return f"""
             <browser mix-top='#posts'>
                 {post}
             </browser>
+        """
+    except Exception as ex:
+        ic(ex)
+        db.rollback()
+        error_code = str(ex)
+        error_msg = x.lans('system_under_maintenance')
+        if "x exception - " in error_code:
+            error_msg = error_code.split("x exception - ")[1].split("',")[0]
+        
+        error_template = render_template(("global/error_message.html"), message=error_msg)
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close() 
+
+@app.route("/edit_post", methods=["GET", "POST"])
+def api_edit_post():
+    try:
+        user = session.get("user", "")
+        post_pk = request.args.get("post", "")
+        if post_pk == "": raise Exception(f"x exception - {x.lans('post_is_deleted')}")
+        db, cursor = x.db()
+
+        q = "SELECT * FROM posts JOIN users ON user_pk = user_fk WHERE post_pk = %s"
+        cursor.execute(q, (post_pk,))
+        post = cursor.fetchone()
+        db.commit()
+
+        if post["user_fk"] != user["user_pk"]:
+            raise Exception(f"x exception - {x.lans('you_dont_have_the_authority_to_edit_this_post')}")
+        
+        if request.method == "GET":
+                
+            edit_post_template = render_template(("_edit_post.html"), post=post)
+            return f"""
+                <browser mix-replace='#post{post_pk}'>{edit_post_template}</browser>
+            """
+        
+        if request.method == "POST":
+            current_time = int(time.time())
+            new_post_message = x.validate_post_message()
+            remove_media = request.form.get("delete_media", "")
+
+            db.start_transaction()
+            q = "UPDATE posts SET post_message = %s, post_updated_at = %s WHERE post_pk = %s"
+            cursor.execute(q, (new_post_message, current_time, post_pk))
+
+            category = ""
+            if remove_media == "on":
+                q = "DELETE FROM post_medias WHERE post_fk = %s"
+                cursor.execute(q, (post_pk,))
+            else:
+                new_post_media = x.validate_post_media()
+                
+                if new_post_media != "":
+                    ext = new_post_media.filename.rsplit(".", 1)[-1].lower()
+                    new_post_media.save(os.path.join(x.upload_folder_path, new_post_media.filename))
+                    new_post_media = new_post_media.filename
+
+                    if ext in {"jpg", "jpeg", "png", "webp"}:
+                        category = "image"
+                    elif ext in {"mp4"}:
+                        category = "video"
+                    elif ext in {"mp3"}:
+                        category = "audio"
+                    elif ext in {"pdf", "txt"}:
+                        category = "file"
+
+                    q = "SELECT post_media_type_pk FROM post_media_types WHERE post_media_type_type = %s"
+                    cursor.execute(q, (category,))
+                    post_media_type_pk = cursor.fetchone()["post_media_type_pk"]
+
+                    q = "SELECT * FROM post_medias WHERE post_fk = %s"
+                    cursor.execute(q, (post_pk,))
+                    media_allready_exists = cursor.fetchone()
+
+                    if media_allready_exists:
+                        q = "UPDATE post_medias SET post_media_path = %s, post_media_type_fk = %s WHERE post_fk = %s"
+                        cursor.execute(q, (new_post_media, post_media_type_pk, post_pk))
+                    else:
+                        q = "INSERT INTO post_medias (post_fk, post_media_path, post_media_type_fk) VALUES (%s, %s, %s)"
+                        cursor.execute(q, (post_pk, new_post_media, post_media_type_pk))
+            db.commit()
+
+            q = """
+            SELECT 
+            post_pk, post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, post_updated_at,
+            user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username, user_pk,
+            post_media_type_fk, post_media_path
+            FROM users 
+            JOIN posts ON user_pk = user_fk
+            LEFT JOIN post_medias ON post_pk = post_fk
+            WHERE post_deleted_at = 0 AND post_pk = %s
+            """
+            cursor.execute(q, (post_pk,))
+            post = cursor.fetchone()
+            
+            if category != "": post["post_media_type"] = category
+
+            q = "SELECT * FROM likes WHERE user_fk = %s AND post_fk = %s"
+            cursor.execute(q, (user["user_pk"], post_pk))
+            existing_like = cursor.fetchone()
+
+            post["user_has_liked"] = existing_like
+            
+            new_post = render_template("_post.html", post=post)
+            succes_template = render_template(("global/succes_message.html"), message=x.lans("post_updated"))
+            return f""" 
+                <browser mix-replace="#post{post_pk}"> {new_post} </browser>
+                <browser mix-bottom='#succes_message'>{succes_template}</browser>
+            """
+
+    except Exception as ex:
+        db.rollback()
+        ic(ex)
+        error_code = str(ex)
+        error_msg = x.lans('system_under_maintenance')
+        if "x exception - " in error_code:
+            error_msg = error_code.split("x exception - ")[1].split("',")[0]
+        
+        error_template = render_template(("global/error_message.html"), message=error_msg)
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+@app.delete("/delete_post")
+def api_delete_post():
+    try:
+        user = session.get("user", "")
+        post_pk = request.args.get("post", "")
+        current_time = int(time.time())
+        if post_pk == "": raise Exception(f"x exception - {x.lans('post_is_allready_deleted')}")
+
+        db, cursor = x.db()
+
+        if "admin" in user['user_role']:
+            q = "SELECT * FROM posts JOIN users ON user_pk = user_fk WHERE post_pk = %s"
+            cursor.execute(q, (post_pk,))
+            post = cursor.fetchone()
+
+            x.default_language = post["user_language"]
+            message_to_user = render_template("___email_post_deleted.html", post=post)
+            x.send_email(post["user_email"], x.lans("one_of_your_post_has_been_deleted"), message_to_user)
+            x.default_language = user["user_language"]
+        else:
+            q = "SELECT * FROM posts WHERE post_pk = %s"
+            cursor.execute(q, (post_pk,))
+            post = cursor.fetchone()
+
+            if post["user_fk"] != user["user_pk"]:
+                raise Exception(f"x exception - {x.lans('you_dont_have_the_authority_to_delete_this_post')}")
+        
+        q = "UPDATE posts SET post_deleted_at = %s WHERE post_pk = %s"
+        cursor.execute(q, (current_time, post_pk))
+        db.commit()
+            
+        succes_template = render_template(("global/succes_message.html"), message=x.lans("post_deleted"))
+        return f"""
+            <browser mix-bottom='#succes_message'>{succes_template}</browser>
+            <browser mix-remove='#post{post_pk}'></browser>
+        """
+    except Exception as ex:
+        ic(ex)
+        error_code = str(ex)
+        error_msg = x.lans('system_under_maintenance')
+        if "x exception - " in error_code:
+            error_msg = error_code.split("x exception - ")[1].split("',")[0]
+        
+        error_template = render_template(("global/error_message.html"), message=error_msg)
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+
+@app.get("/get_more_posts_home")
+def api_get_more_posts_home():
+    try:
+        max_number_of_posts = session.get("max_number_of_posts")
+        current_post_number = session.get("current_post_number", 0) + 5
+        session["current_post_number"] = current_post_number
+        user = session.get("user")
+
+        db, cursor = x.db()
+        posts = x.get_posts(db, cursor, user, "home", "", current_post_number)
+
+        remove_more_button = ""
+        if max_number_of_posts <= current_post_number + 5: 
+            remove_more_button = f"<browser mix-remove='#auto_show_more'></browser>"
+
+        htmlPosts = render_template("_append_posts.html", posts=posts)
+
+        return f""" 
+            <browser mix-bottom="#posts"> {htmlPosts} </browser>
+            {remove_more_button}
+        """
+    except Exception as ex:
+        ic(ex)
+        error_code = str(ex)
+        error_msg = x.lans('system_under_maintenance')
+        if "x exception - " in error_code:
+            error_msg = error_code.split("x exception - ")[1].split("',")[0]
+        
+        error_template = render_template(("global/error_message.html"), message=error_msg)
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+@app.get("/get_more_posts_profile")
+def api_get_more_posts_profile():
+    try:
+        max_number_of_posts = session.get("max_number_of_posts")
+        current_post_number = session.get("current_post_number", 0) + 5
+        session["current_post_number"] = current_post_number
+        user = session.get("user")
+        user_username = request.args.get("username", user["user_username"])
+
+        db, cursor = x.db()
+        posts = x.get_posts(db, cursor, user, "profile", user_username, current_post_number)
+
+        remove_more_button = ""
+        if max_number_of_posts <= current_post_number + 5: 
+            remove_more_button = f"<browser mix-remove='#auto_show_more'></browser>"
+
+        htmlPosts = render_template("_append_posts.html", posts=posts)
+
+        return f""" 
+            <browser mix-bottom="#posts"> {htmlPosts} </browser>
+            {remove_more_button}
         """
     except Exception as ex:
         ic(ex)
@@ -629,15 +883,6 @@ def api_make_a_post():
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close() 
-
-@app.get("/get_more_posts")
-def api_get_more_posts():
-    try:
-        pass
-    except Exception as ex:
-        pass
-    finally:
-        pass
 
 ##############################
 ########## utilities #########

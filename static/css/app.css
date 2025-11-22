@@ -332,6 +332,20 @@ main {
                         width: 100%;
                         height: 40px;
                     }
+
+                    a {
+                        color: black;
+                        display: flex;
+                        align-items: center;
+                        gap: 6px;
+                        white-space: nowrap;
+
+
+                        i {
+                            font-size: 40px;
+                        }
+
+                    }
                 }
             }
 
@@ -347,9 +361,34 @@ main {
                     background: none;
                 }
             }
+
+            .post_authority_action {
+                position: absolute;
+                bottom: 8px;
+                right: 0;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+
+                a.delete {
+                    color: red;
+                    
+                    &:hover {
+                        color: #b60000;
+                    }
+                }
+
+                a.edit {
+                    color: blue;
+                    
+                    &:hover {
+                        color: #000095;
+                    }
+                }
+            }
         }
 
-        &:has(a:hover) .mini_profile, .mini_profile:hover {
+        &:has(> a:hover) .mini_profile, .mini_profile:hover {
             opacity: 1;
             pointer-events: all;
         }
@@ -582,7 +621,7 @@ main {
     }
 
     &.home {
-        .quick_post {
+        .quick_post, .edit_post {
             --user-img-width: 50px;
             display: grid;
             grid-template-columns: var(--user-img-width) 1fr;

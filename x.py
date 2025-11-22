@@ -286,21 +286,12 @@ def send_email(to_email, subject, template):
 # db = database
 # cursor = cursor
 # user = current user (to see if user have likeed and more)
-# user_username = get only post from that user (used in profile)
-def get_posts(db, cursor, user, user_username = ""):
-    if user_username != "":
-        q = """
-        SELECT 
-        post_pk, post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, post_updated_at,
-        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username, user_pk,
-        post_media_type_fk, post_media_path
-        FROM users 
-        JOIN posts ON user_pk = user_fk
-        LEFT JOIN post_medias ON post_pk = post_fk
-        WHERE post_deleted_at = 0 AND user_username = %s
-        ORDER BY post_created_at DESC LIMIT 5"""
-        cursor.execute(q, (user_username,))
-    else:
+# witch_page (home page gets defrient posts then profile)
+# data_fore_page (if the page needs any data)
+# where_in_list (how long in the dfatabase have we scrolled)
+def get_posts(db, cursor, user, witch_page = "home", data_fore_page = "", where_in_list = 0):
+    ic(witch_page)
+    if witch_page == "home":
         q = """
         SELECT 
         post_pk, post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, post_updated_at,
@@ -310,8 +301,20 @@ def get_posts(db, cursor, user, user_username = ""):
         JOIN posts ON user_pk = user_fk
         LEFT JOIN post_medias ON post_pk = post_fk
         WHERE post_deleted_at = 0
-        ORDER BY post_created_at DESC LIMIT 5"""
-        cursor.execute(q)
+        ORDER BY post_created_at DESC LIMIT 5 OFFSET %s"""
+        cursor.execute(q, (where_in_list,))
+    elif witch_page == "profile":
+        q = """
+        SELECT 
+        post_pk, post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, post_updated_at,
+        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username, user_pk,
+        post_media_type_fk, post_media_path
+        FROM users 
+        JOIN posts ON user_pk = user_fk
+        LEFT JOIN post_medias ON post_pk = post_fk
+        WHERE post_deleted_at = 0 AND user_username = %s
+        ORDER BY post_created_at DESC LIMIT 5 OFFSET %s"""
+        cursor.execute(q, (data_fore_page, where_in_list))
         
     posts = cursor.fetchall()
 

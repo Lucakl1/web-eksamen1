@@ -508,5 +508,95 @@
         "english": "File is not recognized",
         "danish": "",
         "spanish": ""
+    },
+    "more_posts": {
+        "english": "More posts",
+        "danish": "",
+        "spanish": ""
+    },
+    "attached_file": {
+        "english": "Attached file:",
+        "danish": "",
+        "spanish": ""
+    },
+    "remove_post": {
+        "english": "Remove post",
+        "danish": "",
+        "spanish": ""
+    },
+    "post_is_allready_deleted": {
+        "english": "Post is allready deleted",
+        "danish": "",
+        "spanish": ""
+    },
+    "you_dont_have_the_authority_to_delete_this_post": {
+        "english": "You dont have the authority to delete this post",
+        "danish": "",
+        "spanish": ""
+    },
+    "succes": {
+        "english": "Succes",
+        "danish": "",
+        "spanish": ""
+    },
+    "post_deleted": {
+        "english": "Post deleted",
+        "danish": "",
+        "spanish": ""
+    },
+    "one_of_your_post_has_been_deleted": {
+        "english": "One of your post has been deleted",
+        "danish": "",
+        "spanish": ""
+    },
+    "dear": {
+        "english": "Dear",
+        "danish": "Kære",
+        "spanish": ""
+    },
+    "your_post_with_the_following_message_has_been_deleted": {
+        "english": "Your post with the following message has been deleted",
+        "danish": "",
+        "spanish": ""
+    },
+    "please_contakt_us_if_you_think_this_was_a_mistake": {
+        "english": "Please contakt us if you think this was a mistake",
+        "danish": "",
+        "spanish": ""
+    },
+    "confirm": {
+        "english": "Confirm",
+        "danish": "",
+        "spanish": ""
+    },
+    "remove_file": {
+        "english": "Remove file",
+        "danish": "",
+        "spanish": ""
+    },
+    "post_is_deleted": {
+        "english": "Post is deleted",
+        "danish": "",
+        "spanish": ""
+    },
+    "you_dont_have_the_authority_to_edit_this_post": {
+        "english": "You dont have the authority to edit this post",
+        "danish": "",
+        "spanish": ""
+    },
+    "edit_post": {
+        "english": "Edit post",
+        "danish": "",
+        "spanish": ""
+    },
+    "will_remove_new_media_uploaded_too": {
+        "english": "Will remove new media uploaded too",
+        "danish": "",
+        "spanish": ""
+    },
+    "post_updated": {
+        "english": "Post updated",
+        "danish": "",
+        "spanish": ""
     }
 }

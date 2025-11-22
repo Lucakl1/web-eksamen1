@@ -1,4 +1,4 @@
-<button id="like_post{{ post.post_pk }}"  mix-patch="/like_post?post_pk={{ post.post_pk }}" class="action">
+<button id="like_post{{ post.post_pk }}"  mix-patch="/like_post?post={{ post.post_pk }}" class="action">
     <span class="no_event">
         {% if post.user_has_liked %}
             <i class="fa-solid fa-heart"></i>

@@ -33,7 +33,7 @@
 
     </section>
 
-    <button href="/get_more_posts?site=home" mix-get mix-default="{{ x.lans('post') }}" mix-await="{{ x.lans('posting...') }}" class="main_button auto_show_more">
-        More posts
+    <button href="/get_more_posts_home" mix-get mix-default="{{ x.lans('more_posts') }}" mix-await="{{ x.lans('loading...') }}" class="main_button" id="auto_show_more">
+        {{ x.lans('more_posts') }}
     </button>
 </main>

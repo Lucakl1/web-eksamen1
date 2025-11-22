@@ -1,0 +1,41 @@
+<article id="post{{ post.post_pk }}" class="edit_post">
+    <a mix-get href="/profile/{{post.user_username}}">
+        {% if post.user_avatar == 'default.svg' %}
+            <img src="{{ url_for('static', filename='images/'~post.user_avatar) }}" alt="" class="profile_img no_event">
+        {% else %}
+            <img src="{{ url_for('static', filename='uploads/'~post.user_avatar) }}" alt="" class="profile_img no_event">
+        {% endif %}
+    </a>
+
+    <div class="post_info">
+        <div class="post_header">
+            <span class="name">
+                {{ post.user_first_name }} {{ post.user_last_name }}
+            </span>
+            <span class="handle">@{{ post.user_username }}</span> ·
+        </div>
+        <form class="post_content" action="/edit_post?post={{ post.post_pk }}" mix-post autocomplete="off" enctype="multipart/form-data">
+            <label for="post_message"> {{ x.lans('edit_post') }} </label>
+            <textarea name="post_message" id="post_message" placeholder="{{ x.lans('tell_the_world_something') }}">{{ post.post_message }}</textarea>
+            
+            <div class="file_with_submit">
+                <div>
+                    <span>
+                        <label for="delete_media">{{ x.lans("remove_file") }} <span>- {{ x.lans('will_remove_new_media_uploaded_too') }}</span></label>
+                        <input type="checkbox" name="delete_media" id="delete_media">
+                    </span>
+
+                    <label for="post_media">{{ x.lans('attachments') }} 
+                        <span>- {{ x.lans('file_formats') }}: 
+                        {% for ext in x.ALLOWED_POST_EXTENSIONS %} 
+                            "{{ ext }}"
+                        {% endfor %}</span></label>
+                    <input name="post_media" type="file" id="post_media">
+                </div>
+                <button mix-await="{{ x.lans('posting...') }}" type="submit" class="main_button">
+                    {{ x.lans('confirm') }}
+                </button>
+            </div>
+        </form>
+    </div>
+</article>

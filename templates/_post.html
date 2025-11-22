@@ -1,4 +1,4 @@
-<article>
+<article id="post{{ post.post_pk }}">
     <a mix-get href="/profile/{{post.user_username}}">
         {% if post.user_avatar == 'default.svg' %}
             <img src="{{ url_for('static', filename='images/'~post.user_avatar) }}" alt="" class="profile_img no_event">
@@ -51,7 +51,8 @@
                 {% elif post.post_media_type == "video" %}
                     <video controls src="{{ url_for('static', filename='uploads/'~post.post_media_path) }}"></video>
                 {% elif post.post_media_type == "file" %}
-                    <a href="{{ url_for('static', filename='uploads/'~post.post_media_path) }}">
+                    <a href="{{ url_for('static', filename='uploads/'~post.post_media_path) }}" target="_blank">
+                        {{ x.lans("attached_file") }}
                         <i class="fa-regular fa-file"></i>
                     </a>
                 {% elif post.post_media_type == "audio" %}
@@ -67,5 +68,14 @@
             <span class="action"><i class="fa-regular fa-bookmark"></i>{{ post.post_total_saved }}</span>
             <!-- <span class="action"><i class="fa-solid fa-share"></i></span> -->
         </div>
+
+        {% if post.user_pk == user.user_pk or user['user_role'] == 'admin' %}
+        <div class="post_authority_action">
+            {% if post.user_pk == user.user_pk %}
+            <a href="/edit_post?post={{ post.post_pk }}" mix-get class="edit"> {{ x.lans("edit") }} </a>
+            {% endif %}
+            <a href="/delete_post?post={{ post.post_pk }}" mix-delete class="delete"> {{ x.lans("remove_post") }} </a>
+        </div>
+        {% endif %}
     </div>
 </article>
