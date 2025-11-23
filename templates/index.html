@@ -24,10 +24,11 @@
             </a>
         </li>
         <li>
-            <a href="#" mix-get mix-default="<i class='fa-regular fa-bell'></i>{{ x.lans('notifications') }}" mix-await="<i class='fa-regular fa-bell'></i>{{ x.lans('loading...') }}">
+            <a href="/notifications" mix-get mix-default="<i class='fa-regular fa-bell'></i>{{ x.lans('notifications') }}" mix-await="<i class='fa-regular fa-bell'></i>{{ x.lans('loading...') }}">
                 <i class='fa-regular fa-bell'></i>{{ x.lans('notifications') }}
             </a>
         </li>
+        {# 
         <li>
             <a href="#" mix-get mix-default="<i class='fa-regular fa-envelope'></i>{{ x.lans('messages') }}" mix-await="<i class='fa-regular fa-envelope'></i>{{ x.lans('loading...') }}">
                 <i class='fa-regular fa-envelope'></i>{{ x.lans('messages') }}
@@ -38,11 +39,13 @@
                 <i class='fa-solid fa-atom'></i>{{ x.lans('grok') }}
             </a>
         </li>
+        #}
         <li>
-            <a href="#" mix-get mix-default="<i class='fa-regular fa-bookmark'></i>{{ x.lans('bookmarks') }}" mix-await="<i class='fa-regular fa-bookmark'></i>{{ x.lans('loading...') }}">
+            <a href="/bookmark" mix-get mix-default="<i class='fa-regular fa-bookmark'></i>{{ x.lans('bookmarks') }}" mix-await="<i class='fa-regular fa-bookmark'></i>{{ x.lans('loading...') }}">
                 <i class='fa-regular fa-bookmark'></i>{{ x.lans('bookmarks') }}
             </a>
         </li>
+        {# 
         <li>
             <a href="#" mix-get mix-default="<i class='fa-solid fa-briefcase'></i>{{ x.lans('jobs') }}" mix-await="<i class='fa-solid fa-briefcase'></i>{{ x.lans('loading...') }}">
                 <i class='fa-solid fa-briefcase'></i>{{ x.lans('jobs') }}
@@ -58,6 +61,7 @@
                 <i class='fa-solid fa-star'></i>{{ x.lans('premium') }}
             </a>
         </li>
+        #}
         <li>
             <a id="profile" href="/profile" mix-get mix-default="<i class='fa-regular fa-user'></i>{{ x.lans('profile') }}" mix-await="<i class='fa-regular fa-user'></i>{{ x.lans('loading...') }}">
                 <i class='fa-regular fa-user'></i>{{ x.lans('profile') }}
@@ -69,7 +73,7 @@
             </a>
         </li>
         <li>
-            <button class="main_button">{{ x.lans('post') }}</button>
+            <button href="/home" mix-get class="main_button">{{ x.lans('post') }}</button>
         </li>
     </ul>
 

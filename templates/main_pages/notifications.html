@@ -1,0 +1,19 @@
+<main id="main" class="notifications">
+    <section>
+        <h1>{{ x.lans("all_following_post") }}</h1>
+    </section>
+
+    <section id="posts">
+        
+    {% for post in posts: %}
+        {% include "_post.html" %}
+    {% endfor %}
+
+    </section>
+
+    {% if count > posts|length and count != 0 %}
+    <button href="/get_more_posts_notifications" mix-get mix-default="{{ x.lans('more_posts') }}" mix-await="{{ x.lans('loading...') }}" class="main_button" id="auto_show_more">
+        {{ x.lans('more_posts') }}
+    </button>
+    {% endif %}
+</main>

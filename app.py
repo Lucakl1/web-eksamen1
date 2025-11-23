@@ -145,11 +145,18 @@ def view_profile(user_username = ""):
 
         q = "SELECT * FROM users WHERE user_username = %s"
         cursor.execute(q, (user_username,))
-        user = cursor.fetchone()
+        view_user = cursor.fetchone()
 
-        site = render_template("main_pages/profile.html", posts=posts, userprofile=user, count=count)
+        q = "SELECT * FROM followers WHERE user_fk = %s AND user_follows_fk = %s"
+        cursor.execute(q, (user["user_pk"], view_user["user_pk"]))
+        current_user_is_following = cursor.fetchone()
+
+        ic(current_user_is_following)
+
+        site = render_template("main_pages/profile.html", posts=posts, userprofile=view_user, count=count, current_user_is_following=current_user_is_following)
         return f""" 
-            <browser mix-replace='#main'> {site} </browser> {x.page_title( x.lans('profile') + " - " + user_username )} 
+            <browser mix-replace='#main'> {site} </browser> 
+            {x.page_title( x.lans('profile') + " - " + user_username )} 
         """
     except Exception as ex:
         ic(ex)
@@ -229,6 +236,62 @@ def view_edit_profile():
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
+@app.get("/bookmark")
+def view_bookmark():
+    try:
+        user = session.get("user", "")
+        session["current_post_number"] = 0
+
+        db, cursor = x.db()
+
+        cursor.execute("SELECT COUNT(*) as total FROM posts JOIN bookmarks ON post_pk = post_fk WHERE post_deleted_at = 0 AND bookmarks.user_fk = %s", (user["user_pk"],))
+        count = cursor.fetchone()["total"]
+        session["max_number_of_posts"] = int(count)
+        
+        posts = x.get_posts(db, cursor, user, "bookmark", user["user_pk"])
+
+        site = render_template("main_pages/bookmark.html", posts=posts, count=count)
+
+        return f""" 
+            <browser mix-replace='#main'> {site} </browser> 
+            {x.page_title( x.lans('bookmarks'))} 
+        """
+    except Exception as ex:
+        ic(ex)
+        return "error"
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+@app.get("/notifications")
+def view_notifications():
+    try:
+        user = session.get("user", "")
+        session["current_post_number"] = 0
+
+        db, cursor = x.db()
+
+        cursor.execute("SELECT COUNT(*) as total FROM users JOIN posts ON user_pk = user_fk JOIN followers ON user_pk = user_follows_fk WHERE post_deleted_at = 0 AND user_deleted_at = 0")        
+        count = cursor.fetchone()["total"]
+        session["max_number_of_posts"] = int(count)
+
+        ic(count)
+        
+        posts = x.get_posts(db, cursor, user, "notifications")
+
+        site = render_template("main_pages/notifications.html", posts=posts, count=count)
+
+        return f""" 
+            <browser mix-replace='#main'> {site} </browser> 
+            {x.page_title( x.lans('notifications'))} 
+        """
+    except Exception as ex:
+        ic(ex)
+        return "error"
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
 ##############################
 #### Login | signup flow #####
 ##############################
@@ -279,7 +342,7 @@ def login(lan = "english"):
                 if not user: raise Exception(f"x exception - {x.lans('username_or_password_is_wrong')}", 400)
 
                 if not check_password_hash(user["user_password"], user_password):
-                    raise Exception(f"x exception - {x.lans('username_or_password_is_wrong')}")
+                    raise Exception(f"x exception - {x.lans('username_or_password_is_wrong')}", 400)
                 
                 
             if user["user_varified_at"] == 0:
@@ -504,6 +567,115 @@ def view_reset_password(lan = "english"):
 ######### Minor calls ########
 ##############################
 
+@app.get("/delete_profile")
+def api_delete_profile():
+    try:
+        user_username = request.args.get("user", "")
+        return f""" 
+            <browser mix-replace="#delete_account">  
+                <a class="secoundary_button red_button" mix-delete href="/delete_profile_confirm?user={user_username}">{ x.lans('are_you_sure_click_again') }</a>
+            </browser>
+        """
+    except Exception as ex:
+        ic(ex)
+        return "error"
+
+@app.delete("/delete_profile_confirm")
+def api_delete_profile_confirm():
+    try:
+        user = session.get("user", "")
+        user_username = request.args.get("user", "")
+        current_time = int(time.time())
+
+        db, cursor = x.db()
+        if user_username != user["user_username"]:
+            if "admin" in user['user_role']:
+                cursor.execute("SELECT user_email, user_first_name, user_last_name FROM users WHERE user_username = %s", (user_username,))
+                user = cursor.fetchone()
+
+                delete_account_template = render_template("___email_account_deleted.html", user=user)
+                ic("XXXXXXXX")
+
+                q = "UPDATE users SET user_deleted_at = %s WHERE user_username = %s"
+                cursor.execute(q, (current_time, user_username))
+                db.commit()
+
+                x.send_email(user['user_email'], f"{x.lans('your_account_has_been_banned')}", delete_account_template)
+            
+                succes_template = render_template(("global/succes_message.html"), message=x.lans("succes"))
+                return f""" 
+                    <browser mix-bottom='#succes_message'>{succes_template}</browser>
+                    <browser mix-redirect="/"></browser>
+                """
+            
+            else:
+                raise Exception(f"x exception - {x.lans('you_dont_have_the_authority_to_delete_this_account')}", 400)
+
+        q = "UPDATE users SET user_deleted_at = %s WHERE user_username = %s"
+        cursor.execute(q, (current_time, user_username))
+        db.commit()
+        
+        return """<browser mix-redirect="/logout"></browser>"""
+
+    except Exception as ex:
+        ic(ex)
+        error_code = str(ex)
+        error_msg = x.lans('system_under_maintenance')
+        if "x exception - " in error_code:
+            error_msg = error_code.split("x exception - ")[1].split("',")[0].split('",')[0]
+        
+        error_template = render_template(("global/error_message.html"), message=error_msg)
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+@app.get("/follow")
+def api_follow():
+    try:
+        user = session.get("user", "")
+        user_username = request.args.get("user", "")
+
+        db, cursor = x.db()
+        q = "SELECT user_pk FROM users WHERE user_username = %s"
+        cursor.execute(q, (user_username,))
+        user_pk = cursor.fetchone()["user_pk"]
+
+        if user_pk == user["user_pk"]: raise Exception(f"x exception - {x.lans('you_cant_follow_yourself')}", 400)
+            
+        q = "SELECT * FROM followers WHERE user_fk = %s AND user_follows_fk = %s"
+        cursor.execute(q, (user["user_pk"], user_pk))
+        current_user_is_following = cursor.fetchone()
+
+        if current_user_is_following:
+            q = "DELETE FROM followers WHERE user_fk = %s AND user_follows_fk = %s"
+            cursor.execute(q, (user["user_pk"], user_pk))
+            current_user_is_following = None
+        else:
+            current_time = int(time.time())
+            q = "INSERT INTO followers VALUES(%s, %s, %s)"
+            cursor.execute(q, (user["user_pk"], user_pk, current_time))
+            current_user_is_following = " "
+        db.commit()
+
+        userprofile = {"user_username": user_username}
+
+        follow_button = render_template("___profile_follow_button.html", current_user_is_following=current_user_is_following, userprofile=userprofile)
+        return f""" <browser mix-replace="#follow"> {follow_button} </browser> """
+
+    except Exception as ex:
+        ic(ex)
+        error_code = str(ex)
+        error_msg = x.lans('system_under_maintenance')
+        if "x exception - " in error_code:
+            error_msg = error_code.split("x exception - ")[1].split("',")[0].split('",')[0]
+        
+        error_template = render_template(("global/error_message.html"), message=error_msg)
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
 @app.patch("/like_post")
 def api_like_post():
     try:
@@ -549,6 +721,54 @@ def api_like_post():
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close() 
 
+@app.patch("/bookmark_post")
+def api_bookmark_post():
+    try:
+        user_pk = session.get("user", "")["user_pk"]
+        post_pk = int(request.args.get("post"))
+        current_time = int(time.time())
+
+        db, cursor = x.db()
+
+        q = "SELECT * FROM bookmarks WHERE user_fk = %s AND post_fk = %s"
+        cursor.execute(q, (user_pk, post_pk))
+        existing_bookmark = cursor.fetchone()
+
+        if existing_bookmark:
+            q = "DELETE FROM bookmarks WHERE user_fk = %s AND post_fk = %s"
+            existing_bookmark = False
+            cursor.execute(q, (user_pk, post_pk))
+        else:
+            q = "INSERT INTO bookmarks VALUES(%s, %s, %s)"
+            existing_bookmark = True
+            cursor.execute(q, (user_pk, post_pk, current_time))
+
+        db.commit()
+
+        q = "SELECT post_total_bookmark FROM posts WHERE post_pk = %s"
+        cursor.execute(q, (post_pk,))
+        post_info = cursor.fetchone()
+
+        post = {"post_total_bookmark": post_info["post_total_bookmark"], "post_pk": post_pk, "user_has_bookmarked": existing_bookmark}
+        bookmark_template = render_template("___post_bookmark.html", post=post)
+
+        return f"""
+            <browser mix-replace='#bookmark_post{post_pk}'>
+                {bookmark_template}
+            </browser>
+        """
+    
+    except Exception as ex:
+        ic(ex)
+        error_msg = {x.lans('something_happened_and_your_bookmark_did_not_get_saved')}
+        error_template = render_template(("global/error_message.html"), message=error_msg)
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>""", 400
+    
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close() 
+
+
 @app.get("/change_lan/<lan>")
 def api_change_lan(lan = "english"):
     try:
@@ -580,7 +800,6 @@ def api_make_a_post():
         user = session.get("user", "")
         post_message = x.validate_post_message()
         post_media = x.validate_post_media()
-
         current_time = int(time.time())
 
         db, cursor = x.db()
@@ -659,7 +878,7 @@ def api_edit_post():
     try:
         user = session.get("user", "")
         post_pk = request.args.get("post", "")
-        if post_pk == "": raise Exception(f"x exception - {x.lans('post_is_deleted')}")
+        if post_pk == "": raise Exception(f"x exception - {x.lans('post_is_deleted')}", 400)
         db, cursor = x.db()
 
         q = "SELECT * FROM posts JOIN users ON user_pk = user_fk WHERE post_pk = %s"
@@ -668,7 +887,7 @@ def api_edit_post():
         db.commit()
 
         if post["user_fk"] != user["user_pk"]:
-            raise Exception(f"x exception - {x.lans('you_dont_have_the_authority_to_edit_this_post')}")
+            raise Exception(f"x exception - {x.lans('you_dont_have_the_authority_to_edit_this_post')}", 400)
         
         if request.method == "GET":
                 
@@ -741,8 +960,13 @@ def api_edit_post():
             q = "SELECT * FROM likes WHERE user_fk = %s AND post_fk = %s"
             cursor.execute(q, (user["user_pk"], post_pk))
             existing_like = cursor.fetchone()
+            
+            q = "SELECT * FROM bookmarks WHERE user_fk = %s AND post_fk = %s"
+            cursor.execute(q, (user["user_pk"], post_pk))
+            existing_bookmark = cursor.fetchone()
 
             post["user_has_liked"] = existing_like
+            post["user_has_bookmarked"] = existing_bookmark
             
             new_post = render_template("_post.html", post=post)
             succes_template = render_template(("global/succes_message.html"), message=x.lans("post_updated"))
@@ -771,7 +995,7 @@ def api_delete_post():
         user = session.get("user", "")
         post_pk = request.args.get("post", "")
         current_time = int(time.time())
-        if post_pk == "": raise Exception(f"x exception - {x.lans('post_is_allready_deleted')}")
+        if post_pk == "": raise Exception(f"x exception - {x.lans('post_is_allready_deleted')}", 400)
 
         db, cursor = x.db()
 
@@ -790,7 +1014,7 @@ def api_delete_post():
                 x.send_email(post["user_email"], x.lans("one_of_your_post_has_been_deleted"), message_to_user)
                 x.default_language = user["user_language"]
             else:
-                raise Exception(f"x exception - {x.lans('you_dont_have_the_authority_to_delete_this_post')}")            
+                raise Exception(f"x exception - {x.lans('you_dont_have_the_authority_to_delete_this_post')}", 400)            
         
         q = "UPDATE posts SET post_deleted_at = %s WHERE post_pk = %s"
         cursor.execute(q, (current_time, post_pk))
@@ -892,7 +1116,7 @@ def api_delete_comment():
     try:
         user = session.get("user", "")
         comment_pk = request.args.get("comment", "")
-        if comment_pk == "": raise Exception(f"x exception - {x.lans('comment_is_allready_deleted')}")
+        if comment_pk == "": raise Exception(f"x exception - {x.lans('comment_is_allready_deleted')}", 400)
 
         db, cursor = x.db()
 
@@ -911,7 +1135,7 @@ def api_delete_comment():
                 x.send_email(comment["user_email"], x.lans("one_of_your_comment_has_been_deleted"), message_to_user)
                 x.default_language = user["user_language"]
             else:
-                raise Exception(f"x exception - {x.lans('you_dont_have_the_authority_to_delete_this_comment')}")            
+                raise Exception(f"x exception - {x.lans('you_dont_have_the_authority_to_delete_this_comment')}", 400)            
         
         q = "SELECT post_pk, post_total_comments FROM posts WHERE post_pk = (SELECT post_fk FROM comments WHERE comment_pk = %s)"
         cursor.execute(q, (comment_pk,))
@@ -949,7 +1173,7 @@ def api_edit_comment():
     try:
         user = session.get("user", "")
         comment_pk = request.args.get("comment", "")
-        if comment_pk == "": raise Exception(f"x exception - {x.lans('comment_is_deleted')}")
+        if comment_pk == "": raise Exception(f"x exception - {x.lans('comment_is_deleted')}", 400)
         db, cursor = x.db()
 
         q = "SELECT * FROM comments JOIN users ON user_pk = user_fk WHERE comment_pk = %s"
@@ -958,7 +1182,7 @@ def api_edit_comment():
         db.commit()
 
         if comment["user_fk"] != user["user_pk"]:
-            raise Exception(f"x exception - {x.lans('you_dont_have_the_authority_to_edit_this_comment')}")
+            raise Exception(f"x exception - {x.lans('you_dont_have_the_authority_to_edit_this_comment')}", 400)
         
         if request.method == "GET":
                 
@@ -1093,6 +1317,76 @@ def api_get_more_posts_profile():
 
         db, cursor = x.db()
         posts = x.get_posts(db, cursor, user, "profile", user_username, current_post_number)
+
+        remove_more_button = ""
+        if max_number_of_posts <= current_post_number + 5: 
+            remove_more_button = f"<browser mix-remove='#auto_show_more'></browser>"
+
+        htmlPosts = render_template("___append_more_posts.html", posts=posts)
+
+        return f""" 
+            <browser mix-bottom="#posts"> {htmlPosts} </browser>
+            {remove_more_button}
+        """
+    except Exception as ex:
+        ic(ex)
+        error_code = str(ex)
+        error_msg = x.lans('system_under_maintenance')
+        if "x exception - " in error_code:
+            error_msg = error_code.split("x exception - ")[1].split("',")[0].split('",')[0]
+        
+        error_template = render_template(("global/error_message.html"), message=error_msg)
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close() 
+
+@app.get("/get_more_posts_bookmarked")
+def api_get_more_posts_bookmarked():
+    try:
+        ic("get_more_posts_bookmarked")
+        max_number_of_posts = session.get("max_number_of_posts")
+        current_post_number = session.get("current_post_number", 0) + 5
+        session["current_post_number"] = current_post_number
+        user = session.get("user")
+
+        db, cursor = x.db()
+        posts = x.get_posts(db, cursor, user, "bookmark", user["user_pk"], current_post_number)
+
+        remove_more_button = ""
+        if max_number_of_posts <= current_post_number + 5: 
+            remove_more_button = f"<browser mix-remove='#auto_show_more'></browser>"
+
+        htmlPosts = render_template("___append_more_posts.html", posts=posts)
+
+        return f""" 
+            <browser mix-bottom="#posts"> {htmlPosts} </browser>
+            {remove_more_button}
+        """
+    except Exception as ex:
+        ic(ex)
+        error_code = str(ex)
+        error_msg = x.lans('system_under_maintenance')
+        if "x exception - " in error_code:
+            error_msg = error_code.split("x exception - ")[1].split("',")[0].split('",')[0]
+        
+        error_template = render_template(("global/error_message.html"), message=error_msg)
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close() 
+
+@app.get("/get_more_posts_notifications")
+def api_get_more_posts_notifications():
+    try:
+        ic("get_more_posts_notifications")
+        max_number_of_posts = session.get("max_number_of_posts")
+        current_post_number = session.get("current_post_number", 0) + 5
+        session["current_post_number"] = current_post_number
+        user = session.get("user")
+
+        db, cursor = x.db()
+        posts = x.get_posts(db, cursor, user, "notifications", None, current_post_number)
 
         remove_more_button = ""
         if max_number_of_posts <= current_post_number + 5: 

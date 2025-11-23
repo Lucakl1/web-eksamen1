@@ -364,7 +364,7 @@
         "danish": "Tilsluttet / Medlem siden",
         "spanish": "Unido / Se unió"
     },
-    "something_happend_and_like_did_not_get_saved": {
+    "Something happened and your bookmark did not get saved": {
         "english": "Something happened and like did not get saved",
         "danish": "Noget gik galt, og like blev ikke gemt",
         "spanish": "Algo salió mal y el “me gusta” no se guardó"
@@ -678,5 +678,55 @@
         "english": "Edit comment",
         "danish": "Rediger kommentar",
         "spanish": "Editar comentario"
+    },
+    "all_bookmarked_posts": {
+        "english": "All bookmarked posts",
+        "danish": "",
+        "spanish": ""
+    },
+    "something_happened_and_your_bookmark_did_not_get_saved": {
+        "english": "Something happened and your bookmark did not get saved",
+        "danish": "",
+        "spanish": ""
+    },
+    "delete_profile": {
+        "english": "Delete profile",
+        "danish": "",
+        "spanish": ""
+    },
+    "are_you_sure_click_again": {
+        "english": "Are you sure? click again",
+        "danish": "",
+        "spanish": ""
+    },
+    "you_dont_have_the_authority_to_delete_this_account": {
+        "english": "You dont have the authority to delete this account",
+        "danish": "",
+        "spanish": ""
+    },
+    "your_account_has_been_banned": {
+        "english": "Your account has been banned",
+        "danish": "",
+        "spanish": ""
+    },
+    "follow": {
+        "english": "Follow",
+        "danish": "",
+        "spanish": ""
+    },
+    "unfollow": {
+        "english": "Unfollow",
+        "danish": "",
+        "spanish": ""
+    },
+    "you_cant_follow_yourself": {
+        "english": "You can't follow yourself",
+        "danish": "",
+        "spanish": ""
+    },
+    "all_following_post": {
+        "english": "Last news from the once you follow",
+        "danish": "",
+        "spanish": ""
     }
 }

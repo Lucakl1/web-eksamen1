@@ -1,6 +1,10 @@
 <button id="comment_count{{ post.post_pk }}" href="/comments?post={{ post.post_pk }}" mix-get class="action">
     <span class="no_event">
-        <i class="fa-regular fa-comment"></i>
+        {% if post.post_total_comments > 0 %}
+            <i class="fa-solid fa-comment"></i>
+        {% else %}
+            <i class="fa-regular fa-comment"></i>
+        {% endif %}
         {{ post.post_total_comments }}
     </span>
 </button>

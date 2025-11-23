@@ -1,0 +1,10 @@
+<button id="bookmark_post{{ post.post_pk }}"  mix-patch="/bookmark_post?post={{ post.post_pk }}" class="action">
+    <span class="no_event">
+        {% if post.user_has_bookmarked %}
+            <i class="fa-solid fa-bookmark"></i>
+        {% else %}
+            <i class="fa-regular fa-bookmark"></i>
+        {% endif %}
+        {{ post.post_total_bookmark }}
+    </span>
+</button>

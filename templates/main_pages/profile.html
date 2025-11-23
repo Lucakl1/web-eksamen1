@@ -23,9 +23,17 @@
                 <span>·</span>
                 <span>{{ x.lans('joined') }} {{ x.epoch_to_time(userprofile.user_created_at) }}</span>
             </div>
-            {% if userprofile['user_username'] == user['user_username'] %}
-                <a class="secoundary_button" mix-get href="/edit_profile">{{ x.lans('edit') }}</a>
-            {% endif %}
+            <div>
+                {% if userprofile['user_username'] != user['user_username'] %}
+                    {% include "___profile_follow_button.html" %}
+                {% endif %}
+                {% if userprofile['user_username'] == user['user_username'] or user["user_role"] == "admin" %}
+                    {% if userprofile['user_username'] == user['user_username'] %}
+                    <a class="secoundary_button" mix-get href="/edit_profile">{{ x.lans('edit') }}</a>
+                    {% endif %}
+                    <a class="secoundary_button red_button" mix-get href="/delete_profile?user={{ userprofile['user_username'] }}" id="delete_account">{{ x.lans('delete_profile') }}</a>
+                {% endif %}
+            </div>
         </div>
         <div>
             <div>
@@ -54,7 +62,7 @@
     
     </section>
 
-    {% if count > posts|length %}
+    {% if count > posts|length and count != 0 %}
     <button href="/get_more_posts_profile?username={{ userprofile['user_username'] }}" mix-get mix-default="{{ x.lans('more_posts') }}" mix-await="{{ x.lans('loading...') }}" class="main_button" id="auto_show_more">
         {{ x.lans('more_posts') }}
     </button>

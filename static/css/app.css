@@ -17,6 +17,7 @@ body {
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
+    width: fit-content;
 
     &:hover {
         background: rgb(50, 50, 50);
@@ -35,6 +36,15 @@ body {
 
     &:hover {
         background: rgb(162, 162, 162);
+    }
+}
+
+.red_button {
+    background: rgb(187, 0, 0);
+    color: white;
+
+    &:hover {
+        background: rgb(154, 0, 0)
     }
 }
 
@@ -452,6 +462,7 @@ main {
 
             .text {
                 margin-top: 12px;
+                max-width: 200px;
             }
         }
 
@@ -673,7 +684,7 @@ main {
         }
     }
 
-    &.home {
+    &.home, &.bookmark {
         .quick_post, .edit_post {
             --user-img-width: 50px;
             display: grid;

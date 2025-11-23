@@ -303,32 +303,56 @@ def send_email(to_email, subject, template):
 # data_fore_page (if the page needs any data)
 # where_in_list (how long in the dfatabase have we scrolled)
 def get_posts(db, cursor, user, witch_page = "home", data_fore_page = "", where_in_list = 0):
-    ic(witch_page)
     if witch_page == "home":
         q = """
         SELECT 
-        post_pk, post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, post_updated_at,
+        post_pk, post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_bookmark, post_updated_at,
         user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username, user_pk, user_created_at,
         post_media_type_fk, post_media_path
         FROM users 
         JOIN posts ON user_pk = user_fk
         LEFT JOIN post_medias ON post_pk = post_fk
-        WHERE post_deleted_at = 0
+        WHERE post_deleted_at = 0 AND user_deleted_at = 0
         ORDER BY post_created_at DESC LIMIT 5 OFFSET %s"""
         cursor.execute(q, (where_in_list,))
     elif witch_page == "profile":
         q = """
         SELECT 
-        post_pk, post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, post_updated_at,
+        post_pk, post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_bookmark, post_updated_at,
         user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username, user_pk, user_created_at,
         post_media_type_fk, post_media_path
         FROM users 
         JOIN posts ON user_pk = user_fk
         LEFT JOIN post_medias ON post_pk = post_fk
-        WHERE post_deleted_at = 0 AND user_username = %s
+        WHERE post_deleted_at = 0 AND user_deleted_at = 0 AND user_username = %s
         ORDER BY post_created_at DESC LIMIT 5 OFFSET %s"""
         cursor.execute(q, (data_fore_page, where_in_list))
-        
+    elif witch_page == "bookmark":
+        q = """
+        SELECT 
+        post_pk, post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_bookmark, post_updated_at,
+        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username, user_pk, user_created_at,
+        post_media_type_fk, post_media_path
+        FROM users 
+        JOIN posts ON user_pk = user_fk
+        JOIN bookmarks ON post_pk = bookmarks.post_fk
+        LEFT JOIN post_medias ON post_pk = post_medias.post_fk
+        WHERE post_deleted_at = 0 AND user_deleted_at = 0 AND bookmarks.user_fk = %s
+        ORDER BY post_created_at DESC LIMIT 5 OFFSET %s"""
+        cursor.execute(q, (data_fore_page, where_in_list))
+    elif witch_page == "notifications":
+        q = """
+        SELECT 
+        post_pk, post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_bookmark, post_updated_at,
+        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username, user_pk, user_created_at,
+        post_media_type_fk, post_media_path
+        FROM users 
+        JOIN posts ON user_pk = user_fk
+        JOIN followers ON user_pk = user_follows_fk
+        LEFT JOIN post_medias ON post_pk = post_medias.post_fk
+        WHERE post_deleted_at = 0 AND user_deleted_at = 0
+        ORDER BY post_created_at DESC LIMIT 5 OFFSET %s"""
+        cursor.execute(q, (where_in_list,))
     posts = cursor.fetchall()
 
     for post in posts:
@@ -342,6 +366,13 @@ def get_posts(db, cursor, user, witch_page = "home", data_fore_page = "", where_
 
         post['user_has_liked'] = False
         if existing_like: post['user_has_liked'] = True
+        
+        q = "SELECT * FROM bookmarks WHERE user_fk = %s AND post_fk = %s"
+        cursor.execute(q, (user_pk, post_pk))
+        existing_bookmark = cursor.fetchone()
+
+        post['user_has_bookmarked'] = False
+        if existing_bookmark: post['user_has_bookmarked'] = True
 
         # what type of media
         if post["post_media_type_fk"]:
