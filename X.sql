@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Vært: mariadb
--- Genereringstid: 20. 11 2025 kl. 19:12:06
+-- Genereringstid: 23. 11 2025 kl. 01:36:20
 -- Serverversion: 10.6.20-MariaDB-ubu2004
 -- PHP-version: 8.3.26
 
@@ -33,8 +33,29 @@ CREATE TABLE `comments` (
   `user_fk` bigint(20) UNSIGNED NOT NULL,
   `comment_message` varchar(100) NOT NULL,
   `comment_created_at` bigint(20) UNSIGNED NOT NULL,
-  `comment_updated_at` bigint(20) UNSIGNED NOT NULL
+  `comment_updated_at` bigint(20) UNSIGNED NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Data dump for tabellen `comments`
+--
+
+INSERT INTO `comments` (`comment_pk`, `post_fk`, `user_fk`, `comment_message`, `comment_created_at`, `comment_updated_at`) VALUES
+(3, 54, 10, 'this is a comment', 1763852389, 0),
+(4, 54, 10, 'this is a comment', 1763852432, 0),
+(5, 54, 10, 'this is a comment2', 1763852457, 0),
+(6, 54, 10, 'another post', 1763852911, 0),
+(7, 54, 10, 'replace', 1763852944, 0),
+(8, 54, 10, 'yesss works=?', 1763852977, 0),
+(9, 54, 10, 'yesss works=?', 1763853018, 0),
+(10, 54, 10, 'yesss works=?', 1763853025, 0),
+(11, 49, 10, 'test post', 1763854553, 0),
+(12, 54, 10, 'more commetns, more comments', 1763855500, 0),
+(13, 54, 10, 'more commetns, more comments', 1763855501, 0),
+(14, 54, 10, 'more commetns, more comments', 1763855501, 0),
+(15, 54, 10, 'more commetns, more comments', 1763855502, 0),
+(16, 54, 10, 'more commetns, more comments', 1763855502, 0),
+(17, 54, 10, 'more commetns, more comments', 1763855502, 0);
 
 --
 -- Triggers/udløsere `comments`
@@ -108,9 +129,8 @@ CREATE TABLE `likes` (
 --
 
 INSERT INTO `likes` (`user_fk`, `post_fk`) VALUES
-(10, 11),
-(21, 11),
-(21, 16);
+(21, 38),
+(21, 54);
 
 --
 -- Triggers/udløsere `likes`
@@ -130,13 +150,13 @@ DELIMITER ;
 DELIMITER $$
 CREATE TRIGGER `user_total_likes_decresse` AFTER DELETE ON `likes` FOR EACH ROW UPDATE users
 SET user_total_likes = user_total_likes - 1
-WHERE user_pk = OLD.user_fk
+WHERE user_pk = (SELECT user_fk FROM posts WHERE post_pk = OLD.post_fk LIMIT 1)
 $$
 DELIMITER ;
 DELIMITER $$
 CREATE TRIGGER `user_total_likes_incresse` AFTER INSERT ON `likes` FOR EACH ROW UPDATE users
 SET user_total_likes = user_total_likes + 1
-WHERE user_pk = NEW.user_fk
+WHERE user_pk = (SELECT user_fk FROM posts WHERE post_pk = NEW.post_fk LIMIT 1)
 $$
 DELIMITER ;
 
@@ -174,12 +194,12 @@ CREATE TABLE `posts` (
 --
 
 INSERT INTO `posts` (`post_pk`, `user_fk`, `post_message`, `post_total_comments`, `post_total_likes`, `post_total_saved`, `post_created_at`, `post_updated_at`, `post_deleted_at`) VALUES
-(11, 10, 'This is a post', 0, 2, 0, 1231213321, 0, 0),
+(11, 10, 'This is a post', 0, 0, 0, 1231213321, 0, 0),
 (12, 10, 'This is a test for time', 0, 0, 0, 1763455801, 1763455826, 0),
 (13, 21, 'HEJ!', 0, 0, 0, 1763650562, 0, 0),
 (14, 21, 'HEJ!', 0, 0, 0, 1763650586, 0, 0),
 (15, 21, 'TEST', 0, 0, 0, 1763650869, 0, 0),
-(16, 21, 'another post in the matrix', 0, 1, 0, 1763650943, 0, 0),
+(16, 21, 'another post in the matrix', 0, 0, 0, 1763650943, 0, 0),
 (17, 10, 'test fore files', 0, 0, 0, 1763657024, 0, 0),
 (18, 10, 'test fore files1', 0, 0, 0, 1763657081, 0, 0),
 (19, 10, 'file test2', 0, 0, 0, 1763657904, 0, 0),
@@ -195,7 +215,23 @@ INSERT INTO `posts` (`post_pk`, `user_fk`, `post_message`, `post_total_comments`
 (35, 10, 'file test12', 0, 0, 0, 1763664805, 0, 0),
 (36, 10, 'file test13', 0, 0, 0, 1763664825, 0, 0),
 (37, 10, 'file test 13', 0, 0, 0, 1763664884, 0, 0),
-(38, 10, 'file test 14', 0, 0, 0, 1763664910, 0, 0);
+(38, 10, 'file test 14', 0, 1, 0, 1763664910, 0, 0),
+(39, 21, 'i am posteing some more to see auto schroll works on profile', 0, 0, 0, 1763779116, 0, 0),
+(40, 21, 'i am posteing some more to see auto schroll works on profile', 0, 0, 0, 1763779212, 0, 0),
+(41, 21, 'i am posteing some more to see auto schroll works on profile 2', 0, 0, 0, 1763779257, 0, 0),
+(42, 21, 'i am posteing some more to see auto schroll works on profile 3', 0, 0, 0, 1763779279, 0, 1763857314),
+(43, 21, 'i am posteing some more to see auto schroll works on profile 5', 0, 0, 0, 1763779294, 0, 1763857312),
+(44, 21, 'i am posteing some more to see auto schroll works on profile 6', 0, 0, 0, 1763779330, 0, 1763857311),
+(45, 21, 'i am posteing some more to see auto schroll works on profile 7', 0, 0, 0, 1763779343, 0, 1763857310),
+(46, 21, 'i am posteing some more to see auto schroll works on profile 8', 0, 0, 0, 1763779373, 0, 1763857296),
+(47, 21, 'i am posteing some more to see auto schroll works on profile 9', 0, 0, 0, 1763779402, 0, 1763857318),
+(48, 21, 'i am posteing some more to see auto schroll works on profile 10', 0, 0, 0, 1763779439, 0, 0),
+(49, 21, 'i am posteing some more to see auto schroll works on profile 10', 1, 0, 0, 1763779454, 0, 1763856160),
+(50, 21, 'i am posteing some more to se', 0, 0, 0, 1763779485, 1763841074, 1763841087),
+(51, 21, 'this is', 0, 0, 0, 1763779561, 1763840836, 1763840844),
+(52, 21, 'i am posteing some more to see auto schroll works on profile 13', 0, 0, 0, 1763779565, 0, 1763834527),
+(53, 21, 'i am posteing some more to see auto schroll works on profile 13', 0, 0, 0, 1763779568, 0, 1763834454),
+(54, 22, 'this is a post from a third account', 14, 1, 0, 1763847898, 0, 0);
 
 --
 -- Triggers/udløsere `posts`
@@ -235,7 +271,11 @@ INSERT INTO `post_medias` (`post_fk`, `post_media_path`, `post_media_type_fk`) V
 (35, 'ffa96c2febe541c7b6dc795db149c8a9.jpeg', 1),
 (36, 'abf3ca8386ee4110973d06ec77bef6ff.mp4', 2),
 (37, 'e017393aff6c4ec5bfe4c9f02b70b054.mp4', 2),
-(38, 'f03ac07ad28a453aa255ad26fa201992.pdf', 3);
+(50, 'f6f73dfa772d42188dcced05d44e6111.mp4', 2),
+(51, 'c2d2ad990dbf420ea0d342a6b89fa2fb.mp4', 2),
+(53, '042c7c5fc8ba4e97a400b2fae1966710.mp4', 2),
+(38, 'f03ac07ad28a453aa255ad26fa201992.pdf', 3),
+(49, 'bfaed9ac6e6a40168af3d8b98b88d320.pdf', 3);
 
 -- --------------------------------------------------------
 
@@ -339,7 +379,8 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_pk`, `user_first_name`, `user_last_name`, `user_username`, `user_email`, `user_password`, `user_language`, `role_fk`, `user_banner`, `user_avatar`, `user_bio`, `user_total_followers`, `user_total_following`, `user_total_likes`, `user_total_posts`, `user_created_at`, `user_varified_at`, `user_updated_at`, `user_deleted_at`) VALUES
 (10, 'luca', 'klæø', 'lucakl', 'lucaklaeoe@gmail.com', 'scrypt:32768:8:1$6NmFWjNGnCMRYqyh$3642d4ae60ebe0e3a602b965d8aefc1dbcb4a0a28d9b2214c848f0e5b76813a8f7bf890e53751edba25dd0eca91d1602a83b86c8bf3cbb82abe87dcf709885c4', 'english', 2, 'bc8f0cc276c645fa95dc14df8730e816.png', 'a3e841c8d2444217911bc43549673a44.jpeg', 'No bio', 0, 0, 1, 18, 1763160252, 1763244248, 1763657202, 0),
-(21, 'test', 'man', 'tester', 'a@b.com', 'scrypt:32768:8:1$wWl0mOYaUXQBJxd6$17e50b0290403c1f943c501be90d406501beb714b7337c85b5045d0b17a39e4b4d081632ba9ca9f95ccd0cfe3275399a3532c040500369107a75ccab5c173a33', 'english', 1, 'default_banner.jpg', 'default.svg', 'No bio', 0, 0, 2, 4, 1763234764, 1763234764, 0, 0);
+(21, 'test', 'man', 'tester', 'lucaklaeoeskole@gmail.com', 'scrypt:32768:8:1$wWl0mOYaUXQBJxd6$17e50b0290403c1f943c501be90d406501beb714b7337c85b5045d0b17a39e4b4d081632ba9ca9f95ccd0cfe3275399a3532c040500369107a75ccab5c173a33', 'english', 1, 'default_banner.jpg', 'df53c2b8faa04fcfb42ae81ae6a9251a.jpeg', 'No bio', 0, 0, 0, 19, 1763234764, 1763234764, 1763841113, 0),
+(22, 'More', 'People', 'More', 'a@a.com', 'scrypt:32768:8:1$LCccAjL8wwGO1Z1K$3ab9a86f580458ed2a669d6c300936d0e8d3f0f9e694437c0897420cd3749785404f4226215bedd64a6515620a72d7e1b2322fd51ecdbfafcc9675d6d7ca23f9', 'english', 1, 'default_banner.jpg', 'default.svg', 'No bio', 0, 0, 1, 1, 1713847740, 1763847859, 0, 0);
 
 --
 -- Begrænsninger for dumpede tabeller
@@ -430,13 +471,13 @@ ALTER TABLE `users`
 -- Tilføj AUTO_INCREMENT i tabel `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `comment_pk` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `comment_pk` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- Tilføj AUTO_INCREMENT i tabel `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `post_pk` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `post_pk` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- Tilføj AUTO_INCREMENT i tabel `post_media_types`
@@ -454,7 +495,7 @@ ALTER TABLE `roles`
 -- Tilføj AUTO_INCREMENT i tabel `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_pk` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `user_pk` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- Begrænsninger for dumpede tabeller

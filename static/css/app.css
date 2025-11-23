@@ -467,7 +467,7 @@ main {
             display: block;
             grid-column: 1 / span 2;
             border-top: 1px solid var(--border-color);
-            padding: 16px 16px 16px 16px;
+            padding: 16px 16px 32px 16px;
             margin-left: 48px;
 
             form {

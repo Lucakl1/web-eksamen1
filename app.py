@@ -841,12 +841,12 @@ def api_comments():
             q = "INSERT INTO comments (post_fk, user_fk, comment_message, comment_created_at) VALUES(%s, %s, %s, %s)"
             cursor.execute(q, (post_pk, user_pk, comment_message, current_time))
             db.commit()
+            comment_pk = cursor.lastrowid
 
             q = "SELECT post_pk, post_total_comments FROM posts WHERE post_pk = %s"
             cursor.execute(q, (post_pk,))
             post = cursor.fetchone()
 
-            comment_pk = cursor.lastrowid
 
             comment = {}
             comment["comment_pk"] = comment_pk
@@ -913,14 +913,23 @@ def api_delete_comment():
             else:
                 raise Exception(f"x exception - {x.lans('you_dont_have_the_authority_to_delete_this_comment')}")            
         
+        q = "SELECT post_pk, post_total_comments FROM posts WHERE post_pk = (SELECT post_fk FROM comments WHERE comment_pk = %s)"
+        cursor.execute(q, (comment_pk,))
+        post = cursor.fetchone()
+
         q = "DELETE FROM comments WHERE comment_pk = %s"
         cursor.execute(q, (comment_pk,))
         db.commit()
+
+        post["post_total_comments"] = post["post_total_comments"] - 1
             
+        comment_count_template = render_template("___post_comment.html", post=post)
         succes_template = render_template(("global/succes_message.html"), message=x.lans("comment_deleted"))
+        
         return f"""
             <browser mix-bottom='#succes_message'>{succes_template}</browser>
             <browser mix-remove='#comment{comment_pk}'></browser>
+            <browser mix-replace="#comment_count{post["post_pk"]}">{comment_count_template}</browser>
         """
     except Exception as ex:
         ic(ex)
