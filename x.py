@@ -94,7 +94,8 @@ USER_USERNAME_MAX = 20
 REGEX_USER_USERNAME = f"^.{{{USER_USERNAME_MIN},{USER_USERNAME_MAX}}}$"
 def validate_user_username(user_username = None):
     if not user_username: user_username = request.form.get("user_username", "").strip()
-    if "@" in user_username : raise Exception(f"x exception - {lans('@_cant_be_in_username')}", 400)
+    if "@" in user_username: raise Exception(f"x exception - {lans('@_cant_be_in_username')}", 400)
+    if " " in user_username: raise Exception(f"x exception - {lans('username_cant_have_spaces')}", 400)
     if len(user_username) < USER_USERNAME_MIN: raise Exception(f"x exception - {lans('username_to_short_must_be_above')} {USER_USERNAME_MIN}", 400)
     if len(user_username) > USER_USERNAME_MAX: raise Exception(f"x exception - {lans('username_to_long_must_be_below')} {USER_USERNAME_MAX}", 400)
     return user_username
@@ -111,6 +112,7 @@ REGEX_USER_FIRST_NAME = f"^.{{{USER_FIRST_NAME_MIN},{USER_FIRST_NAME_MAX}}}$"
 def validate_user_first_name():
     user_first_name = request.form.get("user_first_name", "").strip()
     if "@" in user_first_name : raise Exception(f"x exception - {lans('@_cant_be_in_first_name')}", 400)
+    if " " in user_first_name: raise Exception(f"x exception - {lans('first_name_cant_have_spaces')}", 400)
     if len(user_first_name) < USER_FIRST_NAME_MIN: raise Exception(f"x exception - {lans('first_name_to_short_must_be_above')} {USER_FIRST_NAME_MIN}", 400)
     if len(user_first_name) > USER_FIRST_NAME_MAX: raise Exception(f"x exception - {lans('first_name_to_long_must_be_below')} {USER_FIRST_NAME_MAX}", 400)
     return user_first_name
@@ -122,6 +124,7 @@ REGEX_USER_LAST_NAME = f"^.{{{USER_LAST_NAME_MIN},{USER_LAST_NAME_MAX}}}$"
 def validate_user_last_name():
     user_last_name = request.form.get("user_last_name", "").strip()
     if "@" in user_last_name : raise Exception(f"x exception - {lans('@_cant_be_in_first_name')}", 400)
+    if " " in user_last_name: raise Exception(f"x exception - {lans('last_name_cant_have_spaces')}", 400)
     if len(user_last_name) < USER_LAST_NAME_MIN: raise Exception(f"x exception - {lans('last_name_to_short_must_be_above')} {USER_FIRST_NAME_MIN}", 400)
     if len(user_last_name) > USER_LAST_NAME_MAX: raise Exception(f"x exception - {lans('last_name_to_long_must_be_below')} {USER_FIRST_NAME_MAX}", 400)
     return user_last_name
@@ -247,12 +250,22 @@ def validate_post_media():
 ##############################
 POST_MESSAGE_MIN = 1
 POST_MESSAGE_MAX = 200
-REGEX_USER_PASSWORD = f"^.{{{POST_MESSAGE_MIN},{POST_MESSAGE_MAX}}}$"
+REGEX_POST_MESSAGE = f"^.{{{POST_MESSAGE_MIN},{POST_MESSAGE_MAX}}}$"
 def validate_post_message():
     post_message = request.form.get("post_message", "").strip()
-    if len(post_message) < POST_MESSAGE_MIN: raise Exception(f"x exception - {lans('post_to_short_must_be_above')} {USER_BIO_MIN}", 400)
-    if len(post_message) > POST_MESSAGE_MAX: raise Exception(f"x exception - {lans('post_to_long_must_be_below')} {USER_BIO_MAX}", 400)
+    if len(post_message) < POST_MESSAGE_MIN: raise Exception(f"x exception - {lans('post_to_short_must_be_above')} {POST_MESSAGE_MIN}", 400)
+    if len(post_message) > POST_MESSAGE_MAX: raise Exception(f"x exception - {lans('post_to_long_must_be_below')} {POST_MESSAGE_MAX}", 400)
     return post_message
+
+##############################
+COMMENT_MESSAGE_MIN = 1
+COMMENT_MESSAGE_MAX = 100
+REGEX_COMMENT_MESSAGE = f"^.{{{COMMENT_MESSAGE_MIN},{COMMENT_MESSAGE_MAX}}}$"
+def validate_comment_message():
+    comment_message = request.form.get("comment_message", "").strip()
+    if len(comment_message) < COMMENT_MESSAGE_MIN: raise Exception(f"x exception - {lans('comment_to_short_must_be_above')} {COMMENT_MESSAGE_MIN}", 400)
+    if len(comment_message) > COMMENT_MESSAGE_MAX: raise Exception(f"x exception - {lans('comment_to_long_must_be_below')} {COMMENT_MESSAGE_MAX}", 400)
+    return comment_message
     
 ##############################
 def send_email(to_email, subject, template):
@@ -295,7 +308,7 @@ def get_posts(db, cursor, user, witch_page = "home", data_fore_page = "", where_
         q = """
         SELECT 
         post_pk, post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, post_updated_at,
-        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username, user_pk,
+        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username, user_pk, user_created_at,
         post_media_type_fk, post_media_path
         FROM users 
         JOIN posts ON user_pk = user_fk
@@ -307,7 +320,7 @@ def get_posts(db, cursor, user, witch_page = "home", data_fore_page = "", where_
         q = """
         SELECT 
         post_pk, post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_saved, post_updated_at,
-        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username, user_pk,
+        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username, user_pk, user_created_at,
         post_media_type_fk, post_media_path
         FROM users 
         JOIN posts ON user_pk = user_fk

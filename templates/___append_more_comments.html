@@ -1,0 +1,11 @@
+{% for comment in comments: %}
+    {% include "_comment.html" %}
+{% endfor %}
+
+{% if total_amount_of_comments > current_count %}
+<div class="more_comments_button" id="more_comments_button{{ post_pk }}">
+    <button href="/more_comments?post={{ post_pk }}&current_count={{ current_count }}" mix-get mix-default="{{ x.lans('more_comments') }}" mix-await="{{ x.lans('loading...') }}" class="main_button" id="show_more_comments{{ post_pk }}">
+        {{ x.lans('more_comments') }}
+    </button>
+</div>
+{% endif %}

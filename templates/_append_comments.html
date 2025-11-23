@@ -1,0 +1,33 @@
+<section class="comments" id="comments{{ post_pk }}">
+    <form action="/comments?post={{ post_pk }}" mix-post>
+        <label for="comment_message"> {{ x.lans('write_a_comment') }} </label>
+        <textarea name="comment_message" id="comment_message" placeholder="{{ x.lans('tell_the_world_something') }}" mix-check="{{ x.REGEX_COMMENT_MESSAGE }}"></textarea>
+
+        <div>
+            <button mix-default="{{ x.lans('post_comment') }}" mix-await="{{ x.lans('posting...') }}" type="submit" class="main_button">
+                {{ x.lans('post_comment') }}
+            </button>
+        </div>
+    </form>
+    
+    <div id="all_comments{{ post_pk }}">
+        {% for comment in comments: %}
+            {% include "_comment.html" %}
+        {% endfor %}
+
+        {% if count > comments|length %}
+        <div class="more_comments_button" id="more_comments_button{{ post_pk }}">
+            {% if current_count %}
+            <button href="/more_comments?post={{ post_pk }}&current_count={{ current_count }}" mix-get mix-default="{{ x.lans('more_comments') }}" mix-await="{{ x.lans('loading...') }}" class="main_button" id="show_more_comments{{ post_pk }}">
+                {{ x.lans('more_comments') }}
+            </button>
+            {% else %}
+            <button href="/more_comments?post={{ post_pk }}&current_count=5" mix-get mix-default="{{ x.lans('more_comments') }}" mix-await="{{ x.lans('loading...') }}" class="main_button" id="show_more_comments{{ post_pk }}">
+                {{ x.lans('more_comments') }}
+            </button>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    
+</section>

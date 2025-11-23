@@ -1,0 +1,26 @@
+<article id="comment{{ comment.comment_pk }}">
+    <a mix-get href="/profile/{{ comment.user_username }}">
+        {% if comment.user_avatar == 'default.svg' %}
+            <img src="{{ url_for('static', filename='images/'~comment.user_avatar) }}" alt="" class="profile_img no_event">
+        {% else %}
+            <img src="{{ url_for('static', filename='uploads/'~comment.user_avatar) }}" alt="" class="profile_img no_event">
+        {% endif %}
+    </a>
+
+    <div class="comment_info">
+        <div class="comment_header">
+            <span class="name">
+                {{ comment.user_first_name }} {{ comment.user_last_name }}
+            </span>
+            <span class="handle">@{{ comment.user_username }}</span> ·
+        </div>
+        <form class="comment_content" action="/edit_comment?comment={{ comment.comment_pk }}" mix-post autocomplete="off">
+            <label for="comment_message"> {{ x.lans('edit_comment') }} </label>
+            <textarea name="comment_message" id="comment_message" placeholder="{{ x.lans('tell_the_world_something') }}">{{ comment.comment_message }}</textarea>
+            
+            <button mix-await="{{ x.lans('posting...') }}" type="submit" class="main_button">
+                {{ x.lans('confirm') }}
+            </button>
+        </form>
+    </div>
+</article>

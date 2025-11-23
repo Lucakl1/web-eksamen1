@@ -218,7 +218,7 @@ def view_edit_profile():
         error_code = str(ex)
         error_msg = x.lans('system_under_maintenance')
         if "x exception - " in error_code:
-            error_msg = error_code.split("x exception - ")[1].split("',")[0]
+            error_msg = error_code.split("x exception - ")[1].split("',")[0].split('",')[0]
 
         if "Duplicate entry" in error_code:
             error_msg = x.lans("username_allready_in_system")
@@ -282,7 +282,7 @@ def login(lan = "english"):
                     raise Exception(f"x exception - {x.lans('username_or_password_is_wrong')}")
                 
                 
-            if user["user_varified_at"] == "":
+            if user["user_varified_at"] == 0:
                 raise Exception(f"x exception - {x.lans('user_not_verified')}", 400)  
             
             q = "SELECT * FROM roles WHERE role_pk = %s"
@@ -301,7 +301,7 @@ def login(lan = "english"):
         error_code = str(ex)
         error_msg = x.lans('system_under_maintenance')
         if("x exception - " in error_code):
-            error_msg = error_code.split("x exception - ")[1].split("',")[0]
+            error_msg = error_code.split("x exception - ")[1].split("',")[0].split('",')[0]
         
         error_template = render_template(("global/error_message.html"), message=error_msg)
         return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>""", 400
@@ -364,7 +364,7 @@ def signup(lan = "english"):
         error_code = str(ex)
         error_msg = x.lans('system_under_maintenance')
         if "x exception - " in error_code:
-            error_msg = error_code.split("x exception - ")[1].split("',")[0]
+            error_msg = error_code.split("x exception - ")[1].split("',")[0].split('",')[0]
 
         if "Duplicate entry" in error_code and "user_username" in error_code:
             error_msg = x.lans("username_allready_in_system")
@@ -436,7 +436,7 @@ def view_forgot_password(lan = "english"):
         error_code = str(ex)
         error_msg = x.lans('system_under_maintenance')
         if("x exception - " in error_code):
-            error_msg = error_code.split("x exception - ")[1].split("',")[0]
+            error_msg = error_code.split("x exception - ")[1].split("',")[0].split('",')[0]
         
         error_template = render_template(("global/error_message.html"), message=error_msg)
         return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>""", 40
@@ -492,7 +492,7 @@ def view_reset_password(lan = "english"):
         if "db" in locals(): db.rollback()  
         error_msg = x.lans('system_under_maintenance')
         if("x exception - " in error_code):
-            error_msg = error_code.split("x exception - ")[1].split("',")[0]
+            error_msg = error_code.split("x exception - ")[1].split("',")[0].split('",')[0]
         
         error_template = render_template(("global/error_message.html"), message=error_msg)
         return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>""", 400
@@ -642,11 +642,11 @@ def api_make_a_post():
         """
     except Exception as ex:
         ic(ex)
-        db.rollback()
+        if "db" in locals(): db.rollback()
         error_code = str(ex)
         error_msg = x.lans('system_under_maintenance')
         if "x exception - " in error_code:
-            error_msg = error_code.split("x exception - ")[1].split("',")[0]
+            error_msg = error_code.split("x exception - ")[1].split("',")[0].split('",')[0]
         
         error_template = render_template(("global/error_message.html"), message=error_msg)
         return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
@@ -752,12 +752,12 @@ def api_edit_post():
             """
 
     except Exception as ex:
-        db.rollback()
+        if "db" in locals(): db.rollback()
         ic(ex)
         error_code = str(ex)
         error_msg = x.lans('system_under_maintenance')
         if "x exception - " in error_code:
-            error_msg = error_code.split("x exception - ")[1].split("',")[0]
+            error_msg = error_code.split("x exception - ")[1].split("',")[0].split('",')[0]
         
         error_template = render_template(("global/error_message.html"), message=error_msg)
         return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
@@ -775,22 +775,22 @@ def api_delete_post():
 
         db, cursor = x.db()
 
-        if "admin" in user['user_role']:
-            q = "SELECT * FROM posts JOIN users ON user_pk = user_fk WHERE post_pk = %s"
-            cursor.execute(q, (post_pk,))
-            post = cursor.fetchone()
+        q = "SELECT * FROM posts WHERE post_pk = %s"
+        cursor.execute(q, (post_pk,))
+        post = cursor.fetchone()
 
-            x.default_language = post["user_language"]
-            message_to_user = render_template("___email_post_deleted.html", post=post)
-            x.send_email(post["user_email"], x.lans("one_of_your_post_has_been_deleted"), message_to_user)
-            x.default_language = user["user_language"]
-        else:
-            q = "SELECT * FROM posts WHERE post_pk = %s"
-            cursor.execute(q, (post_pk,))
-            post = cursor.fetchone()
+        if post["user_fk"] != user["user_pk"]:
+            if "admin" in user['user_role']:
+                q = "SELECT * FROM posts JOIN users ON user_pk = user_fk WHERE post_pk = %s"
+                cursor.execute(q, (post_pk,))
+                post = cursor.fetchone()
 
-            if post["user_fk"] != user["user_pk"]:
-                raise Exception(f"x exception - {x.lans('you_dont_have_the_authority_to_delete_this_post')}")
+                x.default_language = post["user_language"]
+                message_to_user = render_template("___email_post_deleted.html", post=post)
+                x.send_email(post["user_email"], x.lans("one_of_your_post_has_been_deleted"), message_to_user)
+                x.default_language = user["user_language"]
+            else:
+                raise Exception(f"x exception - {x.lans('you_dont_have_the_authority_to_delete_this_post')}")            
         
         q = "UPDATE posts SET post_deleted_at = %s WHERE post_pk = %s"
         cursor.execute(q, (current_time, post_pk))
@@ -806,7 +806,7 @@ def api_delete_post():
         error_code = str(ex)
         error_msg = x.lans('system_under_maintenance')
         if "x exception - " in error_code:
-            error_msg = error_code.split("x exception - ")[1].split("',")[0]
+            error_msg = error_code.split("x exception - ")[1].split("',")[0].split('",')[0]
         
         error_template = render_template(("global/error_message.html"), message=error_msg)
         return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
@@ -814,6 +814,230 @@ def api_delete_post():
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
+@app.route("/comments", methods=["GET", "POST"])
+def api_comments():
+    try:
+        post_pk = request.args.get("post", "")
+        db, cursor = x.db()
+
+        if request.method == "GET":
+            q = "SELECT * FROM comments JOIN users ON user_fk = user_pk WHERE post_fk = %s ORDER BY comment_created_at DESC LIMIT 5"
+            cursor.execute(q, (post_pk,))
+            comments = cursor.fetchall()
+
+            cursor.execute("SELECT COUNT(*) as total FROM comments WHERE post_fk = %s", (post_pk,))
+            count = int(cursor.fetchone()["total"])
+
+            template_comments = render_template("_append_comments.html", comments=comments, post_pk=post_pk, count=count)
+
+            return f"""<browser mix-replace="#comments{post_pk}"> {template_comments} </browser>"""
+        
+        if request.method == "POST":
+            user = session.get("user", "")
+            user_pk = user["user_pk"]
+            comment_message = x.validate_comment_message()
+            current_time = int(time.time())
+
+            q = "INSERT INTO comments (post_fk, user_fk, comment_message, comment_created_at) VALUES(%s, %s, %s, %s)"
+            cursor.execute(q, (post_pk, user_pk, comment_message, current_time))
+            db.commit()
+
+            q = "SELECT post_pk, post_total_comments FROM posts WHERE post_pk = %s"
+            cursor.execute(q, (post_pk,))
+            post = cursor.fetchone()
+
+            comment_pk = cursor.lastrowid
+
+            comment = {}
+            comment["comment_pk"] = comment_pk
+            comment["post_fk"] = post_pk
+            comment["user_fk"] = user_pk
+            comment["comment_message"] = comment_message
+            comment["comment_created_at"] = current_time
+            comment["comment_updated_at"] = 0
+
+            comment["user_username"] = user["user_username"]
+            comment["user_banner"] = user["user_banner"]
+            comment["user_avatar"] = user["user_avatar"]
+            comment["user_first_name"] = user["user_first_name"]
+            comment["user_last_name"] = user["user_last_name"]
+            comment["user_created_at"] = user["user_created_at"]
+            comment["user_bio"] = user["user_bio"]
+            
+            comment_template = render_template("_comment.html", comment=comment)
+            comment_count_template = render_template("___post_comment.html", post=post)
+            succes_template = render_template(("global/succes_message.html"), message=x.lans("succes"))
+
+            return f""" 
+                <browser mix-top="#all_comments{post_pk}">{comment_template}</browser> 
+                <browser mix-replace="#comment_count{post_pk}">{comment_count_template}</browser>
+                <browser mix-bottom='#succes_message'>{succes_template}</browser>
+            """
+
+    except Exception as ex:
+        ic(ex)
+        error_code = str(ex)
+        error_msg = x.lans('system_under_maintenance')
+        if "x exception - " in error_code:
+            error_msg = error_code.split("x exception - ")[1].split("',")[0].split('",')[0]
+        
+        error_template = render_template(("global/error_message.html"), message=error_msg)
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+@app.delete("/delete_comment")
+def api_delete_comment():
+    try:
+        user = session.get("user", "")
+        comment_pk = request.args.get("comment", "")
+        if comment_pk == "": raise Exception(f"x exception - {x.lans('comment_is_allready_deleted')}")
+
+        db, cursor = x.db()
+
+        q = "SELECT * FROM comments WHERE comment_pk = %s"
+        cursor.execute(q, (comment_pk,))
+        comment = cursor.fetchone()
+
+        if comment["user_fk"] != user["user_pk"]:
+            if "admin" in user['user_role']:
+                q = "SELECT * FROM posts JOIN users ON user_pk = user_fk WHERE comment_pk = %s"
+                cursor.execute(q, (comment_pk,))
+                comment = cursor.fetchone()
+
+                x.default_language = comment["user_language"]
+                message_to_user = render_template("___email_comment_deleted.html", comment=comment)
+                x.send_email(comment["user_email"], x.lans("one_of_your_comment_has_been_deleted"), message_to_user)
+                x.default_language = user["user_language"]
+            else:
+                raise Exception(f"x exception - {x.lans('you_dont_have_the_authority_to_delete_this_comment')}")            
+        
+        q = "DELETE FROM comments WHERE comment_pk = %s"
+        cursor.execute(q, (comment_pk,))
+        db.commit()
+            
+        succes_template = render_template(("global/succes_message.html"), message=x.lans("comment_deleted"))
+        return f"""
+            <browser mix-bottom='#succes_message'>{succes_template}</browser>
+            <browser mix-remove='#comment{comment_pk}'></browser>
+        """
+    except Exception as ex:
+        ic(ex)
+        error_code = str(ex)
+        error_msg = x.lans('system_under_maintenance')
+        if "x exception - " in error_code:
+            error_msg = error_code.split("x exception - ")[1].split("',")[0].split('",')[0]
+        
+        error_template = render_template(("global/error_message.html"), message=error_msg)
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+@app.route("/edit_comment", methods=["GET", "POST"])
+def api_edit_comment():
+    try:
+        user = session.get("user", "")
+        comment_pk = request.args.get("comment", "")
+        if comment_pk == "": raise Exception(f"x exception - {x.lans('comment_is_deleted')}")
+        db, cursor = x.db()
+
+        q = "SELECT * FROM comments JOIN users ON user_pk = user_fk WHERE comment_pk = %s"
+        cursor.execute(q, (comment_pk,))
+        comment = cursor.fetchone()
+        db.commit()
+
+        if comment["user_fk"] != user["user_pk"]:
+            raise Exception(f"x exception - {x.lans('you_dont_have_the_authority_to_edit_this_comment')}")
+        
+        if request.method == "GET":
+                
+            edit_comment_template = render_template(("_edit_comment.html"), comment=comment)
+            return f"""
+                <browser mix-replace='#comment{comment_pk}'>{edit_comment_template}</browser>
+            """
+        
+        if request.method == "POST":
+            comment_message = x.validate_comment_message()
+            current_time = int(time.time())
+
+
+            q = "UPDATE comments SET comment_message = %s, comment_updated_at = %s WHERE comment_pk = %s"
+            cursor.execute(q, (comment_message, current_time, comment_pk))
+
+            comment = {}
+            comment["comment_pk"] = comment_pk
+            comment["user_fk"] = user["user_pk"]
+            comment["comment_message"] = comment_message
+            comment["comment_updated_at"] = current_time
+            comment["comment_created_at"] = 0
+
+            comment["user_username"] = user["user_username"]
+            comment["user_banner"] = user["user_banner"]
+            comment["user_avatar"] = user["user_avatar"]
+            comment["user_first_name"] = user["user_first_name"]
+            comment["user_last_name"] = user["user_last_name"]
+            comment["user_created_at"] = user["user_created_at"]
+            comment["user_bio"] = user["user_bio"]
+            
+            comment_template = render_template("_comment.html", comment=comment)
+            succes_template = render_template(("global/succes_message.html"), message=x.lans("succes"))
+
+            return f""" 
+                <browser mix-replace="#comment{comment_pk}"> {comment_template} </browser> 
+                <browser mix-bottom='#succes_message'>{succes_template}</browser>
+            """
+
+
+    except Exception as ex:
+        if "db" in locals(): db.rollback()
+        ic(ex)
+        error_code = str(ex)
+        error_msg = x.lans('system_under_maintenance')
+        if "x exception - " in error_code:
+            error_msg = error_code.split("x exception - ")[1].split("',")[0].split('",')[0]
+        
+        error_template = render_template(("global/error_message.html"), message=error_msg)
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+@app.get("/more_comments")
+def api_more_comments():
+    try:
+        post_pk = request.args.get("post", "")
+        current_count = int(request.args.get("current_count", ""))
+        
+        db, cursor = x.db()
+        q = "SELECT * FROM comments JOIN users ON user_fk = user_pk WHERE post_fk = %s ORDER BY comment_created_at DESC LIMIT 5 OFFSET %s"
+        cursor.execute(q, (post_pk, current_count))
+        comments = cursor.fetchall()
+
+        current_count = current_count + 5
+        cursor.execute("SELECT COUNT(*) as total FROM comments WHERE post_fk = %s", (post_pk,))
+        total_amount_of_comments = int(cursor.fetchone()["total"])
+
+
+        template_comments = render_template("___append_more_comments.html", comments=comments, post_pk=post_pk, current_count=current_count, total_amount_of_comments=total_amount_of_comments)
+
+        return f"""
+            <browser mix-replace="#more_comments_button{post_pk}">{template_comments}<browser>
+        """
+
+    except Exception as ex:
+        ic(ex)
+        error_code = str(ex)
+        error_msg = x.lans('system_under_maintenance')
+        if "x exception - " in error_code:
+            error_msg = error_code.split("x exception - ")[1].split("',")[0].split('",')[0]
+        
+        error_template = render_template(("global/error_message.html"), message=error_msg)
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
 
 @app.get("/get_more_posts_home")
 def api_get_more_posts_home():
@@ -830,7 +1054,7 @@ def api_get_more_posts_home():
         if max_number_of_posts <= current_post_number + 5: 
             remove_more_button = f"<browser mix-remove='#auto_show_more'></browser>"
 
-        htmlPosts = render_template("_append_posts.html", posts=posts)
+        htmlPosts = render_template("___append_more_posts.html", posts=posts)
 
         return f""" 
             <browser mix-bottom="#posts"> {htmlPosts} </browser>
@@ -841,7 +1065,7 @@ def api_get_more_posts_home():
         error_code = str(ex)
         error_msg = x.lans('system_under_maintenance')
         if "x exception - " in error_code:
-            error_msg = error_code.split("x exception - ")[1].split("',")[0]
+            error_msg = error_code.split("x exception - ")[1].split("',")[0].split('",')[0]
         
         error_template = render_template(("global/error_message.html"), message=error_msg)
         return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
@@ -865,7 +1089,7 @@ def api_get_more_posts_profile():
         if max_number_of_posts <= current_post_number + 5: 
             remove_more_button = f"<browser mix-remove='#auto_show_more'></browser>"
 
-        htmlPosts = render_template("_append_posts.html", posts=posts)
+        htmlPosts = render_template("___append_more_posts.html", posts=posts)
 
         return f""" 
             <browser mix-bottom="#posts"> {htmlPosts} </browser>
@@ -876,7 +1100,7 @@ def api_get_more_posts_profile():
         error_code = str(ex)
         error_msg = x.lans('system_under_maintenance')
         if "x exception - " in error_code:
-            error_msg = error_code.split("x exception - ")[1].split("',")[0]
+            error_msg = error_code.split("x exception - ")[1].split("',")[0].split('",')[0]
         
         error_template = render_template(("global/error_message.html"), message=error_msg)
         return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""

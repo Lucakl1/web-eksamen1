@@ -23,7 +23,7 @@
                 <span class="handle">@{{ post.user_username }}</span>
             </div>
             <span>·</span>
-            <span class="time">{{ x.lans('joined') }} {{ x.epoch_to_time(user.user_created_at) }}</span>
+            <span class="time">{{ x.lans('joined') }} {{ x.epoch_to_time(post.user_created_at) }}</span>
         </div>
         <p class="text">{{ post.user_bio }}</p>
     </div>
@@ -63,7 +63,7 @@
         </div>
         
         <div class="post_actions">
-            <span class="action"><i class="fa-regular fa-comment"></i>{{ post.post_total_comments }}</span>
+            {% include "___post_comment.html" %}
             {% include "___post_like.html" %}
             <span class="action"><i class="fa-regular fa-bookmark"></i>{{ post.post_total_saved }}</span>
             <!-- <span class="action"><i class="fa-solid fa-share"></i></span> -->
@@ -77,5 +77,9 @@
             <a href="/delete_post?post={{ post.post_pk }}" mix-delete class="delete"> {{ x.lans("remove_post") }} </a>
         </div>
         {% endif %}
+
+        <section class="comments" id="comments{{ post.post_pk }}">
+        
+        </section>
     </div>
 </article>

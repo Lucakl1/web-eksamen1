@@ -256,8 +256,8 @@
     },
     "post": {
         "english": "Post",
-        "danish": "",
-        "spanish": ""
+        "danish": "Indlæg",
+        "spanish": "Publicar"
     },
     "loading...": {
         "english": "Loading...",
@@ -476,127 +476,207 @@
     },
     "whats_on_your_mind": {
         "english": "Whats on your mind?",
-        "danish": "",
-        "spanish": ""
+        "danish": "Hvad tænker du på?",
+        "spanish": "¿Qué estás pensando?"
     },
     "tell_the_world_something": {
         "english": "Tell the world something!",
-        "danish": "",
-        "spanish": ""
+        "danish": "Fortæl verden noget!",
+        "spanish": "¡Cuéntale algo al mundo!"
     },
     "attachments": {
         "english": "Attachments",
-        "danish": "",
-        "spanish": ""
+        "danish": "Vedhæftninger",
+        "spanish": "Archivos adjuntos"
     },
     "posting...": {
         "english": "Posting...",
-        "danish": "",
-        "spanish": ""
+        "danish": "Sender...",
+        "spanish": "Publicando..."
     },
     "post_to_short_must_be_above": {
-        "english": "Post too short must be above",
-        "danish": "",
-        "spanish": ""
+        "english": "Post too short, must be longer",
+        "danish": "Indlæg er for kort, skal være længere",
+        "spanish": "Publicación demasiado corta, debe ser más larga"
     },
     "post_to_long_must_be_below": {
-        "english": "Post too long must be below",
-        "danish": "",
-        "spanish": ""
+        "english": "Post too long, must be shorter",
+        "danish": "Indlæg er for langt, skal være kortere",
+        "spanish": "Publicación demasiado larga, debe ser más corta"
     },
     "file_is_not_recognized": {
         "english": "File is not recognized",
-        "danish": "",
-        "spanish": ""
+        "danish": "Filen genkendes ikke",
+        "spanish": "El archivo no es reconocido"
     },
     "more_posts": {
         "english": "More posts",
-        "danish": "",
-        "spanish": ""
+        "danish": "Flere indlæg",
+        "spanish": "Más publicaciones"
     },
     "attached_file": {
         "english": "Attached file:",
-        "danish": "",
-        "spanish": ""
+        "danish": "Vedhæftet fil:",
+        "spanish": "Archivo adjunto:"
     },
     "remove_post": {
         "english": "Remove post",
-        "danish": "",
-        "spanish": ""
+        "danish": "Fjern indlæg",
+        "spanish": "Eliminar publicación"
     },
     "post_is_allready_deleted": {
-        "english": "Post is allready deleted",
-        "danish": "",
-        "spanish": ""
+        "english": "Post is already deleted",
+        "danish": "Indlæg er allerede slettet",
+        "spanish": "La publicación ya ha sido eliminada"
     },
     "you_dont_have_the_authority_to_delete_this_post": {
-        "english": "You dont have the authority to delete this post",
-        "danish": "",
-        "spanish": ""
+        "english": "You don't have the authority to delete this post",
+        "danish": "Du har ikke tilladelse til at slette dette indlæg",
+        "spanish": "No tienes autoridad para eliminar esta publicación"
     },
     "succes": {
-        "english": "Succes",
-        "danish": "",
-        "spanish": ""
+        "english": "Success",
+        "danish": "Succes",
+        "spanish": "Éxito"
     },
     "post_deleted": {
         "english": "Post deleted",
-        "danish": "",
-        "spanish": ""
+        "danish": "Indlæg slettet",
+        "spanish": "Publicación eliminada"
     },
     "one_of_your_post_has_been_deleted": {
-        "english": "One of your post has been deleted",
-        "danish": "",
-        "spanish": ""
+        "english": "One of your posts has been deleted",
+        "danish": "Et af dine indlæg er blevet slettet",
+        "spanish": "Una de tus publicaciones ha sido eliminada"
     },
     "dear": {
         "english": "Dear",
         "danish": "Kære",
-        "spanish": ""
+        "spanish": "Estimado"
     },
     "your_post_with_the_following_message_has_been_deleted": {
         "english": "Your post with the following message has been deleted",
-        "danish": "",
-        "spanish": ""
+        "danish": "Dit indlæg med følgende besked er blevet slettet",
+        "spanish": "Tu publicación con el siguiente mensaje ha sido eliminada"
     },
     "please_contakt_us_if_you_think_this_was_a_mistake": {
-        "english": "Please contakt us if you think this was a mistake",
-        "danish": "",
-        "spanish": ""
+        "english": "Please contact us if you think this was a mistake",
+        "danish": "Kontakt os venligst, hvis du mener, dette var en fejl",
+        "spanish": "Por favor contáctanos si crees que esto fue un error"
     },
     "confirm": {
         "english": "Confirm",
-        "danish": "",
-        "spanish": ""
+        "danish": "Bekræft",
+        "spanish": "Confirmar"
     },
     "remove_file": {
         "english": "Remove file",
-        "danish": "",
-        "spanish": ""
+        "danish": "Fjern fil",
+        "spanish": "Eliminar archivo"
     },
     "post_is_deleted": {
         "english": "Post is deleted",
-        "danish": "",
-        "spanish": ""
+        "danish": "Indlæg er slettet",
+        "spanish": "La publicación ha sido eliminada"
     },
     "you_dont_have_the_authority_to_edit_this_post": {
-        "english": "You dont have the authority to edit this post",
-        "danish": "",
-        "spanish": ""
+        "english": "You don't have the authority to edit this post",
+        "danish": "Du har ikke tilladelse til at redigere dette indlæg",
+        "spanish": "No tienes autoridad para editar esta publicación"
     },
     "edit_post": {
         "english": "Edit post",
-        "danish": "",
-        "spanish": ""
+        "danish": "Rediger indlæg",
+        "spanish": "Editar publicación"
     },
     "will_remove_new_media_uploaded_too": {
         "english": "Will remove new media uploaded too",
-        "danish": "",
-        "spanish": ""
+        "danish": "Vil også fjerne ny uploadet medie",
+        "spanish": "También eliminará los medios nuevos subidos"
     },
     "post_updated": {
         "english": "Post updated",
-        "danish": "",
-        "spanish": ""
+        "danish": "Indlæg opdateret",
+        "spanish": "Publicación actualizada"
+    },
+    "username_cant_have_spaces": {
+        "english": "Username can't have spaces",
+        "danish": "Brugernavn kan ikke have mellemrum",
+        "spanish": "El nombre de usuario no puede tener espacios"
+    },
+    "first_name_cant_have_spaces": {
+        "english": "First name can't have spaces",
+        "danish": "Fornavn kan ikke have mellemrum",
+        "spanish": "El nombre no puede tener espacios"
+    },
+    "last_name_cant_have_spaces": {
+        "english": "Last name can't have spaces",
+        "danish": "Efternavn kan ikke have mellemrum",
+        "spanish": "El apellido no puede tener espacios"
+    },
+    "remove_comment": {
+        "english": "Remove comment",
+        "danish": "Fjern kommentar",
+        "spanish": "Eliminar comentario"
+    },
+    "write_a_comment": {
+        "english": "Write a comment",
+        "danish": "Skriv en kommentar",
+        "spanish": "Escribir un comentario"
+    },
+    "post_comment": {
+        "english": "Post comment",
+        "danish": "Send kommentar",
+        "spanish": "Publicar comentario"
+    },
+    "comment_to_short_must_be_above": {
+        "english": "Comment too short, must be longer",
+        "danish": "Kommentaren er for kort, skal være længere",
+        "spanish": "Comentario demasiado corto, debe ser más largo"
+    },
+    "comment_to_long_must_be_above": {
+        "english": "Comment too long, must be shorter",
+        "danish": "Kommentaren er for lang, skal være kortere",
+        "spanish": "Comentario demasiado largo, debe ser más corto"
+    },
+    "more_comments": {
+        "english": "More comments",
+        "danish": "Flere kommentarer",
+        "spanish": "Más comentarios"
+    },
+    "comment_is_allready_deleted": {
+        "english": "Comment is already deleted",
+        "danish": "Kommentaren er allerede slettet",
+        "spanish": "El comentario ya ha sido eliminado"
+    },
+    "one_of_your_comment_has_been_deleted": {
+        "english": "One of your comments has been deleted",
+        "danish": "En af dine kommentarer er blevet slettet",
+        "spanish": "Uno de tus comentarios ha sido eliminado"
+    },
+    "your_comment_with_the_following_message_has_been_deleted": {
+        "english": "Your comment with the following message has been deleted",
+        "danish": "Din kommentar med følgende besked er blevet slettet",
+        "spanish": "Tu comentario con el siguiente mensaje ha sido eliminado"
+    },
+    "comment_deleted": {
+        "english": "Comment deleted",
+        "danish": "Kommentar slettet",
+        "spanish": "Comentario eliminado"
+    },
+    "you_dont_have_the_authority_to_delete_this_comment": {
+        "english": "You don't have the authority to delete this comment",
+        "danish": "Du har ikke tilladelse til at slette denne kommentar",
+        "spanish": "No tienes autoridad para eliminar este comentario"
+    },
+    "comment_is_deleted": {
+        "english": "Comment is deleted",
+        "danish": "Kommentar er slettet",
+        "spanish": "La comentario ha sido eliminada"
+    },
+    "edit_comment": {
+        "english": "Edit comment",
+        "danish": "Rediger kommentar",
+        "spanish": "Editar comentario"
     }
 }

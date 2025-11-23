@@ -1,0 +1,58 @@
+<article id="comment{{ comment.comment_pk }}">
+    <a mix-get href="/profile/{{ comment.user_username }}">
+        {% if comment.user_avatar == 'default.svg' %}
+            <img src="{{ url_for('static', filename='images/'~comment.user_avatar) }}" alt="" class="profile_img no_event">
+        {% else %}
+            <img src="{{ url_for('static', filename='uploads/'~comment.user_avatar) }}" alt="" class="profile_img no_event">
+        {% endif %}
+    </a>
+
+    <div class="mini_profile">
+        {% if comment.user_banner == 'default_banner.jpg' %}
+            <img src="{{ url_for('static', filename='images/'~comment.user_banner) }}" alt="" class="profile_img">
+        {% else %}
+            <img src="{{ url_for('static', filename='uploads/'~comment.user_banner) }}" alt="" class="profile_img">
+        {% endif %}
+        <div class="mini_profile_header">
+            <div>
+                <a mix-get href="/profile/{{comment.user_username}}">
+                    <span class="name no_event">
+                        {{ comment.user_first_name }} {{ comment.user_last_name }}
+                    </span>
+                </a>
+                <span class="handle">@{{ comment.user_username }}</span>
+            </div>
+            <span>·</span>
+            <span class="time">{{ x.lans('joined') }} {{ x.epoch_to_time(comment.user_created_at) }}</span>
+        </div>
+        <p class="text">{{ comment.user_bio }}</p>
+    </div>
+
+    <div class="comment_info">
+        <div class="comment_header">
+            <span class="name">
+                {{ comment.user_first_name }} {{ comment.user_last_name }}
+            </span>
+            <span class="handle">@{{ comment.user_username }}</span> ·
+            {% if comment.comment_updated_at != 0 %} 
+                <span class="time">{{ x.lans('updated') }} {{ x.time_ago(comment.comment_updated_at) }}</span>
+            {% else %}
+                <span class="time">{{ x.lans('created') }} {{ x.time_ago(comment.comment_created_at) }}</span>
+            {% endif %}
+        </div>
+        <div class="comment_content">
+            <p class="text">
+                {{ comment.comment_message }}
+            </p>
+        </div>
+
+        {% if comment.user_fk == user.user_pk or user['user_role'] == 'admin' %}
+        <div class="comment_authority_action">
+            {% if comment.user_fk == user.user_pk %}
+            <a href="/edit_comment?comment={{ comment.comment_pk }}" mix-get class="edit"> {{ x.lans("edit") }} </a>
+            {% endif %}
+            <a href="/delete_comment?comment={{ comment.comment_pk }}" mix-delete class="delete"> {{ x.lans("remove_comment") }} </a>
+        </div>
+        {% endif %}
+    </div>
+</article>
