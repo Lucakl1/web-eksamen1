@@ -728,5 +728,35 @@
         "english": "Last news from the once you follow",
         "danish": "",
         "spanish": ""
+    },
+    "search_fore_other_users": {
+        "english": "Search fore other users",
+        "danish": "",
+        "spanish": ""
+    },
+    "recommended_users": {
+        "english": "Recommended users",
+        "danish": "",
+        "spanish": ""
+    },
+    "explore_other_users_or_posts": {
+        "english": "Explore other users or posts",
+        "danish": "",
+        "spanish": ""
+    },
+    "search_for": {
+        "english": "Search for",
+        "danish": "",
+        "spanish": ""
+    },
+    "search_fore_something": {
+        "english": "Search fore something",
+        "danish": "",
+        "spanish": ""
+    },
+    "users": {
+        "english": "Users",
+        "danish": "",
+        "spanish": ""
     }
 }

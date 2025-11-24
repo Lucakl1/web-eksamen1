@@ -1,5 +1,5 @@
-<div id="follow">
-    {% if current_user_is_following == None %}
+<div class="follow" id="follow{{ userprofile['user_username'] }}">
+    {% if userprofile['current_user_is_following'] == None %}
     <a class="main_button" mix-get href="/follow?user={{ userprofile['user_username'] }}">{{ x.lans('follow') }}</a>
     {% else %}
     <a class="main_button" mix-get href="/follow?user={{ userprofile['user_username'] }}">{{ x.lans('unfollow') }}</a>

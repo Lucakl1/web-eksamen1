@@ -19,7 +19,7 @@
             </a>
         </li>
         <li>
-            <a href="#" mix-get mix-default="<i class='fa-solid fa-magnifying-glass'></i>{{ x.lans('explore') }}" mix-await="<i class='fa-solid fa-magnifying-glass'></i>{{ x.lans('loading...') }}">
+            <a href="/explore" mix-get mix-default="<i class='fa-solid fa-magnifying-glass'></i>{{ x.lans('explore') }}" mix-await="<i class='fa-solid fa-magnifying-glass'></i>{{ x.lans('loading...') }}">
                 <i class='fa-solid fa-magnifying-glass'></i>{{ x.lans('explore') }}
             </a>
         </li>
@@ -86,10 +86,22 @@
 {% include "main_pages/home.html" %}
 
 <aside>
-    <p>content</p>
-    <div class="sticky">
-        <p>HEJJJJJ</p>
+    <div class="search_fore_users">
+        <form action="/aside_user_search" mix-post>
+            <label for="user_name_search">{{x.lans('search_fore_other_users')}}</label>
+            <input mix-delay="1000" mix-input mix-post="/aside_user_search" type="text" name="user_name_search" id="user_name_search" placeholder="{{ x.lans('search_fore_other_users') }}">
+            <button type="submit"><i class='fa-solid fa-magnifying-glass'></i></button>
+        </form>
+        <div id="search_results" class="recommended_users">
+
+        </div>
     </div>
+    {% if recommended_users %}
+    <div class="sticky recommended_users">
+        <p>{{ x.lans('recommended_users') }}</p>
+        {% include "___recommended_users.html" %}
+    </div>
+    {% endif %}
 </aside>
 
 {% include "global/footer.html" %}

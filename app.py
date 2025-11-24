@@ -79,6 +79,7 @@ def view_index():
         session["current_post_number"] = 0
         user = session.get("user", "")
         if not user: return redirect(url_for("login"))
+        user_pk = user["user_pk"]
 
         lan = x.default_language = user["user_language"]
         if lan not in x.allowed_languages: lan = "english"
@@ -92,7 +93,25 @@ def view_index():
         
         posts = x.get_posts(db, cursor, user)
 
-        return render_template("index.html", posts=posts)
+        q = """SELECT 
+        user_pk, user_username, user_avatar, user_first_name, user_last_name, user_username 
+        FROM users 
+        LEFT JOIN followers ON users.user_pk = followers.user_follows_fk 
+        WHERE users.user_pk != %s 
+        AND (followers.user_fk IS NULL OR followers.user_fk != %s)
+        AND user_deleted_at = 0
+        ORDER BY RAND() LIMIT 5"""
+        cursor.execute(q, (user_pk, user_pk))
+        recommended_users = cursor.fetchall()
+
+        for rec_user in recommended_users:
+            q = "SELECT * FROM followers WHERE user_fk = %s AND user_follows_fk = %s"
+            cursor.execute(q, (user_pk, rec_user["user_pk"]))
+            current_user_is_following = cursor.fetchone()
+
+            rec_user["current_user_is_following"] = current_user_is_following
+
+        return render_template("index.html", posts=posts, recommended_users=recommended_users)
     except Exception as ex:
         ic(ex)
         return "error"
@@ -126,7 +145,20 @@ def view_home():
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
-    
+@app.get("/explore")
+def view_explore():
+    try:
+        site = render_template("main_pages/explore.html", currently_selectet='users')
+        return f""" 
+        <browser mix-replace='#main'> {site} </browser> 
+        {x.page_title(x.lans("explore"))}
+        """
+    except Exception as ex:
+        ic(ex)
+        return "error"
+    finally:
+        pass
+
 @app.get("/profile")
 @app.get("/profile/<user_username>")
 def view_profile(user_username = ""):
@@ -151,9 +183,9 @@ def view_profile(user_username = ""):
         cursor.execute(q, (user["user_pk"], view_user["user_pk"]))
         current_user_is_following = cursor.fetchone()
 
-        ic(current_user_is_following)
+        view_user["current_user_is_following"] = current_user_is_following
 
-        site = render_template("main_pages/profile.html", posts=posts, userprofile=view_user, count=count, current_user_is_following=current_user_is_following)
+        site = render_template("main_pages/profile.html", posts=posts, userprofile=view_user, count=count)
         return f""" 
             <browser mix-replace='#main'> {site} </browser> 
             {x.page_title( x.lans('profile') + " - " + user_username )} 
@@ -659,9 +691,10 @@ def api_follow():
         db.commit()
 
         userprofile = {"user_username": user_username}
+        userprofile["current_user_is_following"] = current_user_is_following
 
-        follow_button = render_template("___profile_follow_button.html", current_user_is_following=current_user_is_following, userprofile=userprofile)
-        return f""" <browser mix-replace="#follow"> {follow_button} </browser> """
+        follow_button = render_template("___profile_follow_button.html", userprofile=userprofile)
+        return f""" <browser mix-replace="#follow{userprofile["user_username"]}"> {follow_button} </browser> """
 
     except Exception as ex:
         ic(ex)
@@ -1111,63 +1144,6 @@ def api_comments():
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
-@app.delete("/delete_comment")
-def api_delete_comment():
-    try:
-        user = session.get("user", "")
-        comment_pk = request.args.get("comment", "")
-        if comment_pk == "": raise Exception(f"x exception - {x.lans('comment_is_allready_deleted')}", 400)
-
-        db, cursor = x.db()
-
-        q = "SELECT * FROM comments WHERE comment_pk = %s"
-        cursor.execute(q, (comment_pk,))
-        comment = cursor.fetchone()
-
-        if comment["user_fk"] != user["user_pk"]:
-            if "admin" in user['user_role']:
-                q = "SELECT * FROM posts JOIN users ON user_pk = user_fk WHERE comment_pk = %s"
-                cursor.execute(q, (comment_pk,))
-                comment = cursor.fetchone()
-
-                x.default_language = comment["user_language"]
-                message_to_user = render_template("___email_comment_deleted.html", comment=comment)
-                x.send_email(comment["user_email"], x.lans("one_of_your_comment_has_been_deleted"), message_to_user)
-                x.default_language = user["user_language"]
-            else:
-                raise Exception(f"x exception - {x.lans('you_dont_have_the_authority_to_delete_this_comment')}", 400)            
-        
-        q = "SELECT post_pk, post_total_comments FROM posts WHERE post_pk = (SELECT post_fk FROM comments WHERE comment_pk = %s)"
-        cursor.execute(q, (comment_pk,))
-        post = cursor.fetchone()
-
-        q = "DELETE FROM comments WHERE comment_pk = %s"
-        cursor.execute(q, (comment_pk,))
-        db.commit()
-
-        post["post_total_comments"] = post["post_total_comments"] - 1
-            
-        comment_count_template = render_template("___post_comment.html", post=post)
-        succes_template = render_template(("global/succes_message.html"), message=x.lans("comment_deleted"))
-        
-        return f"""
-            <browser mix-bottom='#succes_message'>{succes_template}</browser>
-            <browser mix-remove='#comment{comment_pk}'></browser>
-            <browser mix-replace="#comment_count{post["post_pk"]}">{comment_count_template}</browser>
-        """
-    except Exception as ex:
-        ic(ex)
-        error_code = str(ex)
-        error_msg = x.lans('system_under_maintenance')
-        if "x exception - " in error_code:
-            error_msg = error_code.split("x exception - ")[1].split("',")[0].split('",')[0]
-        
-        error_template = render_template(("global/error_message.html"), message=error_msg)
-        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
-    finally:
-        if "cursor" in locals(): cursor.close()
-        if "db" in locals(): db.close()
-
 @app.route("/edit_comment", methods=["GET", "POST"])
 def api_edit_comment():
     try:
@@ -1237,6 +1213,63 @@ def api_edit_comment():
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
+@app.delete("/delete_comment")
+def api_delete_comment():
+    try:
+        user = session.get("user", "")
+        comment_pk = request.args.get("comment", "")
+        if comment_pk == "": raise Exception(f"x exception - {x.lans('comment_is_allready_deleted')}", 400)
+
+        db, cursor = x.db()
+
+        q = "SELECT * FROM comments WHERE comment_pk = %s"
+        cursor.execute(q, (comment_pk,))
+        comment = cursor.fetchone()
+
+        if comment["user_fk"] != user["user_pk"]:
+            if "admin" in user['user_role']:
+                q = "SELECT * FROM posts JOIN users ON user_pk = user_fk WHERE comment_pk = %s"
+                cursor.execute(q, (comment_pk,))
+                comment = cursor.fetchone()
+
+                x.default_language = comment["user_language"]
+                message_to_user = render_template("___email_comment_deleted.html", comment=comment)
+                x.send_email(comment["user_email"], x.lans("one_of_your_comment_has_been_deleted"), message_to_user)
+                x.default_language = user["user_language"]
+            else:
+                raise Exception(f"x exception - {x.lans('you_dont_have_the_authority_to_delete_this_comment')}", 400)            
+        
+        q = "SELECT post_pk, post_total_comments FROM posts WHERE post_pk = (SELECT post_fk FROM comments WHERE comment_pk = %s)"
+        cursor.execute(q, (comment_pk,))
+        post = cursor.fetchone()
+
+        q = "DELETE FROM comments WHERE comment_pk = %s"
+        cursor.execute(q, (comment_pk,))
+        db.commit()
+
+        post["post_total_comments"] = post["post_total_comments"] - 1
+            
+        comment_count_template = render_template("___post_comment.html", post=post)
+        succes_template = render_template(("global/succes_message.html"), message=x.lans("comment_deleted"))
+        
+        return f"""
+            <browser mix-bottom='#succes_message'>{succes_template}</browser>
+            <browser mix-remove='#comment{comment_pk}'></browser>
+            <browser mix-replace="#comment_count{post["post_pk"]}">{comment_count_template}</browser>
+        """
+    except Exception as ex:
+        ic(ex)
+        error_code = str(ex)
+        error_msg = x.lans('system_under_maintenance')
+        if "x exception - " in error_code:
+            error_msg = error_code.split("x exception - ")[1].split("',")[0].split('",')[0]
+        
+        error_template = render_template(("global/error_message.html"), message=error_msg)
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
 @app.get("/more_comments")
 def api_more_comments():
     try:
@@ -1271,6 +1304,54 @@ def api_more_comments():
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
+
+@app.post("/aside_user_search")
+def api_aside_user_search():
+    try:
+        user = session.get("user", "")
+        user_pk = user["user_pk"]
+        user_search = f"{request.form.get('user_name_search', '')}%"
+
+        recommended_users = ""
+        if user_search != "%":
+            db, cursor = x.db()
+            q = """SELECT 
+            user_pk, user_username, user_avatar, user_first_name, user_last_name, user_username 
+            FROM users 
+            LEFT JOIN followers ON users.user_pk = followers.user_follows_fk 
+            WHERE users.user_pk != %s
+            AND (user_username LIKE %s OR user_first_name LIKE %s OR user_last_name LIKE %s)
+            AND user_deleted_at = 0
+            LIMIT 7"""
+            cursor.execute(q, (user_pk, user_search, user_search, user_search))
+            recommended_users = cursor.fetchall()
+
+            for rec_user in recommended_users:
+                q = "SELECT * FROM followers WHERE user_fk = %s AND user_follows_fk = %s"
+                cursor.execute(q, (user_pk, rec_user["user_pk"]))
+                current_user_is_following = cursor.fetchone()
+
+                rec_user["current_user_is_following"] = current_user_is_following
+
+        recommended_users_template = f"<div id='search_results' class='recommended_users'> {render_template('___recommended_users.html', recommended_users=recommended_users)} </div>"
+
+        return f"""<browser mix-replace="#search_results"> {recommended_users_template} </browser>"""
+    except Exception as ex:
+        ic(ex)
+        return "error"
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+@app.get("/change_search_for")
+@app.get("/change_search_for/<search_fore>")
+def api_change_search_for(search_fore = "users"):
+    try:
+        change_search_for = render_template("_change_search_for.html", currently_selectet=search_fore)
+        return f"""<browser mix-replace="#search_selector"> {change_search_for} </browser>"""
+    except Exception as ex:
+        ic(ex)
+        return x.lans('system_under_maintenance')
 
 @app.get("/get_more_posts_home")
 def api_get_more_posts_home():
@@ -1409,7 +1490,7 @@ def api_get_more_posts_notifications():
         return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
     finally:
         if "cursor" in locals(): cursor.close()
-        if "db" in locals(): db.close() 
+        if "db" in locals(): db.close()
 
 ##############################
 ########## utilities #########
