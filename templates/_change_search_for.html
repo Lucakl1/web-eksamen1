@@ -1,7 +1,8 @@
 <div id="search_selector">
     <label for="search_for">{{x.lans('search_for')}}</label>
     <div>
-        <input name="search_for" type="button" id="search_for" class="selector" value="{{ currently_selectet }}">
+        <input type="button" id="search_for" class="selector" value="{{ currently_selectet }}">
+        <input name="search_for" type="hidden" value="{{ currently_selectet }}">
         <option-div>
         {% if currently_selectet != 'users' %}
         <a href="/change_search_for/users" mix-get>{{ x.lans('users') }}</a>

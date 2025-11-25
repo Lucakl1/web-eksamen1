@@ -1,4 +1,4 @@
-<div>
+<div class="users">
     <a href="/profile/{{ rec_user['user_username'] }}" mix-get>
         {% if rec_user['user_avatar'] == 'default.svg' %}
         <img src="{{ url_for('static', filename='images/'~rec_user['user_avatar']) }}" alt="" class="profile_img no_event">

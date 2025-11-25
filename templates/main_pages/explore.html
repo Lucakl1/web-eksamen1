@@ -3,10 +3,10 @@
         <h1>{{ x.lans("explore_other_users_or_posts") }}</h1>
     </section>
 
-    <form action="/make_a_search_request">
+    <form action="/make_a_search_request" mix-post>
         <div>
             <label for="search_for_value">{{x.lans('search_fore_something')}}</label>
-            <input mix-delay="1000" mix-input mix-post="/aside_user_search" type="text" name="search_for_value" id="search_for_value" placeholder="{{ x.lans('search_fore_something') }}">
+            <input type="text" name="search_for_value" id="search_for_value" placeholder="{{ x.lans('search_fore_something') }}">
             <button type="submit"><i class='fa-solid fa-magnifying-glass'></i></button>
         </div>
         {% include "_change_search_for.html" %}

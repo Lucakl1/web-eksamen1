@@ -626,7 +626,6 @@ def api_delete_profile_confirm():
                 user = cursor.fetchone()
 
                 delete_account_template = render_template("___email_account_deleted.html", user=user)
-                ic("XXXXXXXX")
 
                 q = "UPDATE users SET user_deleted_at = %s WHERE user_username = %s"
                 cursor.execute(q, (current_time, user_username))
@@ -1352,6 +1351,53 @@ def api_change_search_for(search_fore = "users"):
     except Exception as ex:
         ic(ex)
         return x.lans('system_under_maintenance')
+    
+@app.post("/make_a_search_request")
+def api_make_a_search_request():
+    try:
+        user = session.get("user", "")
+        user_pk = user["user_pk"]
+        search_value = request.form.get('search_for_value', '')
+        search_for = request.form.get('search_for', '')
+
+        if search_for == "users":
+            search_value = f"{search_value}%"
+            db, cursor = x.db()
+            q = """SELECT 
+            user_pk, user_username, user_avatar, user_first_name, user_last_name, user_username 
+            FROM users 
+            LEFT JOIN followers ON users.user_pk = followers.user_follows_fk 
+            WHERE users.user_pk != %s
+            AND (user_username LIKE %s OR user_first_name LIKE %s OR user_last_name LIKE %s)
+            AND user_deleted_at = 0
+            LIMIT 10"""
+            cursor.execute(q, (user_pk, search_value, search_value, search_value))
+            result_users = cursor.fetchall()
+
+            ic(result_users)
+
+            for result_user in result_users:
+                q = "SELECT * FROM followers WHERE user_fk = %s AND user_follows_fk = %s"
+                cursor.execute(q, (user_pk, result_user["user_pk"]))
+                current_user_is_following = cursor.fetchone()
+
+                result_user["current_user_is_following"] = current_user_is_following
+
+            search_results_template = render_template("___recommended_users.html", recommended_users=result_users)
+        elif search_for == "posts":
+            pass
+
+        return f"""<browser mix-replace="#search_content"> 
+            <section id="search_content">
+                {search_results_template} 
+            </section>
+        </browser>"""
+    except Exception as ex:
+        ic(ex)
+        return "error"
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
 
 @app.get("/get_more_posts_home")
 def api_get_more_posts_home():
