@@ -65,13 +65,13 @@ main {
                     }
 
                     > div {
-                        .selector {
+                        .selector_style {
                             cursor: pointer;
                             text-align: left;
                             background: white;
                         }
 
-                        div:has(.selector) {
+                        div:has(.selector_style) {
                             position: relative;
 
                             option-div {
@@ -119,7 +119,7 @@ main {
                         }
                         
 
-                        div.open:has(.selector) {
+                        div.open:has(.selector_style) {
                             option-div {
                                 display: block;
                             }

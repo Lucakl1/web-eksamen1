@@ -1,0 +1,23 @@
+<div class="users" id="users">
+    {% for user in users: %}
+        <div class="users">
+            <a href="/profile/{{ user['user_username'] }}" mix-get>
+                {% if user['user_avatar'] == 'default.svg' %}
+                <img src="{{ url_for('static', filename='images/'~user['user_avatar']) }}" alt="" class="profile_img no_event">
+                {% else %}
+                <img src="{{ url_for('static', filename='uploads/'~user['user_avatar']) }}" alt="" class="profile_img no_event">
+                {% endif %}
+            </a>
+            <div>
+                <p class="name">{{ user['user_first_name'] }} {{ user['user_last_name'] }}</p>
+                <p class="handle">@{{ user['user_username'] }}</p>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+{% if all_user_count > users|length and all_user_count != 0 %}
+<button href="/admin_all_more_users?total_count={{all_user_count}}&current_count={{ users|length }}" mix-get mix-default="{{ x.lans('more_users') }}" mix-await="{{ x.lans('loading...') }}" class="main_button" id="auto_show_more">
+    {{ x.lans('more_users') }}
+</button>
+{% endif %}

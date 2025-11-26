@@ -303,56 +303,51 @@ def send_email(to_email, subject, template):
 # data_fore_page (if the page needs any data)
 # where_in_list (how long in the dfatabase have we scrolled)
 def get_posts(db, cursor, user, witch_page = "home", data_fore_page = "", where_in_list = 0):
-    if witch_page == "home":
-        q = """
+
+    q = """
         SELECT 
         post_pk, post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_bookmark, post_updated_at,
         user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username, user_pk, user_created_at,
         post_media_type_fk, post_media_path
-        FROM users 
-        JOIN posts ON user_pk = user_fk
+        FROM users
+        JOIN posts ON user_pk = user_fk"""
+    if witch_page == "home":
+        q = q + """
         LEFT JOIN post_medias ON post_pk = post_fk
         WHERE post_deleted_at = 0 AND user_deleted_at = 0
         ORDER BY post_created_at DESC LIMIT 5 OFFSET %s"""
         cursor.execute(q, (where_in_list,))
     elif witch_page == "profile":
-        q = """
-        SELECT 
-        post_pk, post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_bookmark, post_updated_at,
-        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username, user_pk, user_created_at,
-        post_media_type_fk, post_media_path
-        FROM users 
-        JOIN posts ON user_pk = user_fk
+        q = q + """
         LEFT JOIN post_medias ON post_pk = post_fk
         WHERE post_deleted_at = 0 AND user_deleted_at = 0 AND user_username = %s
         ORDER BY post_created_at DESC LIMIT 5 OFFSET %s"""
         cursor.execute(q, (data_fore_page, where_in_list))
     elif witch_page == "bookmark":
-        q = """
-        SELECT 
-        post_pk, post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_bookmark, post_updated_at,
-        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username, user_pk, user_created_at,
-        post_media_type_fk, post_media_path
-        FROM users 
-        JOIN posts ON user_pk = user_fk
+        q = q + """
         JOIN bookmarks ON post_pk = bookmarks.post_fk
         LEFT JOIN post_medias ON post_pk = post_medias.post_fk
         WHERE post_deleted_at = 0 AND user_deleted_at = 0 AND bookmarks.user_fk = %s
         ORDER BY post_created_at DESC LIMIT 5 OFFSET %s"""
         cursor.execute(q, (data_fore_page, where_in_list))
     elif witch_page == "notifications":
-        q = """
-        SELECT 
-        post_pk, post_created_at, post_deleted_at, post_message, post_pk, post_total_comments, post_total_likes, post_total_bookmark, post_updated_at,
-        user_avatar, user_banner, user_bio, user_first_name, user_last_name, user_username, user_pk, user_created_at,
-        post_media_type_fk, post_media_path
-        FROM users 
-        JOIN posts ON user_pk = user_fk
+        q = q + """
         JOIN followers ON user_pk = user_follows_fk
         LEFT JOIN post_medias ON post_pk = post_medias.post_fk
         WHERE post_deleted_at = 0 AND user_deleted_at = 0
         ORDER BY post_created_at DESC LIMIT 5 OFFSET %s"""
         cursor.execute(q, (where_in_list,))
+    elif witch_page == "explore":
+        q = q + """
+        LEFT JOIN post_medias ON post_pk = post_medias.post_fk
+        WHERE post_deleted_at = 0 AND user_deleted_at = 0
+        AND MATCH(post_message) AGAINST("%s" IN NATURAL LANGUAGE MODE WITH QUERY EXPANSION)
+        ORDER BY post_created_at DESC LIMIT 5 OFFSET %s"""
+        # not sure wether to user "IN NATURAL LANGUAGE MODE" or not
+        # It seams to make the understanding wider therefore i am useing it
+        # Same with "WITH QUERY EXPANSION"
+        cursor.execute(q, (data_fore_page, where_in_list))
+
     posts = cursor.fetchall()
 
     for post in posts:

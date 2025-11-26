@@ -272,7 +272,7 @@ main {
 
     --profile_pic_height: 50px;
     --profile_pic_width: 50px;
-    #posts article, .comments article {
+    #posts article, .comments article, #search_content article {
         position: relative;
         padding: 32px 16px;
         display: grid;
@@ -309,7 +309,7 @@ main {
                 color: gray;
                 
                 .name {
-                    font-weight: 500;
+                    font-weight: 600;
                     font-size: 14px;
                     color: black;
                     white-space: nowrap;
@@ -452,7 +452,7 @@ main {
                     flex-flow: column;
     
                     .name {
-                        font-weight: 500;
+                        font-weight: 600;
                         font-size: 14px;
                         color: black;
                         white-space: nowrap;
@@ -590,13 +590,13 @@ main {
                     }
 
                     > div {
-                        .selector {
+                        .selector_style {
                             cursor: pointer;
                             text-align: left;
                             background: white;
                         }
 
-                        div:has(.selector) {
+                        div:has(.selector_style) {
                             position: relative;
 
                             option-div {
@@ -644,7 +644,7 @@ main {
                         }
                         
 
-                        div.open:has(.selector) {
+                        div.open:has(.selector_style) {
                             option-div {
                                 display: block;
                             }
@@ -684,67 +684,65 @@ main {
         }
     }
 
-    &.home, &.bookmark {
-        .quick_post, .edit_post {
-            --user-img-width: 50px;
-            display: grid;
-            grid-template-columns: var(--user-img-width) 1fr;
-            gap: 8px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border-color);
+    .quick_post, .edit_post {
+        --user-img-width: 50px;
+        display: grid;
+        grid-template-columns: var(--user-img-width) 1fr;
+        gap: 8px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border-color);
 
-            img {
-                height: var(--user-img-width);
-                width: var(--user-img-width);
-                border-radius: 50px;
-                object-fit: cover;
+        img {
+            height: var(--user-img-width);
+            width: var(--user-img-width);
+            border-radius: 50px;
+            object-fit: cover;
+        }
+
+        form {
+            margin-top: calc(var(--user-img-width) * 0.20);
+            display: flex;
+            flex-flow: column;
+
+            label {
+                padding-bottom: 16px;
+                font-size: 20px;
+                font-weight: 600;
             }
 
-            form {
-                margin-top: calc(var(--user-img-width) * 0.20);
+            textarea {
+                border: 1px solid black;
+                min-height: 70px;
+                border-radius: 10px;
+                font-family: var(--font);
+                padding: 8px;
+            }
+
+            .file_with_submit {
                 display: flex;
-                flex-flow: column;
+                justify-content: space-between;
+                align-items: flex-end;
+                gap: 16px;
 
-                label {
-                    padding-bottom: 16px;
-                    font-size: 20px;
-                    font-weight: 600;
-                }
-
-                textarea {
-                    border: 1px solid black;
-                    min-height: 70px;
-                    border-radius: 10px;
-                    font-family: var(--font);
-                    padding: 8px;
-                }
-
-                .file_with_submit {
+                div {
                     display: flex;
-                    justify-content: space-between;
-                    align-items: flex-end;
-                    gap: 16px;
+                    flex-flow: column;
 
-                    div {
-                        display: flex;
-                        flex-flow: column;
+                    label {
+                        padding: 0.75rem 0 0.3rem 0;
+                        display: block;
+                        font-size: 14px;
+                        font-weight: 400;
 
-                        label {
-                            padding: 0.75rem 0 0.3rem 0;
-                            display: block;
-                            font-size: 14px;
-                            font-weight: 400;
-
-                            span {
-                                color: rgb(71, 71, 71)
-                            }
+                        span {
+                            color: rgb(71, 71, 71)
                         }
+                    }
 
-                        input {
-                            padding: 0.75rem 1rem;
-                            border: 1px solid black;
-                            border-radius: 50px;
-                        }
+                    input {
+                        padding: 0.75rem 1rem;
+                        border: 1px solid black;
+                        border-radius: 50px;
                     }
                 }
             }
@@ -752,7 +750,7 @@ main {
     }
 
     &.explore {
-        form {
+        form.explore_form {
             display: flex;
             margin-top: 16px;
             gap: 16px;
@@ -790,7 +788,7 @@ main {
             #search_selector {
                 width: 150px;
 
-                div:has(.selector) {
+                div:has(.selector_style) {
                     position: relative;
 
                     input {
@@ -843,7 +841,7 @@ main {
                     }
                 }
 
-                div.open:has(.selector) {
+                div.open:has(.selector_style) {
                     option-div {
                         display: block;
                     }
@@ -856,36 +854,51 @@ main {
         }
 
         #search_content {
-            &:has(.users) {
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-                gap: 32px 16px;
-                margin-top: 32px;
-    
-                > div {
-                    display: flex;
-                    align-items: center;
-                    flex-flow: column;
-                    gap: 8px;
-    
-                    > a {
-                        width: 100px;
-                        height: 100px;
-                        position: relative;
-                        display: block;
+            .users {
+                &:has(.users) {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                    gap: 32px 16px;
+                    margin-top: 32px;
         
-                        img {
+                    > div {
+                        display: flex;
+                        align-items: center;
+                        flex-flow: column;
+                        gap: 8px;
+        
+                        > a {
+                            width: 100px;
+                            height: 100px;
+                            position: relative;
+                            display: block;
+            
+                            img {
+                                width: 100%;
+                                height: 100%;
+                                object-fit: cover;
+                                border-radius: 100px;
+                            }
+                        }
+    
+                        div:has(.name) {
                             width: 100%;
-                            height: 100%;
-                            object-fit: cover;
-                            border-radius: 100px;
+                            max-width: 130px;
+                            overflow: hidden;
+    
+                            .name {
+                                font-weight: 600;
+                                font-size: 14px;
+                                color: black;
+                                white-space: nowrap;
+                            }
                         }
                     }
                 }
             }
 
-            &:has(.posts) {
-                
+            button {
+                margin: 25px auto;
             }
         }
     }
@@ -970,7 +983,7 @@ aside {
 
             div {
                 .name {
-                    font-weight: 500;
+                    font-weight: 600;
                     font-size: 14px;
                     color: black;
                     white-space: nowrap;

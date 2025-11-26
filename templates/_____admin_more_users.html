@@ -1,0 +1,15 @@
+{% for user in users: %}
+    <div class="users">
+        <a href="/profile/{{ user['user_username'] }}" mix-get>
+            {% if user['user_avatar'] == 'default.svg' %}
+            <img src="{{ url_for('static', filename='images/'~user['user_avatar']) }}" alt="" class="profile_img no_event">
+            {% else %}
+            <img src="{{ url_for('static', filename='uploads/'~user['user_avatar']) }}" alt="" class="profile_img no_event">
+            {% endif %}
+        </a>
+        <div>
+            <p class="name">{{ user['user_first_name'] }} {{ user['user_last_name'] }}</p>
+            <p class="handle">@{{ user['user_username'] }}</p>
+        </div>
+    </div>
+{% endfor %}

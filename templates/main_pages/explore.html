@@ -3,7 +3,7 @@
         <h1>{{ x.lans("explore_other_users_or_posts") }}</h1>
     </section>
 
-    <form action="/make_a_search_request" mix-post>
+    <form action="/make_a_search_request" mix-post class="explore_form">
         <div>
             <label for="search_for_value">{{x.lans('search_fore_something')}}</label>
             <input type="text" name="search_for_value" id="search_for_value" placeholder="{{ x.lans('search_fore_something') }}">
@@ -13,8 +13,6 @@
     </form>
 
     <section id="search_content">
-        <!-- Fore fulltext search - remeber only fore post due to it being the only one atually fulltext'ed in the db -->
-        <!-- And remeber to import the db also -->
-        <!-- SELECT * FROM articles WHERE MATCH(title, body) AGAINST('Flask tutorial' WITH QUERY EXPANSION); -->
+        
     </section>
 </main>

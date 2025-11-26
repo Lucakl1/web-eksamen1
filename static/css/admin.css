@@ -33,3 +33,53 @@ admin-bar {
         color: white;
     }
 }
+
+.admin_all_users {
+    grid-column: 1 span / 3;
+    .users {
+        &:has(.users) {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 32px 16px;
+            margin-top: 32px;
+    
+            > div {
+                display: flex;
+                align-items: center;
+                flex-flow: column;
+                gap: 8px;
+    
+                > a {
+                    width: 100px;
+                    height: 100px;
+                    position: relative;
+                    display: block;
+    
+                    img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        border-radius: 100px;
+                    }
+                }
+    
+                div:has(.name) {
+                    width: 100%;
+                    max-width: 130px;
+                    overflow: hidden;
+    
+                    .name {
+                        font-weight: 600;
+                        font-size: 14px;
+                        color: black;
+                        white-space: nowrap;
+                    }
+                }
+            }
+        }
+    }
+    
+    button {
+        margin: 25px auto;
+    }
+}

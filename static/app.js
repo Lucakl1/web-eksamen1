@@ -1,5 +1,6 @@
 function addSelectorButton() {
     document.querySelectorAll(".selector")?.forEach(button => {
+        button.classList.remove("selector");
         button.addEventListener("click", e => {
             e.target.parentNode.classList.toggle("open");
         });

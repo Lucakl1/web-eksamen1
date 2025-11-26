@@ -681,82 +681,87 @@
     },
     "all_bookmarked_posts": {
         "english": "All bookmarked posts",
-        "danish": "",
-        "spanish": ""
+        "danish": "Alle bogmærkede opslag",
+        "spanish": "Todas las publicaciones guardadas"
     },
     "something_happened_and_your_bookmark_did_not_get_saved": {
         "english": "Something happened and your bookmark did not get saved",
-        "danish": "",
-        "spanish": ""
+        "danish": "Der skete en fejl, og dit bogmærke blev ikke gemt",
+        "spanish": "Algo pasó y tu marcador no se guardó"
     },
     "delete_profile": {
         "english": "Delete profile",
-        "danish": "",
-        "spanish": ""
+        "danish": "Slet profil",
+        "spanish": "Eliminar perfil"
     },
     "are_you_sure_click_again": {
         "english": "Are you sure? click again",
-        "danish": "",
-        "spanish": ""
+        "danish": "Er du sikker? klik igen",
+        "spanish": "¿Estás seguro? haz clic de nuevo"
     },
     "you_dont_have_the_authority_to_delete_this_account": {
         "english": "You dont have the authority to delete this account",
-        "danish": "",
-        "spanish": ""
+        "danish": "Du har ikke tilladelse til at slette denne konto",
+        "spanish": "No tienes autoridad para eliminar esta cuenta"
     },
     "your_account_has_been_banned": {
         "english": "Your account has been banned",
-        "danish": "",
-        "spanish": ""
+        "danish": "Din konto er blevet bandlyst",
+        "spanish": "Tu cuenta ha sido suspendida"
     },
     "follow": {
         "english": "Follow",
-        "danish": "",
-        "spanish": ""
+        "danish": "Følg",
+        "spanish": "Seguir"
     },
     "unfollow": {
         "english": "Unfollow",
-        "danish": "",
-        "spanish": ""
+        "danish": "Følg ikke længere",
+        "spanish": "Dejar de seguir"
     },
     "you_cant_follow_yourself": {
         "english": "You can't follow yourself",
-        "danish": "",
-        "spanish": ""
+        "danish": "Du kan ikke følge dig selv",
+        "spanish": "No puedes seguirte a ti mismo"
     },
     "all_following_post": {
         "english": "Last news from the once you follow",
-        "danish": "",
-        "spanish": ""
+        "danish": "Seneste nyt fra dem du følger",
+        "spanish": "Últimas novedades de quienes sigues"
     },
     "search_fore_other_users": {
         "english": "Search fore other users",
-        "danish": "",
-        "spanish": ""
+        "danish": "Søg efter andre brugere",
+        "spanish": "Buscar otros usuarios"
     },
     "recommended_users": {
         "english": "Recommended users",
-        "danish": "",
-        "spanish": ""
+        "danish": "Anbefalede brugere",
+        "spanish": "Usuarios recomendados"
     },
     "explore_other_users_or_posts": {
         "english": "Explore other users or posts",
-        "danish": "",
-        "spanish": ""
+        "danish": "Udforsk andre brugere eller opslag",
+        "spanish": "Explorar otros usuarios o publicaciones"
     },
     "search_for": {
         "english": "Search for",
-        "danish": "",
-        "spanish": ""
+        "danish": "Søg efter",
+        "spanish": "Buscar"
     },
     "search_fore_something": {
         "english": "Search fore something",
-        "danish": "",
-        "spanish": ""
+        "danish": "Søg efter noget",
+        "spanish": "Buscar algo"
     },
     "users": {
         "english": "Users",
-        "danish": "",
-        "spanish": ""
+        "danish": "Brugere",
+        "spanish": "Usuarios"
+    },
+    "more_users": {
+        "english": "More users",
+        "danish": "Flere brugere",
+        "spanish": "Más usuarios"
     }
 }

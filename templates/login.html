@@ -14,7 +14,7 @@
                 <div>
                     <label for="user_language">{{ x.lans('language') }}</label>
                     <div>
-                        <input name="user_language" type="button" id="user_language" class="selector" value="{{ x.lans(x.default_language) }}" placeholder="{{ x.lans('language') }}">
+                        <input name="user_language" type="button" id="user_language" class="selector selector_style" value="{{ x.lans(x.default_language) }}" placeholder="{{ x.lans('language') }}">
                         <option-div>
                             {% if x.default_language != 'danish' %}
                             <a href="/login/danish"><img src="/static/images/flag_danish.png" alt="Danish"> Dansk</a>
