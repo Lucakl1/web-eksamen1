@@ -1234,7 +1234,6 @@ def api_comments():
             cursor.execute(q, (post_pk,))
             post = cursor.fetchone()
 
-
             comment = {}
             comment["comment_pk"] = comment_pk
             comment["post_fk"] = post_pk
@@ -1254,11 +1253,13 @@ def api_comments():
             comment_template = render_template("_comment.html", comment=comment)
             comment_count_template = render_template("___post_comment.html", post=post)
             succes_template = render_template(("global/succes_message.html"), message=x.lans("succes"))
+            post_comment_form = render_template(("___post_comment_form.html"), post_pk=post_pk)
 
             return f""" 
                 <browser mix-top="#all_comments{post_pk}">{comment_template}</browser> 
                 <browser mix-replace="#comment_count{post_pk}">{comment_count_template}</browser>
                 <browser mix-bottom='#succes_message'>{succes_template}</browser>
+                <browser mix-replace='#comments_form{post_pk}'>{post_comment_form}</browser>
             """
 
     except Exception as ex:

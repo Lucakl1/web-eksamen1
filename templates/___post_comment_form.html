@@ -1,0 +1,10 @@
+<form action="/comments?post={{ post_pk }}" mix-post id="comments_form{{ post_pk }}">
+    <label for="comment_message"> {{ x.lans('write_a_comment') }} </label>
+    <textarea name="comment_message" id="comment_message" placeholder="{{ x.lans('tell_the_world_something') }}" mix-check="{{ x.REGEX_COMMENT_MESSAGE }}"></textarea>
+
+    <div>
+        <button mix-default="{{ x.lans('post_comment') }}" mix-await="{{ x.lans('posting...') }}" type="submit" class="main_button">
+            {{ x.lans('post_comment') }}
+        </button>
+    </div>
+</form>
