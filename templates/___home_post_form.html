@@ -1,0 +1,20 @@
+<form action="/make_a_post" mix-post autocomplete="off" enctype="multipart/form-data" id="make_a_post">
+    <label for="post_message"> {{ x.lans('whats_on_your_mind') }} </label>
+    <label for="post_message"> {{ x.lans('post_message') }} <span> - {{ x.POST_MESSAGE_MIN }} {{ x.lans('to') }} {{ x.POST_MESSAGE_MAX }} {{ x.lans('charetors') }} </span></label>
+    <textarea name="post_message" id="post_message" placeholder="{{ x.lans('tell_the_world_something') }}" mix-check="{{ x.REGEX_POST_MESSAGE }}"></textarea>
+    
+    <div class="file_with_submit">
+        <div>
+            <label for="post_media">{{ x.lans('attachments') }} 
+                <span>- {{ x.lans('file_formats') }}: 
+                {% for ext in x.ALLOWED_POST_EXTENSIONS %} 
+                    "{{ ext }}"
+                {% endfor %}</span></label>
+            <input name="post_media" type="file" id="post_media">
+            <span class="remove_media remove_media_style"><i class="fa-solid fa-x"></i></span>        
+        </div>
+        <button mix-default="{{ x.lans('post') }}" mix-await="{{ x.lans('posting...') }}" type="submit" class="main_button">
+            {{ x.lans('post') }}
+        </button>
+    </div>
+</form>

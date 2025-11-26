@@ -42,6 +42,7 @@ body {
 .red_button {
     background: rgb(187, 0, 0);
     color: white;
+    white-space: nowrap;
 
     &:hover {
         background: rgb(154, 0, 0)
@@ -221,7 +222,7 @@ main {
         .info {
             display: flex;
             flex-flow: column nowrap;
-            gap: 16px;
+            gap: 24px;
             width: 100%;
             padding: 0 0 32px calc(var(--profile-avatar-width) + 32px);
             border-bottom: 1px solid var(--border-color);
@@ -251,13 +252,12 @@ main {
                         font-size: 16px;
                         color: #696969;
                     }
-                }
-                
+                } 
             }
 
-            > div:last-child {
+            > div.user_stats {
                 display: flex;
-                justify-content: center;
+                justify-content: flex-start;
                 gap: 32px;
 
                 div {
@@ -266,6 +266,14 @@ main {
                     gap: 6px;
                     text-align: start;
                 }
+
+                p {
+                    color: black;
+                }
+            }
+
+            > div.user_bio {
+                max-width: 400px;
             }
         }
     }
@@ -554,10 +562,6 @@ main {
                 label {
                     padding: 0.75rem 0 0.3rem 0;
                     display: block;
-
-                    span {
-                        color: rgb(71, 71, 71)
-                    }
                 }
                 
                 input, textarea {
@@ -587,6 +591,14 @@ main {
                             width: 100%;
                         }
 
+                        .remove_media_style {
+                            position: absolute;
+                            right: 1.2rem;
+                            bottom: 0.95rem;
+                            background: none;
+                            cursor: pointer;
+                            width: fit-content;
+                        }
                     }
 
                     > div {
@@ -653,7 +665,6 @@ main {
                                 transform: rotate(180deg);
                             }
                         }
-                        
                     }
                 }
 
@@ -708,6 +719,12 @@ main {
                 padding-bottom: 16px;
                 font-size: 20px;
                 font-weight: 600;
+
+                span {
+                    color: rgb(71, 71, 71);
+                    font-size: 14px;
+                    font-weight: 400;
+                }
             }
 
             textarea {
@@ -727,6 +744,7 @@ main {
                 div {
                     display: flex;
                     flex-flow: column;
+                    position: relative;
 
                     label {
                         padding: 0.75rem 0 0.3rem 0;
@@ -743,6 +761,64 @@ main {
                         padding: 0.75rem 1rem;
                         border: 1px solid black;
                         border-radius: 50px;
+                    }
+
+                    .remove_media_style {
+                        position: absolute;
+                        right: 1.2rem;
+                        bottom: 0.95rem;
+                        background: none;
+                        cursor: pointer;
+                    }
+                }
+            }
+        }
+    }
+
+    &.followers_following {
+        &:has(.users) {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 32px 16px;
+            margin-top: 32px;
+            max-width: 850px;
+
+            > div {
+                display: flex;
+                align-items: center;
+                flex-flow: column;
+                gap: 8px;
+
+                > a {
+                    width: 100px;
+                    height: 100px;
+                    position: relative;
+                    display: block;
+    
+                    img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        border-radius: 100px;
+                    }
+                }
+
+                div:has(.name) {
+                    width: 100%;
+                    max-width: 130px;
+                    overflow: hidden;
+                    text-align: center;
+
+                    .name {
+                        font-weight: 600;
+                        font-size: 14px;
+                        color: black;
+                        white-space: nowrap;
+                    }
+
+                    .handle {
+                        font-size: 12px;
+                        color: gray;
                     }
                 }
             }
@@ -892,12 +968,17 @@ main {
                                 color: black;
                                 white-space: nowrap;
                             }
+
+                            .handle {
+                                font-size: 12px;
+                                color: gray;
+                            }
                         }
                     }
                 }
             }
 
-            button {
+            > button {
                 margin: 25px auto;
             }
         }

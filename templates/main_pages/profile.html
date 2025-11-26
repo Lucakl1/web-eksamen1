@@ -31,18 +31,26 @@
                     {% if userprofile['user_username'] == user['user_username'] %}
                     <a class="secoundary_button" mix-get href="/edit_profile">{{ x.lans('edit') }}</a>
                     {% endif %}
-                    <a class="secoundary_button red_button" mix-get href="/delete_profile?user={{ userprofile['user_username'] }}" id="delete_account">{{ x.lans('delete_profile') }}</a>
+                    {% if userprofile['user_deleted_at'] != 0 and user["user_role"] == "admin" %}
+                        <a class="secoundary_button red_button" mix-get href="/unban?user={{ userprofile['user_username'] }}" id="unban">{{ x.lans('unban') }}</a>
+                    {% else %}
+                        <a class="secoundary_button red_button" mix-get href="/delete_profile?user={{ userprofile['user_username'] }}" id="delete_account">{{ x.lans('delete_profile') }}</a>
+                    {% endif %}
                 {% endif %}
             </div>
         </div>
-        <div>
+        <div class="user_stats">
             <div>
-                <p>{{ x.lans('followers') }}</p>
-                <p>{{ userprofile['user_total_followers'] }}</p>
+                <a mix-get href="/followers/{{userprofile['user_username']}}">
+                    <p class="no_event">{{ x.lans('followers') }}</p>
+                    <p class="no_event">{{ userprofile['user_total_followers'] }}</p>
+                </a>
             </div>
             <div>
-                <p>{{ x.lans('following') }}</p>
-                <p>{{ userprofile['user_total_following'] }}</p>
+                <a mix-get href="/following/{{userprofile['user_username']}}">                
+                    <p class="no_event">{{ x.lans('following') }}</p>
+                    <p class="no_event">{{ userprofile['user_total_following'] }}</p>
+                </a>
             </div>
             <div>
                 <p>{{ x.lans('likes') }}</p>
@@ -52,6 +60,9 @@
                 <p>{{ x.lans('posts') }}</p>
                 <p>{{ userprofile['user_total_posts'] }}</p>
             </div>
+        </div>
+        <div class="user_bio">
+            <p>{{ userprofile['user_bio'] }}</p>
         </div>
     </section>
     <section id="posts">

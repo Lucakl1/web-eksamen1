@@ -143,12 +143,16 @@ main {
                         }
 
                     }
-                    
                 }
-    
+
+                &.double_button {
+                    display: flex;
+                    flex-flow: row;
+                    gap: 32px;
+                }
             }
     
-            button {
+            button, .button {
                 margin-top: 1rem;
                 padding: 0.75rem 2rem;
                 width: fit-content;
@@ -157,6 +161,12 @@ main {
                 background: black;
                 color: white;
                 cursor: pointer;
+                position: relative;
+
+                &.off_button {
+                    background: rgb(207, 207, 207);
+                    color: rgb(0, 0, 0);
+                }
             }
         }
 

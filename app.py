@@ -199,6 +199,72 @@ def view_profile(user_username = ""):
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
 
+@app.get("/followers")
+@app.get("/followers/<userprofile>")
+def view_followers(userprofile = ""):
+    try:
+        if userprofile == "": userprofile = session.get("user")["user_username"]
+
+        db, cursor = x.db()
+        cursor.execute("SELECT user_pk FROM users WHERE user_username = %s", (userprofile,))
+        userprofile_user_pk = cursor.fetchone()
+
+        q = "SELECT * FROM users JOIN followers ON user_fk = user_pk WHERE user_follows_fk = %s"
+        cursor.execute(q, (userprofile_user_pk["user_pk"],))
+        userprofile_data = cursor.fetchall()
+
+        html_content_followers = render_template("main_pages/followers_following.html", users=userprofile_data)
+        return f"""
+        <browser mix-replace="#main"> {html_content_followers} </browser> 
+        {x.page_title( x.lans('followers') + " - " + userprofile )}
+        """
+
+    except Exception as ex:
+        ic(ex)
+        error_code = str(ex)
+        error_msg = x.lans('system_under_maintenance')
+        if "x exception - " in error_code:
+            error_msg = error_code.split("x exception - ")[1].split("',")[0].split('",')[0]
+        
+        error_template = render_template(("global/error_message.html"), message=error_msg)
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+@app.get("/following")
+@app.get("/following/<userprofile>")
+def view_following(userprofile = ""):
+    try:
+        if userprofile == "": userprofile = session.get("user")["user_username"]
+
+        db, cursor = x.db()
+        cursor.execute("SELECT user_pk FROM users WHERE user_username = %s", (userprofile,))
+        userprofile_user_pk = cursor.fetchone()
+
+        q = "SELECT * FROM users JOIN followers ON user_follows_fk = user_pk WHERE user_fk = %s"
+        cursor.execute(q, (userprofile_user_pk["user_pk"],))
+        userprofile_data = cursor.fetchall()
+
+        html_content_followers = render_template("main_pages/followers_following.html", users=userprofile_data)
+        return f"""
+        <browser mix-replace="#main"> {html_content_followers} </browser> 
+        {x.page_title( x.lans('following') + " - " + userprofile )}
+        """
+
+    except Exception as ex:
+        ic(ex)
+        error_code = str(ex)
+        error_msg = x.lans('system_under_maintenance')
+        if "x exception - " in error_code:
+            error_msg = error_code.split("x exception - ")[1].split("',")[0].split('",')[0]
+        
+        error_template = render_template(("global/error_message.html"), message=error_msg)
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
 @app.route("/edit_profile", methods=["GET", "POST"])
 def view_edit_profile():
     try:
@@ -247,9 +313,16 @@ def view_edit_profile():
 
             succes_template = render_template(("global/succes_message.html"), message=x.lans("succes"))
             profile_tag = render_template(("___profile_tag.html"))
+
+            cursor.execute("SELECT COUNT(*) as total FROM posts JOIN users ON user_pk = user_fk WHERE post_deleted_at = 0 AND user_username = %s", (user_username,))
+            count = cursor.fetchone()["total"]
+            session["max_number_of_posts"] = int(count)
+
+            html_content_profile = render_template(("main_pages/profile.html"), userprofile=user, count=count)
             return f"""
                 <browser mix-bottom='#succes_message'>{succes_template}</browser>
                 <browser mix-replace='#profile_tag'>{profile_tag}</browser>
+                <browser mix-replace='#main'>{html_content_profile}</browser>
             """
 
     except Exception as ex:
@@ -577,7 +650,13 @@ def view_reset_password(lan = "english"):
             if cursor.rowcount != 1: raise Exception(f"x exception - {x.lans('cannot_verify_user')}", 400)
             db.commit()
 
-            return f"""<browser mix-redirect="/login"></browser>""", 200
+            html_content_login = render_template("login.html")
+            succes_template = render_template(("global/succes_message.html"), message=f"{x.lans('password_reset')}")
+
+            return f"""
+                <browser mix-replace="main">{html_content_login}</browser>
+                <browser mix-bottom='#succes_message'>{succes_template}</browser>
+            """
 
     except Exception as ex:
         ic(ex)
@@ -645,6 +724,55 @@ def api_delete_profile_confirm():
         db.commit()
         
         return """<browser mix-redirect="/logout"></browser>"""
+
+    except Exception as ex:
+        ic(ex)
+        error_code = str(ex)
+        error_msg = x.lans('system_under_maintenance')
+        if "x exception - " in error_code:
+            error_msg = error_code.split("x exception - ")[1].split("',")[0].split('",')[0]
+        
+        error_template = render_template(("global/error_message.html"), message=error_msg)
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+@app.get("/unban")
+def api_unban():
+    try:
+        user = session.get("user", "")
+        user_username = request.args.get("user", "")
+
+        if "admin" in user['user_role']:
+            db, cursor = x.db()
+            
+            q = "UPDATE users SET user_deleted_at = %s WHERE user_username = %s"
+            cursor.execute(q, (0, user_username))
+            db.commit()
+
+            q = "SELECT * FROM users WHERE user_username = %s"
+            cursor.execute(q, (user_username,))
+            unbanned_user = cursor.fetchone()
+            
+            x.default_language = unbanned_user["user_language"]
+            html_content_unban_account_template = render_template("___email_account_unbanned.html", user=unbanned_user)
+            x.send_email(unbanned_user['user_email'], f"{x.lans('your_account_has_been_unbanned')}", html_content_unban_account_template)
+            x.default_language = user["user_language"]
+        
+            cursor.execute("SELECT COUNT(*) as total FROM posts JOIN users ON user_pk = user_fk WHERE post_deleted_at = 0 AND user_username = %s", (user_username,))
+            count = cursor.fetchone()["total"]
+            session["max_number_of_posts"] = int(count)
+
+            succes_template = render_template(("global/succes_message.html"), message=x.lans("succes"))
+            html_content_user_profile = render_template("main_pages/profile.html", userprofile=unbanned_user, count=count)
+            return f"""
+            <browser mix-replace="#main">{html_content_user_profile}</browser>
+            <browser mix-bottom='#succes_message'>{succes_template}</browser>
+            """
+    
+        error_template = render_template(("global/error_message.html"), message=x.lans("you_are_not_an_admin"))
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
 
     except Exception as ex:
         ic(ex)
@@ -881,13 +1009,17 @@ def api_make_a_post():
         post["user_last_name"] = user["user_last_name"]
         post["user_created_at"] = user["user_created_at"]
         post["user_bio"] = user["user_bio"]
+        post["user_pk"] = user["user_pk"]
         if post_media != "": post["post_media_type"] = post_media_type["post_media_type_type"]
 
-        post = render_template("_post.html", post=post)
+        html_content_post = render_template("_post.html", post=post)
+        html_content_home_post_form = render_template("___home_post_form.html", post=post)
+        succes_template = render_template(("global/succes_message.html"), message=x.lans("succes"))
+        
         return f"""
-            <browser mix-top='#posts'>
-                {post}
-            </browser>
+            <browser mix-top='#posts'>{html_content_post}</browser>
+            <browser mix-replace='#make_a_post'>{html_content_home_post_form}</browser>
+            <browser mix-bottom='#succes_message'>{succes_template}</browser>
         """
     except Exception as ex:
         ic(ex)
@@ -1793,8 +1925,6 @@ def view_verify_account():
 
         q = "UPDATE users SET user_varified_at = %s WHERE user_pk = %s" 
         cursor.execute(q, (user_verified_at, user_fk))
-
-        if cursor.rowcount != 1: raise Exception(f"x exception - {x.lans('cannot_verify_user')}", 400)
         db.commit()
 
         return redirect( url_for('login') )

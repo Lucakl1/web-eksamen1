@@ -5,24 +5,7 @@
         {% else %}
         <img src="{{ url_for('static', filename='uploads/'~user['user_avatar']) }}" alt="" class="profile_img">
         {% endif %}
-        <form action="/make_a_post" mix-post autocomplete="off" enctype="multipart/form-data">
-            <label for="post_message"> {{ x.lans('whats_on_your_mind') }} </label>
-            <textarea name="post_message" id="post_message" placeholder="{{ x.lans('tell_the_world_something') }}" mix-check="{{ x.REGEX_POST_MESSAGE }}"></textarea>
-            
-            <div class="file_with_submit">
-                <div>
-                    <label for="post_media">{{ x.lans('attachments') }} 
-                        <span>- {{ x.lans('file_formats') }}: 
-                        {% for ext in x.ALLOWED_POST_EXTENSIONS %} 
-                            "{{ ext }}"
-                        {% endfor %}</span></label>
-                    <input name="post_media" type="file" id="post_media">         
-                </div>
-                <button mix-default="{{ x.lans('post') }}" mix-await="{{ x.lans('posting...') }}" type="submit" class="main_button">
-                    {{ x.lans('post') }}
-                </button>
-            </div>
-        </form>
+        {% include "___home_post_form.html" %}
     </section>
 
     <section id="posts">

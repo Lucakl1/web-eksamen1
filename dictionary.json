@@ -763,5 +763,35 @@
         "english": "More users",
         "danish": "Flere brugere",
         "spanish": "Más usuarios"
+    },
+    "post_message": {
+        "english": "Post message",
+        "danish": "",
+        "spanish": ""
+    },
+    "back_to_login": {
+        "english": "Back to login",
+        "danish": "",
+        "spanish": ""
+    },
+    "password_reset": {
+        "english": "Password reset",
+        "danish": "",
+        "spanish": ""
+    },
+    "unban": {
+        "english": "Unban",
+        "danish": "",
+        "spanish": ""
+    },
+    "you_are_not_an_admin": {
+        "english": "You are not an admin",
+        "danish": "",
+        "spanish": ""
+    },
+    "your_account_has_been_unbanned": {
+        "english": "Your account has been unbanned",
+        "danish": "",
+        "spanish": ""
     }
 }

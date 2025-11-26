@@ -12,6 +12,16 @@ function addSelectorButton() {
 }
 addSelectorButton();
 
+function removeMediaButton() {
+    document.querySelectorAll(".remove_media")?.forEach(button => {
+        button.classList.remove("remove_media");
+        button.addEventListener("click", e => {
+            e.target.parentNode.parentNode.querySelector('input[type="file"]').value = null;
+        });
+    });
+}
+removeMediaButton();
+
 function previewEditProfileImage() {
     document.getElementById("user_avatar")?.addEventListener("change", function (event) {
         const file = event.target.files[0];
@@ -38,7 +48,7 @@ window.addEventListener("scroll", () => {
     if(!button) return
     const buttonTop = button.getBoundingClientRect().top;
     const winHeight = window.innerHeight;
-    if (buttonTop <= winHeight && canClick) {
+    if (buttonTop <= winHeight + 300 && canClick) {
         button.click()
         canClick = false;
     }
@@ -66,6 +76,7 @@ document.querySelectorAll("nav ul li a")?.forEach(link => {
 const observer = new MutationObserver( () => {
     addSelectorButton();
     previewEditProfileImage();
+    removeMediaButton();
 });
 
 const mainContainer = document.querySelector("body");

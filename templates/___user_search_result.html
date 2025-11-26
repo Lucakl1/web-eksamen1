@@ -7,8 +7,10 @@
         {% endif %}
     </a>
     <div>
-        <p class="name">{{ rec_user['user_first_name'] }} {{ rec_user['user_last_name'] }}</p>
-        <p class="handle">@{{ rec_user['user_username'] }}</p>
+        <a href="/profile/{{ rec_user['user_username'] }}" mix-get>
+            <p class="name no_event">{{ rec_user['user_first_name'] }} {{ rec_user['user_last_name'] }}</p>
+            <p class="handle no_event">@{{ rec_user['user_username'] }}</p>
+        </a>
     </div>
     {% set userprofile = rec_user %}
     {% include "___profile_follow_button.html" %}
