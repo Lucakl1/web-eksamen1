@@ -114,7 +114,7 @@ def view_index():
         return render_template("index.html", posts=posts, recommended_users=recommended_users)
     except Exception as ex:
         ic(ex)
-        return "error"
+        return x.lans('system_under_maintenance')
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
@@ -140,7 +140,7 @@ def view_home():
         """
     except Exception as ex:
         ic(ex)
-        return "error"
+        return x.lans('system_under_maintenance')
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
@@ -155,7 +155,7 @@ def view_explore():
         """
     except Exception as ex:
         ic(ex)
-        return "error"
+        return x.lans('system_under_maintenance')
     finally:
         pass
 
@@ -192,7 +192,7 @@ def view_profile(user_username = ""):
         """
     except Exception as ex:
         ic(ex)
-        error_msg = "error"
+        error_msg = x.lans('system_under_maintenance')
         error_template = render_template(("global/error_message.html"), message=error_msg)
         return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
     finally:
@@ -363,7 +363,7 @@ def view_bookmark():
         """
     except Exception as ex:
         ic(ex)
-        return "error"
+        return x.lans('system_under_maintenance')
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
@@ -390,7 +390,7 @@ def view_notifications():
         """
     except Exception as ex:
         ic(ex)
-        return "error"
+        return x.lans('system_under_maintenance')
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
@@ -410,13 +410,12 @@ def login(lan = "english"):
         if request.method == "GET":
             try:
                 if session.get("user", ""): return redirect("/")
-                return render_template("login.html")
+                return render_template("main_pages/login.html")
             except Exception as ex:
                 ic(ex)
-                return "error"
+                return x.lans('system_under_maintenance')
 
         if request.method == "POST":
-
             user_email_or_username = request.form.get("user_email_username", "").strip()
 
             if "@" in user_email_or_username:
@@ -487,10 +486,10 @@ def signup(lan = "english"):
         if request.method == "GET":
             try:
                 if session.get("user", ""): return redirect("/")
-                return render_template("signup.html")
+                return render_template("main_pages/signup.html")
             except Exception as ex:
                 ic(ex)
-                return "error"
+                return x.lans('system_under_maintenance')
 
         if request.method == "POST":
             user_email = x.validate_user_email()
@@ -508,18 +507,18 @@ def signup(lan = "english"):
 
             q = "INSERT INTO users (user_first_name, user_last_name, user_username, user_email, user_password, user_language, user_created_at) VALUES (%s, %s, %s, %s, %s, %s, %s)"
             
-            cursor.execute(q, ( user_first_name, user_last_name, user_username, user_email, encrypted_user_password, x.default_language, current_time))            
+            cursor.execute(q, (user_first_name, user_last_name, user_username, user_email, encrypted_user_password, x.default_language, current_time))
             
             user_pk = cursor.lastrowid
             user_uuid = uuid.uuid4().hex
 
             q = "INSERT INTO not_verifyed_accounts VALUES(%s, %s)"
             cursor.execute(q, (user_pk, user_uuid))
-            db.commit()
 
             # send verification email
             email_verify_account = render_template("___email_verify_account.html", user_verification_key=user_uuid)
             x.send_email(user_email, x.lans('verify_your_account'), email_verify_account)
+            db.commit()
             
             return f"""<browser mix-redirect="/"></browser>""", 200
 
@@ -532,11 +531,41 @@ def signup(lan = "english"):
         if "x exception - " in error_code:
             error_msg = error_code.split("x exception - ")[1].split("',")[0].split('",')[0]
 
+        if "Duplicate entry" in error_code and "user_email" in error_code:
+            try:
+                q = "SELECT user_deleted_at, user_pk, user_banned_at FROM users LEFT JOIN user_admin_bans ON user_pk = user_fk WHERE user_email = %s"
+                cursor.execute(q, (user_email,))
+                prev_user = cursor.fetchone()
+                user_pk = prev_user['user_pk']
+
+                if prev_user["user_banned_at"]:
+                    ic("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+                    error_msg = x.lans("user_has_been_banned")
+                elif prev_user["user_deleted_at"] == 0:
+                    error_msg = x.lans("email_allready_in_system")
+                else:
+                    q = "UPDATE users SET user_first_name = %s, user_last_name = %s, user_username = %s, user_password = %s, user_language = %s, user_created_at = %s, user_deleted_at = 0, user_varified_at = 0 WHERE user_pk = %s"
+                    cursor.execute(q, (user_first_name, user_last_name, user_username, encrypted_user_password, x.default_language, current_time, user_pk))            
+
+                    user_uuid = uuid.uuid4().hex
+
+                    q = "INSERT INTO not_verifyed_accounts VALUES(%s, %s)"
+                    cursor.execute(q, (user_pk, user_uuid))
+
+                    # send verification email
+                    email_verify_account = render_template("___email_re_verify_account.html", user_verification_key=user_uuid)
+                    x.send_email(user_email, x.lans('verify_your_account'), email_verify_account)
+                    db.commit()
+
+                    return f"""<browser mix-redirect="/"></browser>""", 200
+
+            except Exception as ex:
+                ic(ex)
+                if "db" in locals(): db.rollback()
+                error_msg = x.lans("email_allready_in_system")
+
         if "Duplicate entry" in error_code and "user_username" in error_code:
             error_msg = x.lans("username_allready_in_system")
-
-        if "Duplicate entry" in error_code and "user_email" in error_code:
-            error_msg = x.lans("email_allready_in_system")
         
         error_template = render_template(("global/error_message.html"), message=error_msg)
         return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
@@ -650,7 +679,7 @@ def view_reset_password(lan = "english"):
             if cursor.rowcount != 1: raise Exception(f"x exception - {x.lans('cannot_verify_user')}", 400)
             db.commit()
 
-            html_content_login = render_template("login.html")
+            html_content_login = render_template("main_pages/login.html")
             succes_template = render_template(("global/succes_message.html"), message=f"{x.lans('password_reset')}")
 
             return f"""
@@ -687,7 +716,7 @@ def api_delete_profile():
         """
     except Exception as ex:
         ic(ex)
-        return "error"
+        return x.lans('system_under_maintenance')
 
 @app.delete("/delete_profile_confirm")
 def api_delete_profile_confirm():
@@ -699,13 +728,16 @@ def api_delete_profile_confirm():
         db, cursor = x.db()
         if user_username != user["user_username"]:
             if "admin" in user['user_role']:
-                cursor.execute("SELECT user_email, user_first_name, user_last_name FROM users WHERE user_username = %s", (user_username,))
+                cursor.execute("SELECT user_email, user_first_name, user_last_name, user_pk FROM users WHERE user_username = %s", (user_username,))
                 user = cursor.fetchone()
 
                 delete_account_template = render_template("___email_account_deleted.html", user=user)
 
                 q = "UPDATE users SET user_deleted_at = %s WHERE user_username = %s"
                 cursor.execute(q, (current_time, user_username))
+
+                q = "INSERT into user_admin_bans (user_fk, user_banned_at) VALUES(%s, %s)"
+                cursor.execute(q, (user["user_pk"], current_time))
                 db.commit()
 
                 x.send_email(user['user_email'], f"{x.lans('your_account_has_been_banned')}", delete_account_template)
@@ -747,8 +779,12 @@ def api_unban():
         if "admin" in user['user_role']:
             db, cursor = x.db()
             
+            db.start_transaction()
             q = "UPDATE users SET user_deleted_at = %s WHERE user_username = %s"
             cursor.execute(q, (0, user_username))
+
+            q = "DELETE FROM user_admin_bans WHERE user_fk = (SELECT user_pk FROM users WHERE user_username = %s)"
+            cursor.execute(q, (user_username,))
             db.commit()
 
             q = "SELECT * FROM users WHERE user_username = %s"
@@ -1168,7 +1204,7 @@ def api_delete_post():
 
         if post["user_fk"] != user["user_pk"]:
             if "admin" in user['user_role']:
-                q = "SELECT * FROM posts JOIN users ON user_pk = user_fk WHERE post_pk = %s"
+                q = "SELECT user_first_name, user_last_name, user_language, post_message FROM posts JOIN users ON user_pk = user_fk WHERE post_pk = %s"
                 cursor.execute(q, (post_pk,))
                 post = cursor.fetchone()
 
@@ -1469,7 +1505,7 @@ def api_aside_user_search():
         return f"""<browser mix-replace="#search_results"> {recommended_users_template} </browser>"""
     except Exception as ex:
         ic(ex)
-        return "error"
+        return x.lans('system_under_maintenance')
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
@@ -1537,7 +1573,7 @@ def api_make_a_search_request():
         </browser>"""
     except Exception as ex:
         ic(ex)
-        return "error"
+        return x.lans('system_under_maintenance')
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
@@ -1770,7 +1806,7 @@ def get_data_from_sheet():
         ################
         user = session.get("user", "")
         if not user:
-            return redirect("/login")
+            return redirect(url_for('login'))
 
         if "admin" not in user['user_role']:
             return redirect("/")
@@ -1827,7 +1863,7 @@ def get_admin_all_users():
         ################
         user = session.get("user", "")
         if not user:
-            return redirect("/login")
+            return redirect(url_for('login'))
 
         if "admin" not in user['user_role']:
             return redirect("/")
@@ -1868,7 +1904,7 @@ def api_admin_all_users():
         ################
         user = session.get("user", "")
         if not user:
-            return redirect("/login")
+            return redirect(url_for('login'))
 
         if "admin" not in user['user_role']:
             return redirect("/")
@@ -1928,7 +1964,7 @@ def view_verify_account():
         cursor.execute(q, (user_verified_at, user_fk))
         db.commit()
 
-        return redirect( url_for('login') )
+        return redirect(url_for('login'))
     except Exception as ex:
         ic(ex)
         if "db" in locals(): db.rollback()  

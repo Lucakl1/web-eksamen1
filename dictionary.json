@@ -793,5 +793,30 @@
         "english": "Your account has been unbanned",
         "danish": "Din konto er blevet afbandlyst",
         "spanish": "Tu cuenta ha sido desbaneada"
+    },
+    "welcome_back_to": {
+        "english": "Welcome back to",
+        "danish": "",
+        "spanish": ""
+    },
+    "dont_worry_we_remeber_you": {
+        "english": "Don't worry, we remeber you!",
+        "danish": "",
+        "spanish": ""
+    },
+    "your_account_will_remeber_your_previus_posts_and_comments": {
+        "english": "Your account will remeber your previus posts and comments",
+        "danish": "",
+        "spanish": ""
+    },
+    "user_has_been_banned": {
+        "english": "User has been banned",
+        "danish": "",
+        "spanish": ""
+    },
+    "email_allready_in_system": {
+        "english": "Email allready in system",
+        "danish": "",
+        "spanish": ""
     }
 }

@@ -179,7 +179,7 @@ def validate_file(file, allowed_extenstions, allowed_mime_types, max_filesize_mb
     file.seek(0, 2)
     file_size = file.tell()
     # 1048576 = 1MB
-    if file_size > max_filesize_mb * 1048576 :
+    if file_size > max_filesize_mb * 1048576:
         raise Exception(f"x exception - {lans('file_exceeds_max_size_of')} {max_filesize_mb} MB", 400)
     file.seek(0)
 
@@ -225,7 +225,6 @@ def validate_user_avatar():
 ALLOWED_BANNER_EXTENSIONS = {"png", "jpg", "jpeg", "webp"}
 ALLOWED_BANNER_MIME_TYPES = {"image/png", "image/jpeg", "image/webp"}
 MAX_BANNER_FILESIZE_MB = 5
-
 def validate_user_banner():
     user_banner = request.files.get("user_banner", "")
     if not user_banner or user_banner.filename == "" or user_banner.content_type == "application/octet-stream": return ""
