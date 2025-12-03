@@ -1532,8 +1532,9 @@ def api_make_a_search_request():
         if search_for == "users":
             search_value = f"{search_value}%"
             cursor.execute("""SELECT COUNT(*) as total FROM users 
-                           WHERE users.user_pk != %s AND (user_username LIKE %s OR user_first_name LIKE %s OR user_last_name LIKE %s) 
-                           AND user_deleted_at = 0""", (user_pk, search_value, search_value, search_value))        
+                WHERE users.user_pk != %s AND (user_username LIKE %s OR user_first_name LIKE %s OR user_last_name LIKE %s) 
+                AND user_deleted_at = 0""", 
+                (user_pk, search_value, search_value, search_value))        
             count = int(cursor.fetchone()["total"])
             session["max_number_of_posts"] = int(count)
 
