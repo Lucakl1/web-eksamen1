@@ -15,6 +15,8 @@ import re, json, os, uuid
 ########### Set up ###########
 google_spread_sheet_key = "1UYgE2jJ__HYl0N7lA5JR3sMH75hwhzhPPsSRRA-WNdg"
 base_url = "https://lucaklaeoe.eu.pythonanywhere.com" if "PYTHONANYWHERE_DOMAIN" in os.environ else "http://127.0.0.1"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+upload_folder_path = os.path.join(BASE_DIR, "static", "uploads")
 allowed_languages = ["english", "danish", "spanish"]
 default_language = "english"
 MAGIC_BYTES = {
@@ -40,8 +42,7 @@ MAGIC_BYTES = {
 ###### Helper functions ######
 ##############################
 def lans(key):
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(base_dir, "dictionary.json")
+    file_path = os.path.join(BASE_DIR, "dictionary.json")
 
     with open(file_path, 'r', encoding='utf-8') as file:
         data = json.load(file)
@@ -163,7 +164,6 @@ def validate_user_password_confirm():
     return user_password_confirm
 
 ##############################
-upload_folder_path = "static/uploads"
 def validate_file(file, allowed_extenstions, allowed_mime_types, max_filesize_mb):
 
     if file.content_type == "application/octet-stream":
