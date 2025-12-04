@@ -818,5 +818,10 @@
         "english": "Email allready in system",
         "danish": "",
         "spanish": ""
+    },
+    "restore_post": {
+        "english": "Restore post",
+        "danish": "",
+        "spanish": ""
     }
 }

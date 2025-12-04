@@ -42,33 +42,33 @@ def logout():
 
 ##############################
 ##############################
-@app.route("/test", methods=["GET","POST"])
-@app.route("/test/<test_name>", methods=["GET","POST"])
-def view_tests(test_name = "all"):
-    try:
-        if test_name == "all":
-            all_the_html = ""
-            templates_path = os.listdir(os.path.join(app.root_path, 'templates/test'))
-            for file in templates_path:
-                all_the_html += render_template(f"test/{file}")
-            return all_the_html
-        return render_template(f"test/{test_name}.html")
-    except:
-        return "either no pages was found, or an error in the code"
+# @app.route("/test", methods=["GET","POST"])
+# @app.route("/test/<test_name>", methods=["GET","POST"])
+# def view_tests(test_name = "all"):
+#     try:
+#         if test_name == "all":
+#             all_the_html = ""
+#             templates_path = os.listdir(os.path.join(app.root_path, 'templates/test'))
+#             for file in templates_path:
+#                 all_the_html += render_template(f"test/{file}")
+#             return all_the_html
+#         return render_template(f"test/{test_name}.html")
+#     except:
+#         return "either no pages was found, or an error in the code"
     
-@app.post('/upload')
-def upload_file():
-    if 'file' not in request.files:
-        return 'No file part'
+# @app.post('/upload')
+# def upload_file():
+#     if 'file' not in request.files:
+#         return 'No file part'
     
-    file = request.files['file']
+#     file = request.files['file']
     
-    if file.filename == '':
-        return 'No selected file'
+#     if file.filename == '':
+#         return 'No selected file'
     
-    # til senere sæt en path i x filen UPLOAD_ITEM_FOLDER = './images'
-    file.save(os.path.join("static/uploads", file.filename))
-    return redirect("/test")
+#     # til senere sæt en path i x filen UPLOAD_ITEM_FOLDER = './images'
+#     file.save(os.path.join("static/uploads", file.filename))
+#     return redirect("/test")
 ##############################
 ##############################
 
@@ -1875,14 +1875,11 @@ def get_admin_all_users():
         cursor.execute(q)
         all_user_count = int(cursor.fetchone()["total"])
  
-        q = "SELECT * FROM users LIMIT 30"
+        q = "SELECT * FROM users ORDER BY user_created_at ASC LIMIT 30"
         cursor.execute(q)
         all_users = cursor.fetchall()
 
-
         template_fore_all_users = render_template("_____admin_all_users.html", users=all_users, all_user_count=all_user_count)
-
-        header = render_template("global/header.html")
 
         return f""" <browser mix-replace="#main">
             <main id="main" class="admin_all_users"> 
@@ -1915,7 +1912,7 @@ def api_admin_all_users():
         total_count = int(request.args.get("total_count", ""))
  
         db, cursor = x.db()
-        q = "SELECT * FROM users LIMIT 30 OFFSET %s"
+        q = "SELECT * FROM users ORDER BY user_created_at ASC LIMIT 30 OFFSET %s"
         cursor.execute(q, (next_users_count,))
         all_users = cursor.fetchall()
 
@@ -1941,6 +1938,145 @@ def api_admin_all_users():
     except Exception as ex:
         ic(ex)
         return str(ex)
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+@app.get("/get_admin_all_posts")
+def get_admin_all_posts():
+    try:
+        # Validate user is admin
+        ################
+        user = session.get("user", "")
+        if not user:
+            return redirect(url_for('login'))
+
+        if "admin" not in user['user_role']:
+            return redirect("/")
+        ################
+
+        db, cursor = x.db()
+        q = "SELECT COUNT(*) as total FROM posts"
+        cursor.execute(q)
+        all_posts_count = int(cursor.fetchone()["total"])
+ 
+        q = "SELECT * FROM posts JOIN users ON user_fk = user_pk ORDER BY post_created_at DESC LIMIT 10"
+        cursor.execute(q)
+        all_posts = cursor.fetchall()
+
+
+        template_fore_all_users = render_template("_____admin_all_posts.html", posts=all_posts, all_posts_count=all_posts_count)
+
+        return f""" <browser mix-replace="#main">
+            <main id="main" class="admin_all_posts"> 
+                {template_fore_all_users}
+            </main>
+            </browser>
+        """
+
+    except Exception as ex:
+        ic(ex)
+        return str(ex)
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+@app.get("/admin_all_more_posts")
+def admin_all_more_posts():
+    try:
+        # Validate user is admin
+        ################
+        user = session.get("user", "")
+        if not user:
+            return redirect(url_for('login'))
+
+        if "admin" not in user['user_role']:
+            return redirect("/")
+        ################
+
+        next_posts_count = int(request.args.get("current_count", ""))
+        total_count = int(request.args.get("total_count", ""))
+ 
+        db, cursor = x.db()
+        q = "SELECT * FROM posts JOIN users ON user_fk = user_pk ORDER BY post_created_at DESC LIMIT 10 OFFSET %s"
+        cursor.execute(q, (next_posts_count,))
+        all_posts = cursor.fetchall()
+
+        template_fore_all_posts = render_template("_____admin_more_posts.html", posts=all_posts)
+
+        next_posts_count = next_posts_count + 10
+
+        remove_more_button = f"""
+            <browser mix-replace='#auto_show_more'>
+                <button href="/admin_all_more_posts?total_count={total_count}&current_count={ next_posts_count }" mix-get mix-default="{ x.lans('more_posts') }" mix-await="{ x.lans('loading...') }" class="main_button" id="auto_show_more">
+                    { x.lans('more_posts') }
+                </button>
+            </browser>"""
+        
+        if total_count <= next_posts_count: 
+            remove_more_button = f"<browser mix-remove='#auto_show_more'></browser>"
+
+        return f""" 
+            <browser mix-bottom="#posts">{template_fore_all_posts}</browser>
+            {remove_more_button}
+        """
+
+    except Exception as ex:
+        ic(ex)
+        return str(ex)
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+@app.delete("/admin_delete_post")
+def api_admin_delete_post():
+    try:
+        post_pk = request.args.get("post", "")
+        current_time = int(time.time())
+
+        db, cursor = x.db()
+        q = "UPDATE posts SET post_deleted_at = %s WHERE post_pk = %s" 
+        cursor.execute(q, (current_time, post_pk))
+        db.commit()
+
+        new_button = f""" 
+            <a href="/admin_restore_post?post={ post_pk }" mix-put class="delete" id="admin_post_delete{ post_pk }"> { x.lans("restore_post") } </a>
+        """
+        succes_template = render_template(("global/succes_message.html"), message=x.lans("succes"))
+        return f"""
+        <browser mix-replace='#admin_post_delete{post_pk}'> {new_button}</browser>
+        <browser mix-bottom='#succes_message'>{succes_template}</browser>
+        """
+    except Exception as ex:
+        ic(ex)
+        error_template = render_template(("global/error_message.html"), message=x.lans("error_please_try_again"))
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
+    finally:
+        if "cursor" in locals(): cursor.close()
+        if "db" in locals(): db.close()
+
+@app.put("/admin_restore_post")
+def api_admin_restore_post():
+    try:
+        post_pk = request.args.get("post", "")
+
+        db, cursor = x.db()
+        q = "UPDATE posts SET post_deleted_at = %s WHERE post_pk = %s" 
+        cursor.execute(q, (0, post_pk))
+        db.commit()
+
+        new_button = f""" 
+            <a href="/admin_delete_post?post={ post_pk }" mix-delete class="delete" id="admin_post_delete{ post_pk }"> { x.lans("remove_post") } </a>
+        """
+        succes_template = render_template(("global/succes_message.html"), message=x.lans("succes"))
+        return f"""
+        <browser mix-replace='#admin_post_delete{post_pk}'> {new_button}</browser>
+        <browser mix-bottom='#succes_message'>{succes_template}</browser>
+        """
+    except Exception as ex:
+        ic(ex)
+        error_template = render_template(("global/error_message.html"), message=x.lans("error_please_try_again"))
+        return f"""<browser mix-bottom='#error_response'>{ error_template }</browser>"""
     finally:
         if "cursor" in locals(): cursor.close()
         if "db" in locals(): db.close()
