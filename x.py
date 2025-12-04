@@ -14,6 +14,7 @@ import re, json, os, uuid
 
 ########### Set up ###########
 google_spread_sheet_key = "1UYgE2jJ__HYl0N7lA5JR3sMH75hwhzhPPsSRRA-WNdg"
+base_url = "https://lucaklaeoe.eu.pythonanywhere.com" if "PYTHONANYWHERE_DOMAIN" in os.environ else "http://127.0.0.1"
 allowed_languages = ["english", "danish", "spanish"]
 default_language = "english"
 MAGIC_BYTES = {
@@ -39,7 +40,10 @@ MAGIC_BYTES = {
 ###### Helper functions ######
 ##############################
 def lans(key):
-    with open("dictionary.json", 'r', encoding='utf-8') as file:
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(base_dir, "dictionary.json")
+
+    with open(file_path, 'r', encoding='utf-8') as file:
         data = json.load(file)
     return data[key][default_language]
 
@@ -49,7 +53,7 @@ def db():
         host = "lucaklaeoe.mysql.eu.pythonanywhere-services.com" if "PYTHONANYWHERE_DOMAIN" in os.environ else "mariadb"
         user = "lucaklaeoe" if "PYTHONANYWHERE_DOMAIN" in os.environ else "root"
         password = "MyPasswordForYou" if "PYTHONANYWHERE_DOMAIN" in os.environ else "eksamen312luca"
-        database = "lucaklaeoe$default" if "PYTHONANYWHERE_DOMAIN" in os.environ else "x"
+        database = "lucaklaeoe$x" if "PYTHONANYWHERE_DOMAIN" in os.environ else "x"
 
         db = mysql.connector.connect(
             host = host,

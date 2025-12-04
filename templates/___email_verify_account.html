@@ -1,6 +1,6 @@
 <h1>
         {{ x.lans('welcome_to')}} X
 </h1>
-<a href="http://127.0.0.1/verify-account?key={{ user_verification_key }}">
+<a href="{{ x.base_url }}/verify-account?key={{ user_verification_key }}">
     <span style="color: black; text-decoration: none;">{{ x.lans("to_verify_your_account_please_click") }}</span> {{ x.lans("here") }}
 </a>
