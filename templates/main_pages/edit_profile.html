@@ -3,13 +3,13 @@
         {% if user['user_banner'] == 'default_banner.jpg' %}
         <img src="{{ url_for('static', filename='images/'~user['user_banner']) }}" alt="" class="banner_img">
         {% else %}
-        <img src="{{ url_for('static', filename='uploads/'~user['user_banner']) }}" alt="" class="banner_img">
+        <img src="{{ url_for('static', filename='users_uploads/'~user['user_banner']) }}" alt="" class="banner_img">
         {% endif %}
         
         {% if user['user_avatar'] == 'default.svg' %}
         <img src="{{ url_for('static', filename='images/'~user['user_avatar']) }}" alt="" class="profile_img">
         {% else %}
-        <img src="{{ url_for('static', filename='uploads/'~user['user_avatar']) }}" alt="" class="profile_img">
+        <img src="{{ url_for('static', filename='users_uploads/'~user['user_avatar']) }}" alt="" class="profile_img">
         {% endif %}
         
     </section>

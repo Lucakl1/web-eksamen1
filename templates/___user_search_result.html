@@ -3,7 +3,7 @@
         {% if rec_user['user_avatar'] == 'default.svg' %}
         <img src="{{ url_for('static', filename='images/'~rec_user['user_avatar']) }}" alt="" class="profile_img no_event">
         {% else %}
-        <img src="{{ url_for('static', filename='uploads/'~rec_user['user_avatar']) }}" alt="" class="profile_img no_event">
+        <img src="{{ url_for('static', filename='users_uploads/'~rec_user['user_avatar']) }}" alt="" class="profile_img no_event">
         {% endif %}
     </a>
     <div>

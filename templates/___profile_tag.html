@@ -2,7 +2,7 @@
     {% if user['user_avatar'] == 'default.svg' %}
     <img src="{{ url_for('static', filename='images/'~user['user_avatar']) }}" alt="Profile">
     {% else %}
-    <img src="{{ url_for('static', filename='uploads/'~user['user_avatar']) }}" alt="Profile">
+    <img src="{{ url_for('static', filename='users_uploads/'~user['user_avatar']) }}" alt="Profile">
     {% endif %}
     <div>
         <div class="name">

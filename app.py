@@ -286,19 +286,36 @@ def view_edit_profile():
             user_bio = x.validate_user_bio()
             current_time = int(time.time())
 
+            db, cursor = x.db()
+            
             if user_avatar != "":
-                user_avatar.save(os.path.join(x.upload_folder_path, user_avatar.filename))
+                user_avatar.save(os.path.join(x.upload_user_folder_path, user_avatar.filename))
                 user_avatar = user_avatar.filename
+
+                q = "SELECT user_avatar FROM users WHERE user_pk = %s"
+                cursor.execute(q, (user["user_pk"],))
+                user_avatar_url = cursor.fetchone()["user_avatar"]
+
+                old_path = os.path.join(x.upload_user_folder_path, user_avatar_url)
+                if os.path.exists(old_path):
+                    os.remove(old_path)
             else:
                 user_avatar = user['user_avatar']
 
             if user_banner != "":
-                user_banner.save(os.path.join(x.upload_folder_path, user_banner.filename))
+                user_banner.save(os.path.join(x.upload_user_folder_path, user_banner.filename))
                 user_banner = user_banner.filename
+
+                q = "SELECT user_banner FROM users WHERE user_pk = %s"
+                cursor.execute(q, (user["user_pk"],))
+                user_banner_url = cursor.fetchone()["user_banner"]
+                
+                old_path = os.path.join(x.upload_user_folder_path, user_banner_url)
+                if os.path.exists(old_path):
+                    os.remove(old_path)
             else:
                 user_banner = user['user_banner']
 
-            db, cursor = x.db()
             q = "UPDATE users SET user_avatar = %s, user_banner = %s, user_username = %s, user_first_name = %s, user_last_name = %s, user_bio = %s, user_updated_at = %s WHERE user_pk = %s"
             cursor.execute(q, (user_avatar, user_banner, user_username, user_first_name, user_last_name, user_bio, current_time, user['user_pk']))
             db.commit()
@@ -1004,7 +1021,7 @@ def api_make_a_post():
 
         if post_media != "":
             ext = post_media.filename.rsplit(".", 1)[-1].lower()
-            post_media.save(os.path.join(x.upload_folder_path, post_media.filename))
+            post_media.save(os.path.join(x.upload_post_folder_path, post_media.filename))
             post_media = post_media.filename
 
             if ext in {"jpg", "jpeg", "png", "webp"}:
@@ -1112,7 +1129,7 @@ def api_edit_post():
                 
                 if new_post_media != "":
                     ext = new_post_media.filename.rsplit(".", 1)[-1].lower()
-                    new_post_media.save(os.path.join(x.upload_folder_path, new_post_media.filename))
+                    new_post_media.save(os.path.join(x.upload_post_folder_path, new_post_media.filename))
                     new_post_media = new_post_media.filename
 
                     if ext in {"jpg", "jpeg", "png", "webp"}:

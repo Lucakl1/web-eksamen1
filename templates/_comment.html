@@ -3,7 +3,7 @@
         {% if comment.user_avatar == 'default.svg' %}
             <img src="{{ url_for('static', filename='images/'~comment.user_avatar) }}" alt="" class="profile_img no_event">
         {% else %}
-            <img src="{{ url_for('static', filename='uploads/'~comment.user_avatar) }}" alt="" class="profile_img no_event">
+            <img src="{{ url_for('static', filename='users_uploads/'~comment.user_avatar) }}" alt="" class="profile_img no_event">
         {% endif %}
     </a>
 
@@ -11,7 +11,7 @@
         {% if comment.user_banner == 'default_banner.jpg' %}
             <img src="{{ url_for('static', filename='images/'~comment.user_banner) }}" alt="" class="profile_img">
         {% else %}
-            <img src="{{ url_for('static', filename='uploads/'~comment.user_banner) }}" alt="" class="profile_img">
+            <img src="{{ url_for('static', filename='users_uploads/'~comment.user_banner) }}" alt="" class="profile_img">
         {% endif %}
         <div class="mini_profile_header">
             <div>

@@ -5,7 +5,7 @@
                 {% if post.user_avatar == 'default.svg' %}
                     <img src="{{ url_for('static', filename='images/'~post.user_avatar) }}" alt="" class="profile_img no_event">
                 {% else %}
-                    <img src="{{ url_for('static', filename='uploads/'~post.user_avatar) }}" alt="" class="profile_img no_event">
+                    <img src="{{ url_for('static', filename='users_uploads/'~post.user_avatar) }}" alt="" class="profile_img no_event">
                 {% endif %}
             </a>
 
@@ -28,16 +28,16 @@
                     {% if post.post_media_type %}
                     <div class="media">
                         {% if post.post_media_type == "image" %}
-                            <img src="{{ url_for('static', filename='uploads/'~post.post_media_path) }}" alt="user content">
+                            <img src="{{ url_for('static', filename='posts_uploads/'~post.post_media_path) }}" alt="user content">
                         {% elif post.post_media_type == "video" %}
-                            <video controls src="{{ url_for('static', filename='uploads/'~post.post_media_path) }}"></video>
+                            <video controls src="{{ url_for('static', filename='posts_uploads/'~post.post_media_path) }}"></video>
                         {% elif post.post_media_type == "file" %}
-                            <a href="{{ url_for('static', filename='uploads/'~post.post_media_path) }}" target="_blank">
+                            <a href="{{ url_for('static', filename='posts_uploads/'~post.post_media_path) }}" target="_blank">
                                 {{ x.lans("attached_file") }}
                                 <i class="fa-regular fa-file"></i>
                             </a>
                         {% elif post.post_media_type == "audio" %}
-                            <audio controls src="{{ url_for('static', filename='uploads/'~post.post_media_path) }}"></audio>
+                            <audio controls src="{{ url_for('static', filename='posts_uploads/'~post.post_media_path) }}"></audio>
                         {% endif %}
                     </div>
                     {% endif %}

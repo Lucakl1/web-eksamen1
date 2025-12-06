@@ -16,7 +16,8 @@ import re, json, os, uuid
 google_spread_sheet_key = "1UYgE2jJ__HYl0N7lA5JR3sMH75hwhzhPPsSRRA-WNdg"
 base_url = "https://lucaklaeoe.eu.pythonanywhere.com" if "PYTHONANYWHERE_DOMAIN" in os.environ else "http://127.0.0.1"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-upload_folder_path = os.path.join(BASE_DIR, "static", "uploads")
+upload_post_folder_path = os.path.join(BASE_DIR, "static", "posts_uploads")
+upload_user_folder_path = os.path.join(BASE_DIR, "static", "users_uploads")
 allowed_languages = ["english", "danish", "spanish"]
 default_language = "english"
 MAGIC_BYTES = {
