@@ -77,7 +77,7 @@ def view_index():
     try:
         x.site_name = x.lans("home")
         session["current_post_number"] = 0
-        user = session.get("user", "")
+        user = session.get("user")
         if not user: return redirect(url_for("login"))
         user_pk = user["user_pk"]
 
@@ -122,7 +122,8 @@ def view_index():
 @app.get("/home")
 def view_home():
     try:
-        user = session.get("user", "")
+        user = session.get("user")
+        if not user: return redirect(url_for("login"))
         session["current_post_number"] = 0
 
         db, cursor = x.db()
@@ -163,7 +164,9 @@ def view_explore():
 @app.get("/profile/<user_username>")
 def view_profile(user_username = ""):
     try:
-        user = session.get("user", "")
+        user = session.get("user")
+        if not user: return redirect(url_for("login"))
+        
         session["current_post_number"] = 0
         if not user_username: user_username = user['user_username']
 
@@ -204,6 +207,7 @@ def view_profile(user_username = ""):
 def view_followers(userprofile = ""):
     try:
         if userprofile == "": userprofile = session.get("user")["user_username"]
+        if userprofile == "": return redirect(url_for("login"))
 
         db, cursor = x.db()
         cursor.execute("SELECT user_pk FROM users WHERE user_username = %s", (userprofile,))
@@ -237,6 +241,7 @@ def view_followers(userprofile = ""):
 def view_following(userprofile = ""):
     try:
         if userprofile == "": userprofile = session.get("user")["user_username"]
+        if not userprofile: return redirect(url_for("login"))
 
         db, cursor = x.db()
         cursor.execute("SELECT user_pk FROM users WHERE user_username = %s", (userprofile,))
@@ -277,7 +282,8 @@ def view_edit_profile():
             """
         
         if request.method == "POST":
-            user = session.get("user", "")
+            user = session.get("user")
+            if not user: return redirect(url_for("login"))
             user_avatar = x.validate_user_avatar()
             user_banner = x.validate_user_banner()
             user_username = x.validate_user_username()
@@ -361,7 +367,8 @@ def view_edit_profile():
 @app.get("/bookmark")
 def view_bookmark():
     try:
-        user = session.get("user", "")
+        user = session.get("user")
+        if not user: return redirect(url_for("login"))
         session["current_post_number"] = 0
 
         db, cursor = x.db()
@@ -388,7 +395,8 @@ def view_bookmark():
 @app.get("/notifications")
 def view_notifications():
     try:
-        user = session.get("user", "")
+        user = session.get("user")
+        if not user: return redirect(url_for("login"))
         session["current_post_number"] = 0
 
         db, cursor = x.db()
@@ -476,7 +484,7 @@ def login(lan = "english"):
 
             session["user"] = user
 
-            return f"""<browser mix-redirect="/"></browser>""", 200
+            return f"""<browser mix-redirect="/"></browser>"""
 
     except Exception as ex:
         ic(ex)
@@ -537,7 +545,7 @@ def signup(lan = "english"):
             x.send_email(user_email, x.lans('verify_your_account'), email_verify_account)
             db.commit()
             
-            return f"""<browser mix-redirect="/"></browser>""", 200
+            return f"""<browser mix-redirect="/"></browser>"""
 
     except Exception as ex:
         ic(ex)
@@ -556,7 +564,6 @@ def signup(lan = "english"):
                 user_pk = prev_user['user_pk']
 
                 if prev_user["user_banned_at"]:
-                    ic("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
                     error_msg = x.lans("user_has_been_banned")
                 elif prev_user["user_deleted_at"] == 0:
                     error_msg = x.lans("email_allready_in_system")
@@ -574,7 +581,7 @@ def signup(lan = "english"):
                     x.send_email(user_email, x.lans('verify_your_account'), email_verify_account)
                     db.commit()
 
-                    return f"""<browser mix-redirect="/"></browser>""", 200
+                    return f"""<browser mix-redirect="/"></browser>"""
 
             except Exception as ex:
                 ic(ex)
@@ -738,7 +745,8 @@ def api_delete_profile():
 @app.delete("/delete_profile_confirm")
 def api_delete_profile_confirm():
     try:
-        user = session.get("user", "")
+        user = session.get("user")
+        if not user: return redirect(url_for("login"))
         user_username = request.args.get("user", "")
         current_time = int(time.time())
 
@@ -790,7 +798,8 @@ def api_delete_profile_confirm():
 @app.get("/unban")
 def api_unban():
     try:
-        user = session.get("user", "")
+        user = session.get("user")
+        if not user: return redirect(url_for("login"))
         user_username = request.args.get("user", "")
 
         if "admin" in user['user_role']:
@@ -843,7 +852,8 @@ def api_unban():
 @app.get("/follow")
 def api_follow():
     try:
-        user = session.get("user", "")
+        user = session.get("user")
+        if not user: return redirect(url_for("login"))
         user_username = request.args.get("user", "")
 
         db, cursor = x.db()
@@ -985,7 +995,8 @@ def api_change_lan(lan = "english"):
     try:
         if lan not in x.allowed_languages: lan = "english"
 
-        user = session.get("user", "")
+        user = session.get("user")
+        if not user: return redirect(url_for("login"))
         if lan in user['user_language']:
             return redirect("/")
 
@@ -1008,7 +1019,8 @@ def api_change_lan(lan = "english"):
 @app.post("/make_a_post")
 def api_make_a_post():
     try:
-        user = session.get("user", "")
+        user = session.get("user")
+        if not user: return redirect(url_for("login"))
         post_message = x.validate_post_message()
         post_media = x.validate_post_media()
         current_time = int(time.time())
@@ -1091,7 +1103,8 @@ def api_make_a_post():
 @app.route("/edit_post", methods=["GET", "POST"])
 def api_edit_post():
     try:
-        user = session.get("user", "")
+        user = session.get("user")
+        if not user: return redirect(url_for("login"))
         post_pk = request.args.get("post", "")
         if post_pk == "": raise Exception(f"x exception - {x.lans('post_is_deleted')}", 400)
         db, cursor = x.db()
@@ -1208,7 +1221,8 @@ def api_edit_post():
 @app.delete("/delete_post")
 def api_delete_post():
     try:
-        user = session.get("user", "")
+        user = session.get("user")
+        if not user: return redirect(url_for("login"))
         post_pk = request.args.get("post", "")
         current_time = int(time.time())
         if post_pk == "": raise Exception(f"x exception - {x.lans('post_is_allready_deleted')}", 400)
@@ -1273,7 +1287,8 @@ def api_comments():
             return f"""<browser mix-replace="#comments{post_pk}"> {template_comments} </browser>"""
         
         if request.method == "POST":
-            user = session.get("user", "")
+            user = session.get("user")
+            if not user: return redirect(url_for("login"))
             user_pk = user["user_pk"]
             comment_message = x.validate_comment_message()
             current_time = int(time.time())
@@ -1331,7 +1346,8 @@ def api_comments():
 @app.route("/edit_comment", methods=["GET", "POST"])
 def api_edit_comment():
     try:
-        user = session.get("user", "")
+        user = session.get("user")
+        if not user: return redirect(url_for("login"))
         comment_pk = request.args.get("comment", "")
         if comment_pk == "": raise Exception(f"x exception - {x.lans('comment_is_deleted')}", 400)
         db, cursor = x.db()
@@ -1400,7 +1416,8 @@ def api_edit_comment():
 @app.delete("/delete_comment")
 def api_delete_comment():
     try:
-        user = session.get("user", "")
+        user = session.get("user")
+        if not user: return redirect(url_for("login"))
         comment_pk = request.args.get("comment", "")
         if comment_pk == "": raise Exception(f"x exception - {x.lans('comment_is_allready_deleted')}", 400)
 
@@ -1492,7 +1509,8 @@ def api_more_comments():
 @app.post("/aside_user_search")
 def api_aside_user_search():
     try:
-        user = session.get("user", "")
+        user = session.get("user")
+        if not user: return redirect(url_for("login"))
         user_pk = user["user_pk"]
         user_search = f"{request.form.get('user_name_search', '')}%"
 
@@ -1540,7 +1558,8 @@ def api_change_search_for(search_fore = "users"):
 @app.post("/make_a_search_request")
 def api_make_a_search_request():
     try:
-        user = session.get("user", "")
+        user = session.get("user")
+        if not user: return redirect(url_for("login"))
         user_pk = user["user_pk"]
         search_value = request.form.get('search_for_value', '')
         search_for = request.form.get('search_for', '')
@@ -1599,10 +1618,11 @@ def api_make_a_search_request():
 @app.get("/get_more_posts_home")
 def api_get_more_posts_home():
     try:
+        user = session.get("user")
+        if not user: return redirect(url_for("login"))
         max_number_of_posts = session.get("max_number_of_posts")
         current_post_number = session.get("current_post_number", 0) + 5
         session["current_post_number"] = current_post_number
-        user = session.get("user")
 
         db, cursor = x.db()
         posts = x.get_posts(db, cursor, user, "home", "", current_post_number)
@@ -1633,10 +1653,11 @@ def api_get_more_posts_home():
 @app.get("/get_more_posts_profile")
 def api_get_more_posts_profile():
     try:
+        user = session.get("user")
+        if not user: return redirect(url_for("login"))
         max_number_of_posts = session.get("max_number_of_posts")
         current_post_number = session.get("current_post_number", 0) + 5
         session["current_post_number"] = current_post_number
-        user = session.get("user")
         user_username = request.args.get("username", user["user_username"])
 
         db, cursor = x.db()
@@ -1668,10 +1689,11 @@ def api_get_more_posts_profile():
 @app.get("/get_more_posts_bookmarked")
 def api_get_more_posts_bookmarked():
     try:
+        user = session.get("user")
+        if not user: return redirect(url_for("login"))
         max_number_of_posts = session.get("max_number_of_posts")
         current_post_number = session.get("current_post_number", 0) + 5
         session["current_post_number"] = current_post_number
-        user = session.get("user")
 
         db, cursor = x.db()
         posts = x.get_posts(db, cursor, user, "bookmark", user["user_pk"], current_post_number)
@@ -1702,10 +1724,11 @@ def api_get_more_posts_bookmarked():
 @app.get("/get_more_posts_notifications")
 def api_get_more_posts_notifications():
     try:
+        user = session.get("user")
+        if not user: return redirect(url_for("login"))
         max_number_of_posts = session.get("max_number_of_posts")
         current_post_number = session.get("current_post_number", 0) + 5
         session["current_post_number"] = current_post_number
-        user = session.get("user")
 
         db, cursor = x.db()
         posts = x.get_posts(db, cursor, user, "notifications", None, current_post_number)
@@ -1736,11 +1759,12 @@ def api_get_more_posts_notifications():
 @app.get("/get_more_posts_explore_users")
 def api_get_more_posts_explore_users():
     try:
+        user = session.get("user")
+        if not user: return redirect(url_for("login"))
         max_number_of_users = session.get("max_number_of_posts")
         current_user_number = session.get("current_post_number", 0) + 10
         session["current_post_number"] = current_user_number
         search_value = request.args.get("search_value", "")
-        user = session.get("user")
         
         db, cursor = x.db()
         q = """SELECT 
@@ -1781,11 +1805,12 @@ def api_get_more_posts_explore_users():
 @app.get("/get_more_posts_explore_posts")
 def api_get_more_posts_explore_posts():
     try:
+        user = session.get("user")
+        if not user: return redirect(url_for("login"))
         max_number_of_posts = session.get("max_number_of_posts")
         current_post_number = session.get("current_post_number", 0) + 5
         session["current_post_number"] = current_post_number
         search_value = request.args.get("search_value", "")
-        user = session.get("user")
         
         db, cursor = x.db()
         posts = x.get_posts(db, cursor, user, "explore", search_value, current_post_number)
@@ -1822,9 +1847,8 @@ def get_data_from_sheet():
 
         # Validate user is admin
         ################
-        user = session.get("user", "")
-        if not user:
-            return redirect(url_for('login'))
+        user = session.get("user")
+        if not user: return redirect(url_for('login'))
 
         if "admin" not in user['user_role']:
             return redirect("/")
@@ -1879,9 +1903,8 @@ def get_admin_all_users():
     try:
         # Validate user is admin
         ################
-        user = session.get("user", "")
-        if not user:
-            return redirect(url_for('login'))
+        user = session.get("user")
+        if not user: return redirect(url_for('login'))
 
         if "admin" not in user['user_role']:
             return redirect("/")
@@ -1917,9 +1940,8 @@ def api_admin_all_users():
     try:
         # Validate user is admin
         ################
-        user = session.get("user", "")
-        if not user:
-            return redirect(url_for('login'))
+        user = session.get("user")
+        if not user: return redirect(url_for('login'))
 
         if "admin" not in user['user_role']:
             return redirect("/")
@@ -1964,9 +1986,8 @@ def get_admin_all_posts():
     try:
         # Validate user is admin
         ################
-        user = session.get("user", "")
-        if not user:
-            return redirect(url_for('login'))
+        user = session.get("user")
+        if not user: return redirect(url_for('login'))
 
         if "admin" not in user['user_role']:
             return redirect("/")
@@ -2003,9 +2024,8 @@ def admin_all_more_posts():
     try:
         # Validate user is admin
         ################
-        user = session.get("user", "")
-        if not user:
-            return redirect(url_for('login'))
+        user = session.get("user")
+        if not user: return redirect(url_for('login'))
 
         if "admin" not in user['user_role']:
             return redirect("/")

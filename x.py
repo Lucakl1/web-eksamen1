@@ -1,4 +1,4 @@
-from flask import request, make_response, render_template
+from flask import request, make_response
 import mysql.connector
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -166,7 +166,6 @@ def validate_user_password_confirm():
 
 ##############################
 def validate_file(file, allowed_extenstions, allowed_mime_types, max_filesize_mb):
-
     if file.content_type == "application/octet-stream":
         raise Exception(f"x exception - {lans('file_is_not_recognized')}", 400)
 
@@ -398,8 +397,8 @@ def time_ago(epoch_time):
     if epoch_time == 0:
         return ""
     
-    current_time = datetime.utcnow()
-    datetimet = datetime.utcfromtimestamp(epoch_time)
+    current_time = datetime.now()
+    datetimet = datetime.fromtimestamp(epoch_time)
     diff = current_time - datetimet
 
     seconds = diff.total_seconds()
@@ -426,4 +425,4 @@ def epoch_to_time(epoch_time):
     if epoch_time == 0:
         return ""
     
-    return datetime.utcfromtimestamp(epoch_time).strftime("%Y %m")
+    return datetime.fromtimestamp(epoch_time).strftime("%Y %m")
