@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Vært: mariadb
--- Genereringstid: 06. 12 2025 kl. 14:00:09
+-- Genereringstid: 09. 12 2025 kl. 12:55:15
 -- Serverversion: 10.6.20-MariaDB-ubu2004
 -- PHP-version: 8.3.26
 
@@ -229,12 +229,20 @@ CREATE TABLE `posts` (
 INSERT INTO `posts` (`post_pk`, `user_fk`, `post_message`, `post_total_comments`, `post_total_likes`, `post_total_bookmark`, `post_created_at`, `post_updated_at`, `post_deleted_at`) VALUES
 (11, 10, 'This is a post', 0, 1, 0, 1231213321, 0, 1764845489),
 (12, 10, 'This is a test for time', 0, 0, 0, 1763455801, 1763455826, 0),
-(13, 21, 'HEJ!', 0, 0, 0, 1763650562, 0, 0),
-(16, 21, 'another post in the matrix', 0, 0, 0, 1763650943, 0, 0),
+(13, 21, 'HEJ!', 0, 0, 0, 1763650562, 0, 1765281271),
+(16, 21, 'another post in the matrix', 0, 0, 0, 1763650943, 0, 1765281209),
 (38, 10, 'file test 14', 0, 2, 1, 1763664910, 1764093268, 1764679741),
-(54, 22, 'this is a post from a third account', 1, 2, 1, 1763847898, 0, 0),
-(63, 21, 'genshin manga book 1', 0, 0, 0, 1765029366, 0, 0),
-(64, 21, 'a video file', 0, 0, 0, 1765029437, 0, 0);
+(54, 22, 'this is a post from a third account', 1, 2, 1, 1763847898, 0, 1765281151),
+(63, 21, 'genshin manga book 1', 0, 0, 0, 1765029366, 0, 1765281144),
+(64, 21, 'a video file', 0, 0, 0, 1765029437, 0, 1765281149),
+(65, 10, '<script>alert(\'hacked\')</script>', 0, 0, 0, 1765052698, 0, 1765280925),
+(66, 10, 'test', 0, 0, 0, 1765126320, 0, 1765280924),
+(67, 10, 'test1', 0, 0, 0, 1765281301, 0, 0),
+(68, 10, 'test igen', 0, 0, 0, 1765281306, 0, 0),
+(69, 10, 'yes', 0, 0, 0, 1765281309, 0, 0),
+(70, 10, 'poerfect', 0, 0, 0, 1765281312, 0, 0),
+(71, 10, 'go again', 0, 0, 0, 1765281317, 0, 0),
+(72, 10, 'again again', 0, 0, 0, 1765281321, 0, 0);
 
 --
 -- Triggers/udløsere `posts`
@@ -357,9 +365,9 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_pk`, `user_first_name`, `user_last_name`, `user_username`, `user_email`, `user_password`, `user_language`, `role_fk`, `user_banner`, `user_avatar`, `user_bio`, `user_total_followers`, `user_total_following`, `user_total_likes`, `user_total_posts`, `user_created_at`, `user_varified_at`, `user_updated_at`, `user_deleted_at`) VALUES
-(10, 'luca', 'klæø', 'lucakl', 'lucaklaeoe@gmail.com', 'scrypt:32768:8:1$6NmFWjNGnCMRYqyh$3642d4ae60ebe0e3a602b965d8aefc1dbcb4a0a28d9b2214c848f0e5b76813a8f7bf890e53751edba25dd0eca91d1602a83b86c8bf3cbb82abe87dcf709885c4', 'english', 2, '97996ca7e8b04882a1f15c76e4a45fe1.png', '5bb6f90e6ce2463abf85c0e7d546fdc5.jpg', 'THIS IS A COOL BIO AGAIN AGAIN!!!', 0, 2, 3, 2, 1763160252, 1763244248, 1765029031, 0),
-(21, 'test', 'man', 'tester', 'lucaklaeoeskole@gmail.com', 'scrypt:32768:8:1$QgM5FmS8IGKzXHPS$998a5f253abfddc2fb6ebdb81f4ca7d662251bd27c3981075e2c2713d44f5a91eefad1e5226797165cf96c8ec87e68ed9d05b6cfa972129aa1609d946bee8398', 'english', 1, 'd2338feea5ab4803b8b50c9f0a8d5713.jpg', '4f6289f15f2c436e89ce8166d6bf8812.jpeg', 'No bio', 1, 0, 0, 3, 1764689281, 1764689297, 1765029302, 0),
-(22, 'More', 'People', 'More', 'a@a.com', 'scrypt:32768:8:1$LCccAjL8wwGO1Z1K$3ab9a86f580458ed2a669d6c300936d0e8d3f0f9e694437c0897420cd3749785404f4226215bedd64a6515620a72d7e1b2322fd51ecdbfafcc9675d6d7ca23f9', 'english', 1, 'default_banner.jpg', 'default.svg', 'No bio', 1, 0, 2, 20, 1713847740, 1763847859, 0, 0),
+(10, 'luca', 'klæø', 'lucakl', 'lucaklaeoe@gmail.com', 'scrypt:32768:8:1$6NmFWjNGnCMRYqyh$3642d4ae60ebe0e3a602b965d8aefc1dbcb4a0a28d9b2214c848f0e5b76813a8f7bf890e53751edba25dd0eca91d1602a83b86c8bf3cbb82abe87dcf709885c4', 'english', 2, '97996ca7e8b04882a1f15c76e4a45fe1.png', '5bb6f90e6ce2463abf85c0e7d546fdc5.jpg', 'THIS IS A COOL BIO AGAIN AGAIN!!!', 0, 2, 3, 12, 1763160252, 1763244248, 1765029031, 0),
+(21, 'test', 'man', 'tester', 'lucaklaeoeskole@gmail.com', 'scrypt:32768:8:1$QgM5FmS8IGKzXHPS$998a5f253abfddc2fb6ebdb81f4ca7d662251bd27c3981075e2c2713d44f5a91eefad1e5226797165cf96c8ec87e68ed9d05b6cfa972129aa1609d946bee8398', 'english', 1, 'd2338feea5ab4803b8b50c9f0a8d5713.jpg', '4f6289f15f2c436e89ce8166d6bf8812.jpeg', 'No bio', 1, 0, 0, 1, 1764689281, 1764689297, 1765029302, 0),
+(22, 'More', 'People', 'More', 'a@a.com', 'scrypt:32768:8:1$LCccAjL8wwGO1Z1K$3ab9a86f580458ed2a669d6c300936d0e8d3f0f9e694437c0897420cd3749785404f4226215bedd64a6515620a72d7e1b2322fd51ecdbfafcc9675d6d7ca23f9', 'english', 1, 'default_banner.jpg', 'default.svg', 'No bio', 1, 0, 2, 3, 1713847740, 1763847859, 0, 0),
 (23, 'WOW', 'ME', 'xXwow_meXx', 'a@c.com', 'scrypt:32768:8:1$HdqtolqcuwR1BZii$d96afdb441e64c76f7a8328cac8800fc7a9d03e42155edd19f5a2bdbb097ad8fa50bdac3270deecd1fc89eb93147471f2e9507048aee59bcd8a1947f2303a5cb', 'english', 1, 'default_banner.jpg', 'default.svg', 'No bio', 0, 0, 0, 0, 1764007772, 1763847859, 0, 0),
 (24, 'another', 'user', 'another_user', 'a@d.com', 'scrypt:32768:8:1$Ed9MiGB2E6jDzVyk$7f1e4dc240382541d59dde725d72cbcdbacc6b5bef0e5fc8306ff8d3da05ab926e2fae8b260b932b0c8ee0d56a2309c35d0781991df1efdb381731b98c2e5ce1', 'english', 1, 'default_banner.jpg', 'default.svg', 'No bio', 0, 0, 0, 0, 1764007812, 1763234764, 0, 0),
 (25, 'user1', 'user1', 'anotherone1', 'a@m.com', 'scrypt:32768:8:1$AvL7PK70WaI8ImqS$66bd1f783197a44bb450acb5d20ef9e41810ef066e9b076e9fe9103c3ffddf3a1878880c0815b8e6c36d315ead912bb0ac3b2beebe22855aa55dee82e8088895', 'english', 1, 'default_banner.jpg', 'default.svg', 'No bio', 0, 0, 0, 0, 1764112992, 1763235764, 0, 0),
@@ -467,7 +475,7 @@ ALTER TABLE `users`
 -- Indeks for tabel `user_admin_bans`
 --
 ALTER TABLE `user_admin_bans`
-  ADD KEY `ban_user_pfk` (`user_fk`);
+  ADD PRIMARY KEY (`user_fk`,`user_banned_at`);
 
 --
 -- Brug ikke AUTO_INCREMENT for slettede tabeller
@@ -483,7 +491,7 @@ ALTER TABLE `comments`
 -- Tilføj AUTO_INCREMENT i tabel `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `post_pk` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
+  MODIFY `post_pk` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
 
 --
 -- Tilføj AUTO_INCREMENT i tabel `post_media_types`
