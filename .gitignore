@@ -1,5 +1,5 @@
 .env
 .ds-store
-.vscode
-._pycache_
-.flask_session
+.vscode/
+._pycache_/
+.flask_session/
