@@ -11,6 +11,7 @@ import csv, io, json, time, uuid, os
 
 # other python files
 import x
+from x import no_cache
 
 app = Flask(__name__)
 
@@ -73,6 +74,7 @@ def logout():
 ##############################
 
 @app.get("/")
+@no_cache
 def view_index():
     try:
         x.site_name = x.lans("home")
@@ -111,7 +113,7 @@ def view_index():
 
             rec_user["current_user_is_following"] = current_user_is_following
 
-        return render_template("index.html", posts=posts, recommended_users=recommended_users)
+        return render_template("index.html", posts=posts, recommended_users=recommended_users, count=count)
     except Exception as ex:
         ic(ex)
         return x.lans('system_under_maintenance')
@@ -1235,7 +1237,7 @@ def api_delete_post():
 
         if post["user_fk"] != user["user_pk"]:
             if "admin" in user['user_role']:
-                q = "SELECT user_first_name, user_last_name, user_language, post_message FROM posts JOIN users ON user_pk = user_fk WHERE post_pk = %s"
+                q = "SELECT user_first_name, user_last_name, user_language, post_message, user_email FROM posts JOIN users ON user_pk = user_fk WHERE post_pk = %s"
                 cursor.execute(q, (post_pk,))
                 post = cursor.fetchone()
 

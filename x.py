@@ -3,6 +3,7 @@ import mysql.connector
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from functools import wraps
 
 from icecream import ic
 ic.configureOutput(prefix=f'----- | ', includeContext=True)
