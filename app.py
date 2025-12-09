@@ -136,7 +136,7 @@ def view_home():
 
         posts = x.get_posts(db, cursor, user)
         
-        site = render_template("main_pages/home.html", posts=posts)
+        site = render_template("main_pages/home.html", posts=posts, count=count)
         return f""" 
         <browser mix-replace='#main'> {site} </browser> 
         {x.page_title(x.lans("home"))}

@@ -7,13 +7,13 @@
 <nav>
     <ul>
         <li> 
-            <a href="/" mix-get class="x-logo">
+            <a href="/home" mix-get class="x-logo">
                 <img src="{{ url_for('static', filename='images/x_logo.svg') }}" alt="x logo" class="no_event">
             </a>
         </li>
 
         <li>
-            <a href="/" mix-get mix-default="<i class='fa-solid fa-house'></i>{{ x.lans('home') }}" mix-await="<i class='fa-solid fa-house'></i>{{ x.lans('loading...') }}" class="active">
+            <a href="/home" mix-get mix-default="<i class='fa-solid fa-house'></i>{{ x.lans('home') }}" mix-await="<i class='fa-solid fa-house'></i>{{ x.lans('loading...') }}" class="active">
                 <i class='fa-solid fa-house'></i>{{ x.lans('home') }}
             </a>
         </li>
