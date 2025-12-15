@@ -796,32 +796,32 @@
     },
     "welcome_back_to": {
         "english": "Welcome back to",
-        "danish": "",
-        "spanish": ""
+        "danish": "Velkommen tilbage til",
+        "spanish": "Bienvenido de nuevo a"
     },
     "dont_worry_we_remeber_you": {
-        "english": "Don't worry, we remeber you!",
-        "danish": "",
-        "spanish": ""
+        "english": "Don't worry, we remember you!",
+        "danish": "Bare rolig, vi husker dig!",
+        "spanish": "¡No te preocupes, te recordamos!"
     },
     "your_account_will_remeber_your_previus_posts_and_comments": {
-        "english": "Your account will remeber your previus posts and comments",
-        "danish": "",
-        "spanish": ""
+        "english": "Your account will remember your previous posts and comments",
+        "danish": "Din konto vil huske dine tidligere opslag og kommentarer",
+        "spanish": "Tu cuenta recordará tus publicaciones y comentarios anteriores"
     },
     "user_has_been_banned": {
         "english": "User has been banned",
-        "danish": "",
-        "spanish": ""
+        "danish": "Brugeren er blevet bandlyst",
+        "spanish": "El usuario ha sido baneado"
     },
     "email_allready_in_system": {
-        "english": "Email allready in system",
-        "danish": "",
-        "spanish": ""
+        "english": "Email already in system",
+        "danish": "Email er allerede i systemet",
+        "spanish": "El correo ya está en el sistema"
     },
     "restore_post": {
         "english": "Restore post",
-        "danish": "",
-        "spanish": ""
+        "danish": "Gendan opslag",
+        "spanish": "Restaurar publicación"
     }
 }
