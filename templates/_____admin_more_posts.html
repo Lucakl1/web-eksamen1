@@ -1,3 +1,67 @@
 {% for post in posts: %}
-    {% include "_post.html" %}
+    <article id="post{{ post.post_pk }}">
+        <a mix-get href="/profile/{{post.user_username}}">
+            {% if post.user_avatar == 'default.svg' %}
+                <img src="{{ url_for('static', filename='images/'~post.user_avatar) }}" alt="" class="profile_img no_event">
+            {% else %}
+                <img src="{{ url_for('static', filename='users_uploads/'~post.user_avatar) }}" alt="" class="profile_img no_event">
+            {% endif %}
+        </a>
+
+        <div class="post_info">
+            <div class="post_header">
+                <span class="name">
+                    {{ post.user_first_name }} {{ post.user_last_name }}
+                </span>
+                <span class="handle">@{{ post.user_username }}</span> ·
+                {% if post.post_updated_at != 0 %} 
+                    <span class="time">{{ x.lans('updated') }} {{ x.time_ago(post.post_updated_at) }}</span>
+                {% else %}
+                    <span class="time">{{ x.lans('created') }} {{ x.time_ago(post.post_created_at) }}</span>
+                {% endif %}
+            </div>
+            <div class="post_content">
+                <p class="text">
+                    {{ post.post_message }}
+                </p>
+                {% if post.post_media_type %}
+                <div class="media">
+                    {% if post.post_media_type == "image" %}
+                        <img src="{{ url_for('static', filename='posts_uploads/'~post.post_media_path) }}" alt="user content">
+                    {% elif post.post_media_type == "video" %}
+                        <video controls src="{{ url_for('static', filename='posts_uploads/'~post.post_media_path) }}"></video>
+                    {% elif post.post_media_type == "file" %}
+                        <a href="{{ url_for('static', filename='posts_uploads/'~post.post_media_path) }}" target="_blank">
+                            {{ x.lans("attached_file") }}
+                            <i class="fa-regular fa-file"></i>
+                        </a>
+                    {% elif post.post_media_type == "audio" %}
+                        <audio controls src="{{ url_for('static', filename='posts_uploads/'~post.post_media_path) }}"></audio>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="post_actions">
+                {% include "___post_comment.html" %}
+            </div>
+
+            {% if post.user_pk == user.user_pk or user['user_role'] == 'admin' %}
+            <div class="post_authority_action">
+                {% if post.user_pk == user.user_pk %}
+                <a href="/edit_post?post={{ post.post_pk }}" mix-get class="edit"> {{ x.lans("edit") }} </a>
+                {% endif %}
+                {% if post.post_deleted_at == 0 %}
+                <a href="/admin_delete_post?post={{ post.post_pk }}" mix-delete class="delete" id="admin_post_delete{{ post.post_pk }}"> {{ x.lans("remove_post") }} </a>
+                {% elif user['user_role'] == 'admin'%}
+                <a href="/admin_restore_post?post={{ post.post_pk }}" mix-put class="delete" id="admin_post_delete{{ post.post_pk }}"> {{ x.lans("restore_post") }} </a>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <section class="comments" id="comments{{ post.post_pk }}">
+            
+            </section>
+        </div>
+    </article>
 {% endfor %}

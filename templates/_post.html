@@ -73,11 +73,7 @@
             {% if post.user_pk == user.user_pk %}
             <a href="/edit_post?post={{ post.post_pk }}" mix-get class="edit"> {{ x.lans("edit") }} </a>
             {% endif %}
-            {% if post.post_deleted_at == 0 %}
             <a href="/delete_post?post={{ post.post_pk }}" mix-delete class="delete"> {{ x.lans("remove_post") }} </a>
-            {% else %}
-            <a href="/restore_post?post={{ post.post_pk }}" mix-put class="delete"> {{ x.lans("restore_post") }} </a>
-            {% endif %}
         </div>
         {% endif %}
 

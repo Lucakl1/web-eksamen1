@@ -148,7 +148,6 @@ import apis.bookmark_post
 
 import apis.make_a_post
 import apis.edit_post
-import apis.restore_post
 import apis.delete_post
 
 import apis.api_comments
