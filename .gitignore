@@ -1,6 +1,16 @@
+# Environment
 .env
-.ds-store
-vscode/*
-__pycache__/*
+
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/
+
+# Python cache
+__pycache__/
+**/__pycache__/
 *.pyc
-flask_session/*
+
+# Flask sessions
+flask_session/

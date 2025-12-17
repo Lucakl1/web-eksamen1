@@ -823,5 +823,25 @@
         "english": "Restore post",
         "danish": "Gendan opslag",
         "spanish": "Restaurar publicación"
+    },
+    "you_dont_have_the_authority_to_restore_this_post": {
+        "english": "You don't have the authority to restore this post",
+        "danish": "Du har ikke tilladelse til at gendanne dette opslag",
+        "spanish": "No tienes la autoridad para restaurar esta publicación."
+    },
+    "one_of_your_post_has_been_restore": {
+        "english": "One of your post has been restore",
+        "danish": "Et af dine opslag er blevet gendannet",
+        "spanish": "Una de tus publicaciones ha sido restaurada.\r"
+    },
+    "your_post_with_the_following_message_has_been_restore": {
+        "english": "Your post with the following message has been restored",
+        "danish": "Dit opslag med følgende besked er blevet gendannet",
+        "spanish": "Tu publicación con el siguiente mensaje ha sido restaurada"
+    },
+    "post_restored": {
+        "english": "Post restored",
+        "danish": "Opslaget er gendannet",
+        "spanish": "Post restaurado"
     }
 }
